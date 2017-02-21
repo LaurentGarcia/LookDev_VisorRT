@@ -2,7 +2,9 @@
 // Class designed for help in shaders management
 // It provides utilities to load, unload and change Shaders in the app
 
+#include <math.h>
 #include <glew.h>
+#include <glfw3.h>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -14,7 +16,12 @@ public:
 	Shaders_Manager();
 	~Shaders_Manager();
 
-	GLuint loadShader(char* const vtxShaderFile, char* const frgShaderFile, bool* result);
+	void loadShader(char* const vtxShaderFile, char* const frgShaderFile, bool* result);
+	GLuint getShader();
+	
+	void shaderUniformValues();
+	// Plataform debug
+	void printVertexAttributes();
 
 private:
 	//Todo: A dynamic list/structure to store name and pointers of shaders library
@@ -23,8 +30,7 @@ private:
 	//   2. Application shows the succesful shaders loaded and list in the UI
 	//   3. User selection, Shader manager give us the pointer to selected shader
 
-	GLuint* currentShader;
-
+	GLuint myShader;
 	std::string readFile(char* const filename);
 };
 
