@@ -15,7 +15,7 @@ Shaders_Manager::~Shaders_Manager()
 void Shaders_Manager::loadShader(char* const vtxShaderFile, char* const frgShaderFile, bool* result)
 {	
 	if (vtxShaderFile==nullptr || frgShaderFile==nullptr){
-		result = false;
+		*result = false;
 	}
 	else {	
 		auto vertexshcode    = readFile(vtxShaderFile);
@@ -45,11 +45,11 @@ void Shaders_Manager::loadShader(char* const vtxShaderFile, char* const frgShade
 			if (!vtxsuccess) {
 				glGetShaderInfoLog(vertexshader, 512, nullptr, vtxlog);
 				std::cout << "Vertex Shader Compiling error:" << vtxlog << std::endl;
-				result = false;
+				*result = false;
 			}else{
 				glGetShaderInfoLog(fragmentshader, 512, nullptr, frglog);
 				std::cout << "Fragment Shader Compiling error:" << frglog << std::endl;
-				result = false;
+				*result = false;
 			}
 		}
 		
@@ -65,7 +65,7 @@ void Shaders_Manager::loadShader(char* const vtxShaderFile, char* const frgShade
 		glGetProgramiv(this->myShader, GL_LINK_STATUS, &linksuccess);
 		if (!linksuccess) {
 			std::cout << "Shader linking error:" << linklog << std::endl;
-			result = false;
+			*result = false;
 		}
 
 		//Once linked is not longer neccesary vertex and fragment.

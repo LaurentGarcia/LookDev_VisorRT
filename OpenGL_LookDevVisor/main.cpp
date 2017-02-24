@@ -8,6 +8,7 @@
 
 #define DEBUG TRUE
 
+float MixValue = 0;
 
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -24,6 +25,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	if (key == GLFW_KEY_UP) {
+		if (MixValue < 1)
+			MixValue = MixValue + 0.01;
+	}
+	if (key == GLFW_KEY_DOWN) {
+		if (MixValue > 0)
+			MixValue = MixValue - 0.01;
 	}
 }
 
@@ -76,19 +85,7 @@ int main()
 	glViewport(0, 0, width, height);
 
 
-	//Shader Loading and binding
-	char* vertexShaderFile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
-	char* fragmentshaderfile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
-		
-	Shaders_Manager ShaderManager;
-#if DEBUG
-	ShaderManager.printVertexAttributes();
-#endif
-	bool shaderesult = false;
-	ShaderManager.loadShader(vertexShaderFile, fragmentshaderfile, &shaderesult);
-	if (shaderesult) {
-		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
-	};
+
 
 	//Creating buffer for Vertex loading
 	GLuint VAO, VBO, EBO;
@@ -116,18 +113,71 @@ int main()
 	glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
 
+	// Texture Code // To Migrate // And correct paths
+	int widthTex1, heightTex1;
+	unsigned char* image = SOIL_load_image("Textures/container.jpg", &widthTex1, &heightTex1, 0, SOIL_LOAD_RGB);
+	
+#if DEBUG
+	if (image == 0)
+		std::cout << "Texture not found";
+	else
+		std::cout << "Texture loaded size:" << widthTex1 << "*" << heightTex1;
+#endif
 
-	// Texture Code // To Migrate
-	int widthTex, heightTex;
-
-	unsigned char* image = SOIL_load_image("\textures\cointainer.jpg", &widthTex,&heightTex,0,SOIL_LOAD_RGB);
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	GLuint texture1;
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	//Texture option
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//End Texture Option
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, widthTex1, heightTex1, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	SOIL_free_image_data(image);
+
+	//Texture 2
+
+	// Texture Code // To Migrate // And correct paths
+	int widthTex2, heightTex2;
+	unsigned char* image2 = SOIL_load_image("Textures/wall.jpg", &widthTex2, &heightTex2, 0, SOIL_LOAD_RGB);
+
+#if DEBUG
+	if (image == 0)
+		std::cout << "Texture not found";
+	else
+		std::cout << "Texture loaded size:" << widthTex2 << "*" << heightTex2;
+#endif
+
+	GLuint texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	//Texture option
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//End Texture Option
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, widthTex1, heightTex1, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(image2);
+	//Shader Loading and binding
+	char* vertexShaderFile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
+	char* fragmentshaderfile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
+
+	Shaders_Manager ShaderManager;
+#if DEBUG
+	ShaderManager.printVertexAttributes();
+#endif
+	bool* shaderesult = new bool(false);
+	ShaderManager.loadShader(vertexShaderFile, fragmentshaderfile, shaderesult);
+	if (shaderesult) {
+		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
+	};
+
 
 	// APP LOOP
 
@@ -139,7 +189,17 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		//rendering commands
 		glUseProgram(ShaderManager.getShader());
-		glBindTexture(GL_TEXTURE_2D, texture);
+		//Texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture1);
+		glUniform1i(glGetUniformLocation(ShaderManager.getShader(), "ourTexture1"), 0);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture2);
+		glUniform1i(glGetUniformLocation(ShaderManager.getShader(), "ourTexture1"), 1);
+		
+		GLfloat mixTex = glGetUniformLocation(ShaderManager.getShader(), "mixerValue");
+		glUniform1f(mixTex, MixValue);
+		
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
