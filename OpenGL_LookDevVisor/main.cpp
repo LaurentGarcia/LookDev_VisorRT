@@ -13,6 +13,9 @@
 	#include <iostream>
 	#include "Shaders_Manager.h"
 	#include <SOIL.h>
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
 #else
 #endif
 
@@ -45,7 +48,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			MixValue = MixValue - 0.01;
 	}
 }
-
 
 
 GLfloat Vertices[] = {
@@ -197,6 +199,9 @@ int main()
 	};
 
 
+
+
+
 	// APP LOOP
 
 
@@ -207,6 +212,15 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 		//rendering commands
 		glUseProgram(ShaderManager.getShader());
+
+		// Practicing with Matrix to rotate or scale
+		glm::mat4 trans;
+		trans = glm::rotate(trans,(GLfloat)glfwGetTime() * 50.0f,glm::vec3(0.0f,0.0f,1.0f));
+		trans = glm::scale(trans,glm::vec3(sin((GLfloat)glfwGetTime()),0.5,0.5));
+
+		GLfloat transformLoc = glGetUniformLocation(ShaderManager.getShader(),"transform");
+		glUniformMatrix4fv(transformLoc,1,GL_FALSE,glm::value_ptr(trans));
+
 		//Texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
