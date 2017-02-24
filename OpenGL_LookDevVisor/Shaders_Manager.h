@@ -2,12 +2,24 @@
 // Class designed for help in shaders management
 // It provides utilities to load, unload and change Shaders in the app
 
-#include <math.h>
-#include <glew.h>
-#include <glfw3.h>
-#include <string>
-#include <fstream>
-#include <iostream>
+#ifdef _WIN32
+	#include <math.h>
+	#include <glew.h>
+	#include <glfw3.h>
+	#include <string>
+	#include <fstream>
+	#include <iostream>
+#elif __linux__
+	#include <glew.h>
+	#include <glfw3.h>
+	#include <string>
+	#include <fstream>
+	#include <iostream>
+	#include <stdexcept>
+	#include <math.h>
+#else
+#endif
+
 
 class Shaders_Manager
 {

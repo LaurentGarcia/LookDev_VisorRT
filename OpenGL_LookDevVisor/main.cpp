@@ -1,10 +1,20 @@
-#include <iostream>
-#include <Windows.h>
-#define  GLEW_STATIC
-#include <glew.h>
-#include <glfw3.h>
-#include <SOIL.h>
-#include "Shaders_Manager.h"
+
+#ifdef _WIN32
+	#include <iostream>
+	#include <Windows.h>
+	#define  GLEW_STATIC
+	#include <glew.h>
+	#include <glfw3.h>
+	#include <SOIL.h>
+	#include "Shaders_Manager.h"
+#elif __linux__
+	#include <glew.h>
+	#include <glfw3.h>
+	#include <iostream>
+	#include "Shaders_Manager.h"
+	#include <SOIL.h>
+#else
+#endif
 
 #define DEBUG TRUE
 
@@ -113,6 +123,7 @@ int main()
 	glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
 
+
 	// Texture Code // To Migrate // And correct paths
 	int widthTex1, heightTex1;
 	unsigned char* image = SOIL_load_image("Textures/container.jpg", &widthTex1, &heightTex1, 0, SOIL_LOAD_RGB);
@@ -164,9 +175,16 @@ int main()
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	SOIL_free_image_data(image2);
+
 	//Shader Loading and binding
+#ifdef _Win32
 	char* vertexShaderFile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
 	char* fragmentshaderfile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
+#elif __linux__
+	char* vertexShaderFile   = "Shaders/vertexshader.glsl";
+	char* fragmentshaderfile = "Shaders/fragmentshader.glsl";
+#else
+#endif
 
 	Shaders_Manager ShaderManager;
 #if DEBUG
