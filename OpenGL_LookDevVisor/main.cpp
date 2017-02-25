@@ -24,10 +24,16 @@
 
 #define DEBUG TRUE
 
+
 float MixValue = 0;
+int screenWidth, screenHeight;
+
 
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
+	screenWidth = width; 
+	screenHeight= height;
+
 	glfwSetWindowSize(window, width, height);
 	glViewport(0, 0, width, height);
 }
@@ -54,32 +60,64 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
 GLfloat Vertices[] = {
-	// Positions          // Colors           // Texture Coords
-	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // Top Right
-	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // Bottom Right
-	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // Bottom Left
-	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // Top Left 
-};
-GLuint indices[] = {  // Note that we start from 0!
-	0, 1, 3, // First Triangle
-	1, 2, 3  // Second Triangle
+	// Positions         //Text
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+	0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-GLfloat texCoords[] = {
-	0.0f, 0.0f,  // Lower-left corner  
-	1.0f, 0.0f,  // Lower-right corner
-	0.5f, 1.0f   // Top-center corner
-};
+
 
 int main()
 {
+	screenHeight = 600;
+	screenWidth = 800;
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "LookDev Visor", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "LookDev Visor", nullptr, nullptr);
 	if (window == nullptr){
 		std::runtime_error("Imposible to create the window");
 		glfwTerminate();
@@ -108,7 +146,7 @@ int main()
 	//Init Vertex Array, VBO and EBO
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	//glGenBuffers(1, &EBO);
 
 	//Creating the pipeline
 	//1. Bind Vtx Array
@@ -117,15 +155,17 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 	//3.-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	//Binding Buffer and Shader inputs.
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	
+		//Binding Buffer and Shader inputs.
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	
+	//TexCoord Attributes
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(2);
+	
 	glBindVertexArray(0);
 
 
@@ -202,27 +242,24 @@ int main()
 	};
 
 
+	
 
+	// Creating Matrix transformations for camera4
+	
+	
 
 
 	// APP LOOP
-
-
+	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)){
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwPollEvents();
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		//rendering commands
+		//using our shader
 		glUseProgram(ShaderManager.getShader());
-
-		// Practicing with Matrix to rotate or scale
-		glm::mat4 trans;
-		trans = glm::rotate(trans,(GLfloat)glfwGetTime() * 50.0f,glm::vec3(0.0f,0.0f,1.0f));
-		trans = glm::scale(trans,glm::vec3(sin((GLfloat)glfwGetTime()),0.5,0.5));
-
-		GLfloat transformLoc = glGetUniformLocation(ShaderManager.getShader(),"transform");
-		glUniformMatrix4fv(transformLoc,1,GL_FALSE,glm::value_ptr(trans));
 
 		//Texture
 		glActiveTexture(GL_TEXTURE0);
@@ -231,13 +268,31 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glUniform1i(glGetUniformLocation(ShaderManager.getShader(), "ourTexture1"), 1);
+
+
+		//Transformations
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 projection;
 		
-		GLfloat mixTex = glGetUniformLocation(ShaderManager.getShader(), "mixerValue");
-		glUniform1f(mixTex, MixValue);
+		model		= glm::rotate(model, (GLfloat)glfwGetTime() * 0.5f, glm::vec3(0.5f, 1.0f, 0.0f));
+		view		= glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		projection	= glm::perspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 		
+		GLint modelLoc = glGetUniformLocation(ShaderManager.getShader(), "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		GLint viewLoc = glGetUniformLocation(ShaderManager.getShader(), "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	    GLint projecLoc = glGetUniformLocation(ShaderManager.getShader(), "projection");
+		glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+
+		// Once made the transformation draw
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+	
 		glfwSwapBuffers(window);
 	};
 
