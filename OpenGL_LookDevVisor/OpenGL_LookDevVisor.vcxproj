@@ -74,7 +74,7 @@
     <LibraryPath>C:\glew-2.0.0\lib\Release\x64;C:\glfw-3.2.1\build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Soil\src;C:\glfw-3.2.1\include\GLFW;C:\glew-2.0.0\include\GL;$(IncludePath)</IncludePath>
+    <IncludePath>C:\glm\glm-0.9.8.4;C:\Soil\src;C:\glfw-3.2.1\include\GLFW;C:\glew-2.0.0\include\GL;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Soil\projects\VC9\x64\Release;C:\glfw-3.2.1\build\src\Release;C:\glew-2.0.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

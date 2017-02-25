@@ -7,6 +7,9 @@
 	#include <glfw3.h>
 	#include <SOIL.h>
 	#include "Shaders_Manager.h"
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>
@@ -179,7 +182,7 @@ int main()
 	SOIL_free_image_data(image2);
 
 	//Shader Loading and binding
-#ifdef _Win32
+#ifdef _WIN32
 	char* vertexShaderFile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
 	char* fragmentshaderfile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
 #elif __linux__
