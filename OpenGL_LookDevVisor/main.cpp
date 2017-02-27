@@ -250,6 +250,19 @@ int main()
 
 
 	// APP LOOP
+
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
 	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)){
@@ -276,7 +289,7 @@ int main()
 		glm::mat4 projection;
 		
 		model		= glm::rotate(model, (GLfloat)glfwGetTime() * 0.5f, glm::vec3(0.5f, 1.0f, 0.0f));
-		view		= glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		view		= glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 		projection	= glm::perspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 		
 		GLint modelLoc = glGetUniformLocation(ShaderManager.getShader(), "model");
@@ -289,7 +302,14 @@ int main()
 
 		// Once made the transformation draw
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (GLuint i = 0; i <10; i++){
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			GLfloat angle = 20.0f*i/glfwGetTime()*0.05f;
+			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		};
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	
