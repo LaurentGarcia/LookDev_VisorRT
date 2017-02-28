@@ -5,9 +5,15 @@
 Camera::Camera()
 {
 	cameraPosition  = glm::vec3(0.0f, 0.0f,  3.0f);
-	cameraFront 	= glm::vec3(0.0f, 0.0f, -1.0f);
-	cameraUp    	= glm::vec3(0.0f, 1.0f,  0.0f);
-	cameraSpeed		= 0.05f;
+	cameraTarget    = glm::vec3(0.0f, 0.0f,  0.0f);
+	cameraDirection = glm::normalize(cameraPosition-cameraTarget);
+	cameraUp		= glm::vec3(0.0f, 1.0f, 0.0f);
+	cameraRight	    = glm::normalize(glm::cross(cameraUp, cameraDirection));
+	cameraUp 		= glm::cross(cameraDirection, cameraRight);
+	cameraFront     = glm::vec3(0.0f, 0.0f, -1.0f);
+	cameraSpeed     = 10.0f;
+	phi				= 3.14f;
+	theta           = 0.0f;
 }
 
 
@@ -17,34 +23,59 @@ Camera::~Camera()
 
 
 
-glm::mat4 Camera::getView(){
-	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+glm::mat4 Camera::getCameraViewMatrix(){
+
+	//Orbit Camera
+	GLfloat x = distanceToOrigin  * sin(phi) * cos(theta);
+	GLfloat y = distanceToOrigin  * cos(phi);
+	GLfloat z = distanceToOrigin  * sin(phi) * sin(theta);
+
+	view = glm::lookAt(glm::vec3(x, y, z), glm::vec3(0.0f,0.0f,0.0f), cameraUp);
+	//Free Camera
+	//view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+
+
 	return this->view;
 };
 
 
-glm::mat4 Camera::getAnimatedCamera(){
-	GLfloat radius = 20.0f;
-	GLfloat camX = sin(glfwGetTime()) * radius;
-	GLfloat camZ = cos(glfwGetTime()) * radius;
-	this->view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-	return this->view;
-};
 
-void Camera::doMovement(int keyPressed){
+void Camera::doMovement(int keyPressed,GLfloat deltaTime){
+
+	GLfloat speed = this->cameraSpeed * deltaTime;
+
 	switch (keyPressed){
 		case GLFW_KEY_W:
-			this->cameraPosition += this->cameraSpeed * cameraFront;
+			this->distanceToOrigin = distanceToOrigin - speed;
 			break;
 		case GLFW_KEY_S:
-			this->cameraPosition -= this->cameraSpeed * cameraFront;
+			this->distanceToOrigin = distanceToOrigin + speed;
 			break;
-		case GLFW_KEY_A:
-			this->cameraPosition -= glm::normalize(glm::cross(cameraFront,cameraUp)*cameraSpeed);
-			break;
-		case GLFW_KEY_D:
-			this->cameraPosition += glm::normalize(glm::cross(cameraFront,cameraUp)*cameraSpeed);
 
 	}
+
+};
+
+void Camera::updateMouseRotation(GLfloat xoffset,GLfloat yoffset){
+
+	this->pitch += yoffset;
+	this->yaw   += xoffset;
+
+	if (this->pitch > 89.0f)
+		this->pitch = 89.0f;
+	if (this->pitch < -89.0f)
+		this->pitch = -89.0f;
+
+	glm::vec3 cameraFront;
+	cameraFront.x = cos(glm::radians(this->pitch)) * cos (glm::radians(this->yaw));
+	cameraFront.y = sin(glm::radians(this->pitch));
+	cameraFront.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw));
+
+	phi = pitch/10;
+	theta = yaw/10;
+	this->cameraFront = glm::normalize(cameraFront);
+	this->cameraRight = glm::normalize(glm::cross(this->cameraFront,this->cameraUp));
+	this->cameraUp    = glm::normalize(glm::cross(this->cameraRight,this->cameraFront));
+
 
 };

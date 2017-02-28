@@ -3,6 +3,7 @@
 #ifdef _WIN32
 	#include <glm\glm.hpp>
 #elif __linux__
+	#include <iostream>
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <glm/glm.hpp>
@@ -13,32 +14,38 @@
 
 class Camera
 {
+
 public:
+
+
+
+	//Init camera default
 	Camera();
 	~Camera();
 
-	//Setting options
-	void setCameraPosition(glm::vec3 position);
-	void setCameraFront(glm::vec3 front);
-	void setCameraUp(glm::vec3 up);
+	void doMovement(int keyPressed,GLfloat deltaTime);
+	void updateMouseRotation(GLfloat xoffset,GLfloat yoffset);
 
-	void doMovement(int keyPressed);
-
-	glm::mat4 getView();
-	glm::mat4 getAnimatedCamera();
-
+	glm::mat4 getCameraViewMatrix();
 
 private:
 
-	//world camera position
+	// Camera Init Values
 	glm::vec3 cameraPosition;
-	//lookat
+	glm::vec3 cameraTarget;
+	glm::vec3 cameraDirection;
 	glm::vec3 cameraFront;
-	//Up vector
 	glm::vec3 cameraUp;
-	//right axis
-	//
-	glm::mat4 view;
+	glm::vec3 cameraRight;
+	// Orbit camera, based in spherical coordinates
+
+	GLfloat distanceToOrigin = 5.0f;
+	GLfloat phi,theta;
 	GLfloat cameraSpeed;
+	GLfloat yaw,pitch;
+
+	glm::mat4 view;
+
+
 };
 

@@ -29,8 +29,17 @@
 float MixValue = 0;
 int   screenWidth, screenHeight;
 
-GLfloat cameraSpeed = 0.05f;
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+
+GLfloat cameraSpeed = 0.5f;
+GLfloat fov = 45.0f;
+
 Camera  myViewportCamera;
+GLfloat lastx = 400, lasty = 300;
+bool firstmove = true;
+
+
 
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -61,17 +70,49 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_W) {
-		myViewportCamera.doMovement(key);
+		myViewportCamera.doMovement(key,deltaTime);
 	}
 	if (key == GLFW_KEY_A) {
-		myViewportCamera.doMovement(key);
+		myViewportCamera.doMovement(key,deltaTime);
 	}
 	if (key == GLFW_KEY_S) {
-		myViewportCamera.doMovement(key);
+		myViewportCamera.doMovement(key,deltaTime);
 	}
 	if (key == GLFW_KEY_D) {
-		myViewportCamera.doMovement(key);
+		myViewportCamera.doMovement(key,deltaTime);
 	}
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+
+	if(firstmove){
+		lastx = xpos;
+		lasty = ypos;
+		firstmove = false;
+	}
+	GLfloat xoffset = xpos - lastx;
+	GLfloat yoffset = ypos - lasty;
+
+	lastx = xpos;
+	lasty = ypos;
+
+	GLfloat sensitivity = 0.05f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	myViewportCamera.updateMouseRotation(xoffset,yoffset);
+
+
+};
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+  if(fov >= 1.0f && fov <= 45.0f)
+  	fov -= yoffset;
+  if(fov <= 1.0f)
+  	fov = 1.0f;
+  if(fov >= 45.0f)
+  	fov = 45.0f;
 }
 
 
@@ -142,6 +183,9 @@ int main()
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetWindowSizeCallback(window, window_size_callback);
 	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK){
 		std::runtime_error("Can't not possible init GLEW");
@@ -152,8 +196,6 @@ int main()
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
-
-
 
 
 	//Creating buffer for Vertex loading
@@ -286,6 +328,10 @@ int main()
 
 
 	while (!glfwWindowShouldClose(window)){
+		GLfloat currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwPollEvents();
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -307,14 +353,14 @@ int main()
 		glm::mat4 model;
 		glm::mat4 projection;
 		
-		model		= glm::rotate(model, (GLfloat)glfwGetTime() * 0.5f, glm::vec3(0.5f, 1.0f, 0.0f));
+		model		= glm::rotate(model, (GLfloat)glfwGetTime() * 0.1f, glm::vec3(0.5f, 1.0f, 0.0f));
 		//view		= glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-		projection	= glm::perspective(45.0f, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
+		projection	= glm::perspective(fov, (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 		
 		GLint modelLoc = glGetUniformLocation(ShaderManager.getShader(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		GLint viewLoc = glGetUniformLocation(ShaderManager.getShader(), "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(myViewportCamera.getView()));
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(myViewportCamera.getCameraViewMatrix()));
 	    GLint projecLoc = glGetUniformLocation(ShaderManager.getShader(), "projection");
 		glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -331,7 +377,10 @@ int main()
 		};
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
-	
+
+
+
+
 		glfwSwapBuffers(window);
 	};
 
@@ -339,3 +388,6 @@ int main()
 
 	return 0;
 };
+
+
+
