@@ -124,13 +124,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ApiConfiguration.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="LogicController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shaders_Manager.cpp" />
+    <ClCompile Include="WindowGL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ApiConfiguration.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="LogicController.h" />
     <ClInclude Include="Shaders_Manager.h" />
+    <ClInclude Include="WindowGL.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

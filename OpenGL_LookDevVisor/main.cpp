@@ -6,7 +6,11 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <SOIL.h>
+	#include "ApiConfiguration.h"
+	#include "WindowGL.h"
+	#include "LogicController.h"
 	#include "Shaders_Manager.h"
+	#include "Camera.h"
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
@@ -36,84 +40,11 @@ GLfloat cameraSpeed = 0.5f;
 GLfloat fov = 45.0f;
 
 Camera  myViewportCamera;
-GLfloat lastx = 400, lasty = 300;
-bool firstmove = true;
 
 
 
-void window_size_callback(GLFWwindow* window, int width, int height)
-{
-	screenWidth = width; 
-	screenHeight= height;
-
-	glfwSetWindowSize(window, width, height);
-	glViewport(0, 0, width, height);
-}
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS){
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-	if (key == GLFW_KEY_UP) {
-		if (MixValue < 1)
-			MixValue = MixValue + 0.01;
-	}
-	if (key == GLFW_KEY_DOWN) {
-		if (MixValue > 0)
-			MixValue = MixValue - 0.01;
-	}
-
-	if (key == GLFW_KEY_W) {
-		myViewportCamera.doMovement(key,deltaTime);
-	}
-	if (key == GLFW_KEY_A) {
-		myViewportCamera.doMovement(key,deltaTime);
-	}
-	if (key == GLFW_KEY_S) {
-		myViewportCamera.doMovement(key,deltaTime);
-	}
-	if (key == GLFW_KEY_D) {
-		myViewportCamera.doMovement(key,deltaTime);
-	}
-}
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos){
-
-	if(firstmove){
-		lastx = xpos;
-		lasty = ypos;
-		firstmove = false;
-	}
-	GLfloat xoffset = xpos - lastx;
-	GLfloat yoffset = ypos - lasty;
-
-	lastx = xpos;
-	lasty = ypos;
-
-	GLfloat sensitivity = 0.05f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	myViewportCamera.updateMouseRotation(xoffset,yoffset);
 
 
-};
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-  if(fov >= 1.0f && fov <= 45.0f)
-  	fov -= yoffset;
-  if(fov <= 1.0f)
-  	fov = 1.0f;
-  if(fov >= 45.0f)
-  	fov = 45.0f;
-}
 
 
 GLfloat Vertices[] = {
@@ -165,37 +96,15 @@ GLfloat Vertices[] = {
 
 int main()
 {
-	screenHeight = 600;
-	screenWidth = 800;
+	
+	ApiConfiguration initApi();
+	WindowGL		 windowLookDev = WindowGL(800, 600, "Look Development Real-Time Viewport");
+	LogicController  controllerApp = LogicController(windowLookDev);
 
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "LookDev Visor", nullptr, nullptr);
-	if (window == nullptr){
-		std::runtime_error("Imposible to create the window");
-		glfwTerminate();
-		return -1;
-	};
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetWindowSizeCallback(window, window_size_callback);
-	glfwMakeContextCurrent(window);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK){
-		std::runtime_error("Can't not possible init GLEW");
-		glfwTerminate();
-		return -1;
-	}
+	
 
-	int width, height;
-	glfwGetFramebufferSize(window, &width, &height);
-	glViewport(0, 0, width, height);
+	
 
 
 	//Creating buffer for Vertex loading
