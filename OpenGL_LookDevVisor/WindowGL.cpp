@@ -12,6 +12,10 @@ WindowGL::WindowGL(int wSize, int hSize, char* wName)
 	}else{
 		glfwSetWindowSizeCallback(this->window, WindowGL::window_size_callback);
 		glfwMakeContextCurrent(this->window);
+		glewExperimental = GLEW_OK;
+		if (glewInit()!= GLEW_OK){
+			throw std::runtime_error("Failed to Init GLEW");
+		}
 		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
@@ -19,6 +23,10 @@ WindowGL::WindowGL(int wSize, int hSize, char* wName)
 	}
 }
 
+WindowGL::WindowGL()
+{
+
+};
 
 WindowGL::~WindowGL()
 {

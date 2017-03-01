@@ -12,7 +12,7 @@ Shaders_Manager::~Shaders_Manager()
 {
 }
 
-void Shaders_Manager::loadShader(char* const vtxShaderFile, char* const frgShaderFile, bool* result)
+void Shaders_Manager::loadShader(const char* vtxShaderFile, const char* frgShaderFile, bool* result)
 {	
 	if (vtxShaderFile==nullptr || frgShaderFile==nullptr){
 		*result = false;
@@ -88,7 +88,7 @@ void Shaders_Manager::shaderUniformValues()
 	glUniform4f(vertexcolorlocation, 0.0f, greenvalue, 0.0f, 1.0f);
 }
 
-std::string Shaders_Manager::readFile(char* const filename)
+std::string Shaders_Manager::readFile(const char* filename)
 {
 	std::ifstream file(filename);
 	std::string outfile;
@@ -111,3 +111,14 @@ void Shaders_Manager::printVertexAttributes() {
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 }
+
+
+
+void Shaders_Manager::loadTexture(const char* textureName){
+	Texture newTexture(textureName);
+	this->myTextures.push_back(newTexture);
+};
+
+std::vector<Texture> Shaders_Manager::getTextures(){
+	return this->myTextures;
+};

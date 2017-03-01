@@ -17,8 +17,12 @@
 	#include <iostream>
 	#include <stdexcept>
 	#include <math.h>
+	#include <vector>
+	#include "Texture.h"
 #else
 #endif
+
+
 
 
 class Shaders_Manager
@@ -28,9 +32,12 @@ public:
 	Shaders_Manager();
 	~Shaders_Manager();
 
-	void loadShader(char* const vtxShaderFile, char* const frgShaderFile, bool* result);
+	void loadShader( const char* vtxShaderFile, const char* frgShaderFile, bool* result);
 	GLuint getShader();
 	
+	void loadTexture(const char* textureName);
+	std::vector<Texture> getTextures();
+
 	void shaderUniformValues();
 	// Plataform debug
 	void printVertexAttributes();
@@ -43,6 +50,8 @@ private:
 	//   3. User selection, Shader manager give us the pointer to selected shader
 
 	GLuint myShader;
-	std::string readFile(char* const filename);
+	std::vector<Texture> myTextures;
+
+	std::string readFile(const char* filename);
 };
 

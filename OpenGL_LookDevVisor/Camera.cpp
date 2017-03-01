@@ -71,8 +71,11 @@ void Camera::updateMouseRotation(GLfloat xoffset,GLfloat yoffset){
 	cameraFront.y = sin(glm::radians(this->pitch));
 	cameraFront.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw));
 
-	phi = pitch/10;
+	phi   = pitch/10;
 	theta = yaw/10;
+
+	std::cout<<"Phi Angle:"<<phi<<"Tetha Angle:"<<theta<<"\n";
+
 	this->cameraFront = glm::normalize(cameraFront);
 	this->cameraRight = glm::normalize(glm::cross(this->cameraFront,this->cameraUp));
 	this->cameraUp    = glm::normalize(glm::cross(this->cameraRight,this->cameraFront));

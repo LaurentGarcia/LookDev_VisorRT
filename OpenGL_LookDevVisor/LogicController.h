@@ -11,84 +11,62 @@
 #include <glew.h>
 #include <glfw3.h>
 #include <iostream>
+#include "WindowGL.h"
+#include "RenderEngine.h"
 #else
 #endif
+
 
 
 
 class LogicController
 {
 public:
-	
-	LogicController(WindowGL& window);
+
+
+	 LogicController(WindowGL& window);
 	~LogicController();
+
+	void SetCallbackFunctions();
+	void SetupEngine(RenderEngine& engine);
 
 	GLfloat lastMouseX;
 	GLfloat	lastMouseY;
 	GLfloat cameraFov;
-	bool firstmoveMouse;
+	bool 	firstmoveMouse;
+	GLFWwindow* windowPtrCallbacks;
+
+	WindowGL getWindow();
+
+	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+	void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 
-	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
 
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-			glfwSetWindowShouldClose(window, GL_TRUE);
-		}
-		if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		}
-		if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-		
-		if (key == GLFW_KEY_W) {
-			myViewportCamera.doMovement(key, deltaTime);
-		}
-		if (key == GLFW_KEY_A) {
-			myViewportCamera.doMovement(key, deltaTime);
-		}
-		if (key == GLFW_KEY_S) {
-			myViewportCamera.doMovement(key, deltaTime);
-		}
-		if (key == GLFW_KEY_D) {
-			myViewportCamera.doMovement(key, deltaTime);
-		}
-	}
-
-	void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-
-		if (firstmoveMouse) {
-			this->lastMouseX = xpos;
-			this->lastMouseY = ypos;
-			this->firstmoveMouse = false;
-		}
-		
-		GLfloat xoffset = xpos - this->lastMouseX;
-		GLfloat yoffset = ypos - this->lastMouseY;
-
-		this->lastMouseX = xpos;
-		this->lastMouseY = ypos;
-
-		GLfloat sensitivity = 0.05f;
-		xoffset *= sensitivity;
-		yoffset *= sensitivity;
-
-		myViewportCamera.updateMouseRotation(xoffset, yoffset);
-
-
-	};
-
-	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+	//Wrapper Callback Based on a Solution found at Stack Overflow.
+	class GLFWCallbackWrapper
 	{
-		if (this->cameraFov >= 1.0f && this->cameraFov <= 45.0f)
-			this->cameraFov -= yoffset;
-		if (this->cameraFov<= 1.0f)
-			this->cameraFov = 1.0f;
-		if (this->cameraFov >= 45.0f)
-			this->cameraFov = 45.0f;
+	 	 public:
+	     	 GLFWCallbackWrapper() = delete;
+	         GLFWCallbackWrapper(const GLFWCallbackWrapper&) = delete;
+	         GLFWCallbackWrapper(GLFWCallbackWrapper&&) = delete;
+	         ~GLFWCallbackWrapper() = delete;
+
+	         static void MousePositionCallback(GLFWwindow* window, double positionX, double positionY);
+	         static void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	         static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+	         static void SetApplication(LogicController* logicController);
+	      private:
+	         static LogicController* s_LogicController;
 	};
+
+	// End Of Callback System
+
 
 private:
-	WindowGL appWindow;
+
+	WindowGL 	 appWindow;
+	RenderEngine myEngine;
 };
 
