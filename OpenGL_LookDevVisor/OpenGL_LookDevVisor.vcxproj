@@ -74,8 +74,8 @@
     <LibraryPath>C:\glew-2.0.0\lib\Release\x64;C:\glfw-3.2.1\build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\glfw-3.2.1\include\GLFW;C:\glew-2.0.0\include\GL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\glfw-3.2.1\build\src\Release;C:\glew-2.0.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\glm\glm-0.9.8.4;C:\Soil\src;C:\glfw-3.2.1\include\GLFW;C:\glew-2.0.0\include\GL;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Soil\projects\VC9\x64\Release;C:\glfw-3.2.1\build\src\Release;C:\glew-2.0.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,7 +94,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SOIL.lib;opengl32.lib;glfw3.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,11 +124,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ApiConfiguration.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="LogicController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shaders_Manager.cpp" />
+    <ClCompile Include="WindowGL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ApiConfiguration.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="LogicController.h" />
     <ClInclude Include="Shaders_Manager.h" />
+    <ClInclude Include="WindowGL.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
