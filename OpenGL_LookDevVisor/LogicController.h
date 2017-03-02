@@ -65,8 +65,7 @@ public:
 
 
 private:
-
-	WindowGL 	 appWindow;
-	RenderEngine myEngine;
+	WindowGL 	  appWindow;
+	RenderEngine* myEngine;
 };
 

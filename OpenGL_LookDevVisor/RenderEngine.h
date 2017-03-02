@@ -53,7 +53,9 @@ public:
 	virtual ~RenderEngine();
 
 	void   setRenderWindowSize(int h,int w);
-	void   setFov(GLfloat fov);
+	void   updateCameraFov(GLfloat fov);
+	void   setZoom(int keyPressed);
+	void   setCameraView(GLfloat xoff,GLfloat yoff);
 	Camera getActualCamera();
 	GLfloat getDeltaTime();
 	void   doRender();
@@ -68,10 +70,9 @@ private:
 
 	GLfloat deltaTime;
 	GLfloat lastFrameTime;
-	GLfloat cameraFov = 45.0f;
 	int 	renderWidth = 800;
 	int 	renderHeight = 600;
-	glm::mat4 model = glm::rotate(model, -55.0f, glm::vec3(1.0f, 0.0f, 0.0f));;
+	glm::mat4 model;
 	glm::mat4 projection;
 
 	//Objects

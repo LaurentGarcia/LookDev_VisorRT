@@ -43,11 +43,21 @@ void  RenderEngine::setRenderWindowSize(int h,int w){
 	this->renderHeight = h;
 	this->renderWidth  = w;
 };
-void  RenderEngine::setFov(GLfloat fov){
-	this->cameraFov = fov;
+void  RenderEngine::updateCameraFov(GLfloat fov){
+	this->cameraViewport.updateCameraFov(fov);
 };
 
+void   RenderEngine::setCameraView(GLfloat xoff,GLfloat yoff)
+{
+	this->cameraViewport.updateMouseRotation(xoff,yoff);
+};
+
+void RenderEngine::setZoom(int keyPressed)
+{
+	this->cameraViewport.doMovement(keyPressed,deltaTime);
+};
 void RenderEngine::doRender(){
+
 
 	//Getting info about how many time it took make the last render
 	GLfloat currentFrame = glfwGetTime();
@@ -56,7 +66,7 @@ void RenderEngine::doRender(){
 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glfwPollEvents();
+
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -68,18 +78,20 @@ void RenderEngine::doRender(){
 	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[2].getTexture());
 	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "ourTexture1"), 1);
 
-
-	projection	= glm::perspective(this->cameraFov, (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
-
-	GLint modelLoc = glGetUniformLocation(shaderManager.getShader(), "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	model = glm::rotate(model,-0.0f,glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 view;
+	view = this->cameraViewport.getCameraViewMatrix();
+	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
 
 	GLint viewLoc = glGetUniformLocation(shaderManager.getShader(), "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->cameraViewport.getCameraViewMatrix()));
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
 	GLint projecLoc = glGetUniformLocation(shaderManager.getShader(), "projection");
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+
+	GLint modelLoc = glGetUniformLocation(shaderManager.getShader(), "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 
 	//Todo: Create a system to rendering all the scene via:

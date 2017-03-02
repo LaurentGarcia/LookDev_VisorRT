@@ -14,6 +14,8 @@ Camera::Camera()
 	cameraSpeed     = 10.0f;
 	phi				= 3.14f;
 	theta           = 0.0f;
+	cameraFov		= 45.0f;
+	distanceToOrigin= 5.0f;
 }
 
 
@@ -31,10 +33,6 @@ glm::mat4 Camera::getCameraViewMatrix(){
 	GLfloat z = distanceToOrigin  * sin(phi) * sin(theta);
 
 	view = glm::lookAt(glm::vec3(x, y, z), glm::vec3(0.0f,0.0f,0.0f), cameraUp);
-	//Free Camera
-	//view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
-
-
 	return this->view;
 };
 
@@ -56,8 +54,8 @@ void Camera::doMovement(int keyPressed,GLfloat deltaTime){
 
 };
 
-void Camera::updateMouseRotation(GLfloat xoffset,GLfloat yoffset){
-
+void Camera::updateMouseRotation(GLfloat xoffset,GLfloat yoffset)
+{
 	this->pitch += yoffset;
 	this->yaw   += xoffset;
 
@@ -66,19 +64,27 @@ void Camera::updateMouseRotation(GLfloat xoffset,GLfloat yoffset){
 	if (this->pitch < -89.0f)
 		this->pitch = -89.0f;
 
-	glm::vec3 cameraFront;
-	cameraFront.x = cos(glm::radians(this->pitch)) * cos (glm::radians(this->yaw));
-	cameraFront.y = sin(glm::radians(this->pitch));
-	cameraFront.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw));
+	glm::vec3 cameraFrontAux;
+	cameraFrontAux.x = cos(glm::radians(this->pitch)) * cos (glm::radians(this->yaw));
+	cameraFrontAux.y = sin(glm::radians(this->pitch));
+	cameraFrontAux.z = cos(glm::radians(this->pitch)) * sin(glm::radians(this->yaw));
 
-	phi   = pitch/10;
-	theta = yaw/10;
+	phi   = pitch/3.0f;
+	theta = yaw/3.0f;
 
-	std::cout<<"Phi Angle:"<<phi<<"Tetha Angle:"<<theta<<"\n";
 
-	this->cameraFront = glm::normalize(cameraFront);
+	this->cameraFront = glm::normalize(cameraFrontAux);
 	this->cameraRight = glm::normalize(glm::cross(this->cameraFront,this->cameraUp));
 	this->cameraUp    = glm::normalize(glm::cross(this->cameraRight,this->cameraFront));
-
-
 };
+
+GLfloat   Camera::getCameraFov()
+{
+	return this->cameraFov;
+};
+
+void Camera::updateCameraFov(GLfloat fov)
+{
+	this->cameraFov = fov;
+};
+

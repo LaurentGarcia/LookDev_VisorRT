@@ -12,6 +12,7 @@ LogicController::LogicController(WindowGL& window)
 	lastMouseY = 400;
 	firstmoveMouse = true;
 	cameraFov = 45.0f;
+	this->myEngine = nullptr;
 	//Inits all the callbacks from USER Input
 
 }
@@ -26,7 +27,7 @@ WindowGL LogicController::getWindow(){
 }
 
 void LogicController::SetupEngine(RenderEngine& engine){
-	this->myEngine = engine;
+	this->myEngine = &engine;
 }
 
 
@@ -42,7 +43,7 @@ void LogicController::scroll_callback(GLFWwindow* window, double xoffset, double
 			cameraFov = 1.0f;
 		if (cameraFov >= 45.0f)
 			cameraFov = 45.0f;
-		myEngine.setFov(cameraFov);
+		myEngine->updateCameraFov(cameraFov);
 	};
 
 
@@ -64,7 +65,7 @@ void LogicController::mouse_callback(GLFWwindow* window, double positionX, doubl
 	xoffset *= sensitivity;
 	yoffset *= sensitivity;
 
-	myEngine.getActualCamera().updateMouseRotation(xoffset,yoffset);
+	myEngine->setCameraView(xoffset,yoffset);
 }
 
 void LogicController::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -82,27 +83,20 @@ void LogicController::key_callback(GLFWwindow* window, int key, int scancode, in
 	}
 	if (key == GLFW_KEY_W)
 	{
-		myEngine.getActualCamera().doMovement(key,myEngine.getDeltaTime());
-	}
-	if (key == GLFW_KEY_A)
-	{
-		myEngine.getActualCamera().doMovement(key,myEngine.getDeltaTime());
+		myEngine->setZoom(key);
 	}
 	if (key == GLFW_KEY_S)
 	{
-		myEngine.getActualCamera().doMovement(key,myEngine.getDeltaTime());
+		myEngine->setZoom(key);
 	}
-	if (key == GLFW_KEY_D)
-	{
-		myEngine.getActualCamera().doMovement(key,myEngine.getDeltaTime());
-	}
-}
+};
 
 void LogicController::SetCallbackFunctions()
 {
     GLFWCallbackWrapper::SetApplication(this);
     glfwSetCursorPosCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::MousePositionCallback);
     glfwSetKeyCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::KeyboardCallback);
+    glfwSetScrollCallback(this->appWindow.getWindowPointer(),GLFWCallbackWrapper::scrollCallback);
 }
 
 

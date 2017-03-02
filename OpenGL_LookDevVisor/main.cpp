@@ -42,11 +42,12 @@ int main()
 	ApiConfiguration initApi;
 	WindowGL		 windowLookDev = WindowGL(800, 600, "Look Development Real-Time Viewport");
 	LogicController  controllerApp = LogicController(windowLookDev);
-	RenderEngine     myEngine;
+	RenderEngine    myEngine;
 	controllerApp.SetupEngine(myEngine);
 
 
 	while (!glfwWindowShouldClose(windowLookDev.getWindowPointer())){
+		glfwPollEvents();
 		myEngine.doRender();
 		glBindVertexArray(0);
 		glfwSwapBuffers(windowLookDev.getWindowPointer());

@@ -30,8 +30,10 @@ public:
 
 	void doMovement(int keyPressed,GLfloat deltaTime);
 	void updateMouseRotation(GLfloat xoffset,GLfloat yoffset);
+	void updateCameraFov(GLfloat fov);
 
 	glm::mat4 getCameraViewMatrix();
+	GLfloat   getCameraFov();
 
 private:
 
@@ -44,11 +46,11 @@ private:
 	glm::vec3 cameraRight;
 	// Orbit camera, based in spherical coordinates
 
-	GLfloat distanceToOrigin = 5.0f;
+	GLfloat distanceToOrigin;
 	GLfloat phi,theta;
 	GLfloat cameraSpeed;
 	GLfloat yaw,pitch;
-
+	GLfloat cameraFov;
 	glm::mat4 view;
 
 

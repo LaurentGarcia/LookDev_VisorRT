@@ -78,6 +78,8 @@ Mesh::Mesh() {
 
 Mesh::~Mesh() {
 	// TODO Auto-generated destructor stub
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 }
 
 GLuint Mesh::getVAO(){
