@@ -17,13 +17,17 @@ RenderEngine::RenderEngine() {
 #endif
 
 	bool* shaderesult = new bool(false);
-	shaderManager.loadShader(vertexShaderFileName, fragmentshaderfileName, shaderesult);
+	shaderManager.loadShader(vertexShaderFileName, fragmentshaderfileName, shaderesult,0);
 	if (shaderesult) {
 		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
 	};
 
 	this->shaderManager.loadTexture(texture1);
 	this->shaderManager.loadTexture(texture2);
+	shaderManager.loadShader(vtxLightShaderFileName,frgLightShaderFileName,shaderesult,1);
+	if (shaderesult) {
+		std::cout << "Vertex shader Lighting and Fragment Shader Lighting Load: OK" << std::endl;
+	};
 }
 
 RenderEngine::~RenderEngine() {
@@ -66,7 +70,6 @@ void RenderEngine::doRender(){
 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -82,21 +85,35 @@ void RenderEngine::doRender(){
 	glm::mat4 view;
 	view = this->cameraViewport.getCameraViewMatrix();
 	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
-
 	GLint viewLoc = glGetUniformLocation(shaderManager.getShader(), "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
 	GLint projecLoc = glGetUniformLocation(shaderManager.getShader(), "projection");
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-
 	GLint modelLoc = glGetUniformLocation(shaderManager.getShader(), "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
+	GLint objectColorLoc = glGetUniformLocation(shaderManager.getShader(), "objectColor");
+	GLint lightColorLoc  = glGetUniformLocation(shaderManager.getShader(), "lightColor");
+	GLint lightPosLoc    = glGetUniformLocation(shaderManager.getShader(), "lightPosition");
+	GLint viewPosLoc 	 = glGetUniformLocation(shaderManager.getShader(), "cameraPosition");
 
-	//Todo: Create a system to rendering all the scene via:
-	//      Creating Scene Manager to plug mesh and textures
+	glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
+	glUniform3f(lightColorLoc,  1.0f, 1.0f, 1.0f);
+	glUniform3f(lightPosLoc, myMeshLight.getPosition().x,myMeshLight.getPosition().y,myMeshLight.getPosition().z);
+	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
 
 	this->myActualMesh.Draw();
+
+	glUseProgram(shaderManager.getLightingShader());
+	viewLoc = glGetUniformLocation(shaderManager.getLightingShader(),"view");
+	projecLoc = glGetUniformLocation(shaderManager.getLightingShader(), "projection");
+	modelLoc = glGetUniformLocation(shaderManager.getLightingShader(), "model");
+
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(projecLoc,1,GL_FALSE,glm::value_ptr(projection));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->myMeshLight.getModelMatrix()));
+	this->myMeshLight.Draw();
+
 
 };

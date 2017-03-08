@@ -32,6 +32,10 @@ glm::mat4 Camera::getCameraViewMatrix(){
 	GLfloat y = distanceToOrigin  * cos(phi);
 	GLfloat z = distanceToOrigin  * sin(phi) * sin(theta);
 
+	this->cameraPosition.x = x;
+	this->cameraPosition.y = y;
+	this->cameraPosition.z = z;
+
 	view = glm::lookAt(glm::vec3(x, y, z), glm::vec3(0.0f,0.0f,0.0f), cameraUp);
 	return this->view;
 };
@@ -88,3 +92,7 @@ void Camera::updateCameraFov(GLfloat fov)
 	this->cameraFov = fov;
 };
 
+glm::vec3 Camera::getCameraPosition()
+{
+	return this->cameraPosition;
+};

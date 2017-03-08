@@ -41,9 +41,14 @@ public:
 #ifdef _WIN32
 	const char* vertexShaderFile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
 	const char* fragmentshaderfile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
+	const char* texture1 = "Textures\\container.jpg";
+	const char* texture2 = "Textures\\wall.jpg";
 #elif __linux__
 	const char* vertexShaderFileName   = "Shaders/vertexshader.glsl";
 	const char* fragmentshaderfileName = "Shaders/fragmentshader.glsl";
+	const char* vtxLightShaderFileName   = "Shaders/vtxlightshader.glsl";
+	const char* frgLightShaderFileName = "Shaders/frglightshader.glsl";
+
 	const char* texture1 = "Textures/container.jpg";
 	const char* texture2 = "Textures/wall.jpg";
 #else
@@ -79,6 +84,8 @@ private:
 	Camera  		cameraViewport;
 	Shaders_Manager shaderManager;
 	Mesh		    myActualMesh;
+	Mesh			myMeshLight = Mesh(1); // Calling to constructor specifing if it's a mesh light. Needs to be changed more generic
+
 
 
 

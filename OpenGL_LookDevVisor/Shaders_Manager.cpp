@@ -12,12 +12,14 @@ Shaders_Manager::~Shaders_Manager()
 {
 }
 
-void Shaders_Manager::loadShader(const char* vtxShaderFile, const char* frgShaderFile, bool* result)
+void Shaders_Manager::loadShader( const char* vtxShaderFile, const char* frgShaderFile, bool* result, bool isLightShader)
 {	
 	if (vtxShaderFile==nullptr || frgShaderFile==nullptr){
 		*result = false;
 	}
-	else {	
+	else {
+
+		std::cout<<"Ensambling the following Shaders: "<<vtxShaderFile<<" and "<<frgShaderFile<<"\n";
 		auto vertexshcode    = readFile(vtxShaderFile);
 		auto frgmntshcode	 = readFile(frgShaderFile);
 
@@ -53,25 +55,41 @@ void Shaders_Manager::loadShader(const char* vtxShaderFile, const char* frgShade
 			}
 		}
 		
-		// Linking shaders
-		this->myShader = glCreateProgram();
+		if (!isLightShader){
+			// Linking shaders
+			this->myShader = glCreateProgram();
 
-		glAttachShader(this->myShader, vertexshader);
-		glAttachShader(this->myShader, fragmentshader);
-		glLinkProgram(this->myShader);
+			glAttachShader(this->myShader, vertexshader);
+			glAttachShader(this->myShader, fragmentshader);
+			glLinkProgram(this->myShader);
 
-		GLchar linklog[512];
-		GLint linksuccess;
-		glGetProgramiv(this->myShader, GL_LINK_STATUS, &linksuccess);
-		if (!linksuccess) {
-			std::cout << "Shader linking error:" << linklog << std::endl;
-			*result = false;
+			GLchar linklog[512];
+			GLint linksuccess;
+			glGetProgramiv(this->myShader, GL_LINK_STATUS, &linksuccess);
+			if (!linksuccess) {
+				std::cout << "Shader linking error:" << linklog << std::endl;
+				*result = false;
+			}
+
+			//Once linked is not longer neccesary vertex and fragment.
+			glDeleteShader(vertexshader);
+			glDeleteShader(fragmentshader);
+			*result = true;
+		}else
+		{
+			this->myLightShader = glCreateProgram();
+			glAttachShader(this->myLightShader, vertexshader);
+			glAttachShader(this->myLightShader, fragmentshader);
+			glLinkProgram(this->myLightShader);
+			GLchar linklog[512];
+			GLint linksuccess;
+			glGetProgramiv(this->myLightShader, GL_LINK_STATUS, &linksuccess);
+			if (!linksuccess)
+			{
+				std::cout << "Shader linking error:" << linklog << std::endl;
+				*result = false;
+			}
 		}
-
-		//Once linked is not longer neccesary vertex and fragment.
-		glDeleteShader(vertexshader);
-		glDeleteShader(fragmentshader);
-		*result = true;
 	}	
 }
 
@@ -80,6 +98,10 @@ GLuint Shaders_Manager::getShader()
 	return this->myShader;
 }
 
+GLuint Shaders_Manager::getLightingShader()
+{
+	return this->myLightShader;
+};
 void Shaders_Manager::shaderUniformValues()
 {
 	GLfloat timevalue = glfwGetTime();

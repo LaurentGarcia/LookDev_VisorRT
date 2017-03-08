@@ -32,8 +32,10 @@ public:
 	Shaders_Manager();
 	~Shaders_Manager();
 
-	void loadShader( const char* vtxShaderFile, const char* frgShaderFile, bool* result);
+	void loadShader( const char* vtxShaderFile, const char* frgShaderFile, bool* result, bool isLightShader);
 	GLuint getShader();
+	GLuint getLightingShader();
+
 	
 	void loadTexture(const char* textureName);
 	std::vector<Texture> getTextures();
@@ -50,6 +52,8 @@ private:
 	//   3. User selection, Shader manager give us the pointer to selected shader
 
 	GLuint myShader;
+	GLuint myLightShader;
+
 	std::vector<Texture> myTextures;
 
 	std::string readFile(const char* filename);

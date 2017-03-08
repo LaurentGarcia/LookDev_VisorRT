@@ -49,7 +49,6 @@ int main()
 	while (!glfwWindowShouldClose(windowLookDev.getWindowPointer())){
 		glfwPollEvents();
 		myEngine.doRender();
-		glBindVertexArray(0);
 		glfwSwapBuffers(windowLookDev.getWindowPointer());
 	};
 

@@ -32,6 +32,7 @@ public:
 	void updateMouseRotation(GLfloat xoffset,GLfloat yoffset);
 	void updateCameraFov(GLfloat fov);
 
+	glm::vec3 getCameraPosition();
 	glm::mat4 getCameraViewMatrix();
 	GLfloat   getCameraFov();
 
