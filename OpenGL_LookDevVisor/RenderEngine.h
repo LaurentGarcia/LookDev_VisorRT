@@ -51,6 +51,9 @@ public:
 
 	const char* texture1 = "Textures/container.jpg";
 	const char* texture2 = "Textures/wall.jpg";
+	const char* texture3 = "Textures/container2.png";
+	const char* texture4 = "Textures/container2_specular.png";
+	const char* texture5 = "Textures/emision_matrix.jpg";
 #else
 #endif
 

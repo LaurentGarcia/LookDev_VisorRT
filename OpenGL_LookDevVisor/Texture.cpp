@@ -10,7 +10,7 @@
 Texture::Texture(const char* textureName) {
 	// TODO Auto-generated constructor stub
 	unsigned char* image;
-	image = SOIL_load_image("Textures/container.jpg", &widthTex, &heightTex, 0, SOIL_LOAD_RGB);
+	image = SOIL_load_image(textureName, &widthTex, &heightTex, 0, SOIL_LOAD_RGB);
 	#if DEBUG
 		if (image == 0)
 			std::cout << "Texture not found";

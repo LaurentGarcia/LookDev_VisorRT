@@ -24,6 +24,9 @@ RenderEngine::RenderEngine() {
 
 	this->shaderManager.loadTexture(texture1);
 	this->shaderManager.loadTexture(texture2);
+	this->shaderManager.loadTexture(texture3);
+	this->shaderManager.loadTexture(texture4);
+	this->shaderManager.loadTexture(texture5);
 	shaderManager.loadShader(vtxLightShaderFileName,frgLightShaderFileName,shaderesult,1);
 	if (shaderesult) {
 		std::cout << "Vertex shader Lighting and Fragment Shader Lighting Load: OK" << std::endl;
@@ -74,12 +77,18 @@ void RenderEngine::doRender(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(shaderManager.getShader());
+	//Diffuse
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[1].getTexture());
-	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "ourTexture1"), 0);
-	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[2].getTexture());
-	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "ourTexture1"), 1);
+	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "mat.diffuse"), 0);
+	//Specular
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[3].getTexture());
+	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "mat.specular"), 1);
+	//Emission
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[4].getTexture());
+	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "mat.emission"), 2);
 
 	model = glm::rotate(model,-0.0f,glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 view;
@@ -92,15 +101,28 @@ void RenderEngine::doRender(){
 	GLint modelLoc = glGetUniformLocation(shaderManager.getShader(), "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-	GLint objectColorLoc = glGetUniformLocation(shaderManager.getShader(), "objectColor");
-	GLint lightColorLoc  = glGetUniformLocation(shaderManager.getShader(), "lightColor");
-	GLint lightPosLoc    = glGetUniformLocation(shaderManager.getShader(), "lightPosition");
-	GLint viewPosLoc 	 = glGetUniformLocation(shaderManager.getShader(), "cameraPosition");
+	//Shaders Parameters
 
-	glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.31f);
+	GLint lightAmbLoc         = glGetUniformLocation(shaderManager.getShader(), "light.ambient");
+	GLint lightColorLoc       = glGetUniformLocation(shaderManager.getShader(), "light.color");
+	GLint lightPositionLoc    = glGetUniformLocation(shaderManager.getShader(), "light.position");
+	GLint lightSpecLoc        = glGetUniformLocation(shaderManager.getShader(), "light.specular");
+	GLint viewPosLoc 	      = glGetUniformLocation(shaderManager.getShader(), "cameraPosition");
+
+
 	glUniform3f(lightColorLoc,  1.0f, 1.0f, 1.0f);
-	glUniform3f(lightPosLoc, myMeshLight.getPosition().x,myMeshLight.getPosition().y,myMeshLight.getPosition().z);
+	glUniform3f(lightAmbLoc,  0.2f, 0.2f, 0.2f);
+	glUniform3f(lightSpecLoc,  0.9f, 0.9f, 0.9f);
+	glUniform3f(lightPositionLoc, myMeshLight.getPosition().x,myMeshLight.getPosition().y,myMeshLight.getPosition().z);
 	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
+
+	GLint matShininess  = glGetUniformLocation(shaderManager.getShader(),"mat.shininess");
+	glUniform1f(matShininess,90.0f);
+
+
+
+	//End Update Shading Parameters
+
 
 	this->myActualMesh.Draw();
 
