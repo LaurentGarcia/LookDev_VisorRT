@@ -55,7 +55,6 @@ private:
 	GLuint myLightShader;
 
 	std::vector<Texture> myTextures;
-
 	std::string readFile(const char* filename);
 };
 

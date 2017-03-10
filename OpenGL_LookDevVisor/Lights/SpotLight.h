@@ -1,0 +1,63 @@
+/*
+ * SpotLight.h
+ *
+ *  Created on: Mar 9, 2017
+ *      Author: lcarro
+ */
+
+#pragma once
+
+#ifdef _WIN32
+	#define  GLEW_STATIC
+	#include <glew.h>
+	#include <glfw3.h>
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
+#elif __linux__
+	#include <iostream>
+	#include <glew.h>
+	#include <glfw3.h>
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
+	#include "Light.h"
+#else
+#endif
+
+class SpotLight : public Light{
+public:
+	SpotLight();
+	virtual ~SpotLight();
+
+	//Implements the abstract Light Interface
+	glm::vec3 getPosition();
+	glm::vec3 getKa();
+	glm::vec3 getKd();
+	glm::vec3 getKs();
+	lightType getType();
+	float     getConstant();
+	float     getLinear();
+	float     getQuadratic();
+	float     getCutoff();
+	glm::vec3 getAim();
+
+	void setPosition(glm::vec3 position);
+	void setKa(glm::vec3 ka);
+	void setKd(glm::vec3 kd);
+	void setKs(glm::vec3 ks);
+	void setConstant(float constant);
+	void setLinear(float linear);
+	void setQuadratic(float quadratic);
+	void setCutoff(float cutoff);
+	void setAim(glm::vec3 newaim);
+
+private:
+
+	glm::vec3 aim;
+	float 	  constant;
+	float     linear;
+	float     quadratic;
+	float     cutoff;
+};
+

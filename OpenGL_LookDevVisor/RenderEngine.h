@@ -20,6 +20,7 @@
 	#include <iostream>
 	#include "Camera.h"
 	#include "Shaders_Manager.h"
+	#include "LightManager.h"
 	#include "Mesh.h"
 #else
 #endif
@@ -64,7 +65,9 @@ public:
 	void   updateCameraFov(GLfloat fov);
 	void   setZoom(int keyPressed);
 	void   setCameraView(GLfloat xoff,GLfloat yoff);
-	Camera getActualCamera();
+	void   setLightIntensity(int keyPressed);
+
+	Camera  getActualCamera();
 	GLfloat getDeltaTime();
 	void   doRender();
 
@@ -74,7 +77,6 @@ private:
 	//Todo: Support various cameras defined by user and presets
 	//	    This camera Object is updated by the Logic Controller to provide
 	//      us the user transformation
-
 
 	GLfloat deltaTime;
 	GLfloat lastFrameTime;
@@ -86,12 +88,14 @@ private:
 	//Objects
 	Camera  		cameraViewport;
 	Shaders_Manager shaderManager;
+	Light_Manager   sceneLightManager;
 	Mesh		    myActualMesh;
 	Mesh			myMeshLight = Mesh(1); // Calling to constructor specifing if it's a mesh light. Needs to be changed more generic
 
-
-
-
+	//Private functions
+	void setShaderSceneTransformations();
+	void setSceneTextures();
+	void setShaderLightingCalculation();
 };
 
 #endif /* RENDERENGINE_H_ */
