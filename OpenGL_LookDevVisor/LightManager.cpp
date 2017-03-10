@@ -174,8 +174,55 @@ float Light_Manager::getCurrentLightCutoff()
 	}
 }
 
+float Light_Manager::getCurrentLightOutCutOff()
+{
+	if (this->sceneLights.back()->getType()==Light::spot)
+	{
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights.back());
+		float cutoutoff = p->getOuterCutOff();
+		p = nullptr;
+		return cutoutoff;
+	}else{
+		return 0;
+	}
+
+};
+
+void Light_Manager::createNewLight(int type, glm::vec3 position)
+{
+	switch (type){
+	case 0:
+	{
+		Light* newlight = new DirectionalLight;
+		newlight->setPosition(position);
+		this->sceneLights.push_back(newlight);
+		break;
+	}
+	case 1:
+	{
+		Light* newlight = new PointLight;
+		newlight->setPosition(position);
+		this->sceneLights.push_back(newlight);
+		break;
+	}
+	case 2:
+	{
+		Light* newlight = new SpotLight;
+		newlight->setPosition(position);
+		this->sceneLights.push_back(newlight);
+		break;
+	}
+	default:
+		break;
+	}
+}
 
 int  Light_Manager::getLightType()
 {
 	return this->sceneLights.back()->getType();
+};
+
+int  Light_Manager::getSceneNumberLightsActive()
+{
+	return this->sceneLights.size();
 };

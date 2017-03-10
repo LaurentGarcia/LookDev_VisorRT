@@ -38,7 +38,10 @@ class RenderEngine {
 
 
 public:
-
+	//Todo: Load a config file, with number lights supported, filtering ect...
+	const int numMaxLights = 4;
+		  int renderWidth  = 800;
+	      int renderHeight = 600;
 #ifdef _WIN32
 	const char* vertexShaderFile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
 	const char* fragmentshaderfile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
@@ -57,6 +60,7 @@ public:
 	const char* texture5 = "Textures/emision_matrix.jpg";
 #else
 #endif
+	//End todo, config file;
 
 	RenderEngine();
 	virtual ~RenderEngine();
@@ -80,8 +84,6 @@ private:
 
 	GLfloat deltaTime;
 	GLfloat lastFrameTime;
-	int 	renderWidth = 800;
-	int 	renderHeight = 600;
 	glm::mat4 model;
 	glm::mat4 projection;
 

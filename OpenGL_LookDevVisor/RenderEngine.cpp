@@ -38,7 +38,6 @@ RenderEngine::RenderEngine() {
 	this->sceneLightManager.setNewLightColor(glm::vec3{1.0f, 1.0f, 1.0f});
 	this->sceneLightManager.setNewLightSpecContribution(glm::vec3{0.9f, 0.9f, 0.9f});
 	this->sceneLightManager.setNewLightAmbientContribution(glm::vec3{0.2f, 0.2f, 0.2f});
-
 	this->sceneLightManager.setNewLightLinearValue(0.09f);
 	this->sceneLightManager.setNewLightQuadraticValue(0.032f);
 
@@ -112,57 +111,106 @@ void RenderEngine::setShaderSceneTransformations()
 
 }
 
+//Per light in the scene we need pass the info to our shader
+
 void RenderEngine::setShaderLightingCalculation()
 {
-	//Shaders Lighting Parameters Localization
-	GLint lightAmbLoc         = glGetUniformLocation(shaderManager.getShader(), "light.ambient");
-	GLint lightColorLoc       = glGetUniformLocation(shaderManager.getShader(), "light.color");
-	GLint lightPositionLoc    = glGetUniformLocation(shaderManager.getShader(), "light.position");
-	GLint lightSpecLoc        = glGetUniformLocation(shaderManager.getShader(), "light.specular");
-	GLint lightConstantLoc    = glGetUniformLocation(shaderManager.getShader(), "light.constant");
-	GLint lightLinearLoc      = glGetUniformLocation(shaderManager.getShader(), "light.linear");
-	GLint lightQuadraticLoc   = glGetUniformLocation(shaderManager.getShader(), "light.quadratic");
-	GLint lightCutOffLoc      = glGetUniformLocation(shaderManager.getShader(), "light.cutoff");
-	GLint lightAimLoc         = glGetUniformLocation(shaderManager.getShader(), "light.aim");
-	GLint lightTypeLoc        = glGetUniformLocation(shaderManager.getShader(), "light.type");
-	GLint viewPosLoc 	      = glGetUniformLocation(shaderManager.getShader(), "cameraPosition");
+	//1. First We get the number lights that we have in the scene.
+	int numlightscene = this->sceneLightManager.getSceneNumberLightsActive();
 
-	//Update my current Light (Todo: Make a update module)
-	glUniform1i(lightTypeLoc,this->sceneLightManager.getLightType());
 
-	glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor().x
-							 ,this->sceneLightManager.getCurrentLightColor().y
-							 ,this->sceneLightManager.getCurrentLightColor().z);
+	GLint lightAmbLoc;
+	GLint lightColorLoc;
+	GLint lightPositionLoc;
+	GLint lightSpecLoc;
+	GLint lightConstantLoc;
+	GLint lightLinearLoc;
+	GLint lightQuadraticLoc;
+	GLint lightCutOffLoc;
+	GLint lightOutCutOffLoc;
+	GLint lightAimLoc;
+	GLint lightTypeLoc;
+	GLint viewPosLoc;
+	std::string lightname = "lights[";
+	std::string lightnameend = "]";
 
-	glUniform3f(lightAmbLoc,  this->sceneLightManager.getCurrentLightAmb().x
-							 ,this->sceneLightManager.getCurrentLightAmb().y
-							 ,this->sceneLightManager.getCurrentLightAmb().z);
+	for (int i=0; i<numlightscene;i++){
+		//Shaders Lighting Parameters Localization
+		std::string finalambientname = lightname+std::to_string(i)+lightnameend;
+		lightAmbLoc = glGetUniformLocation(shaderManager.getShader(), finalambientname.append(".ambient").c_str());
 
-	glUniform3f(lightSpecLoc, this->sceneLightManager.getCurrentLightSpec().x
-							 ,this->sceneLightManager.getCurrentLightSpec().y
-							 ,this->sceneLightManager.getCurrentLightSpec().z);
+		std::string finalcolorname = lightname+std::to_string(i)+lightnameend;
+		lightColorLoc = glGetUniformLocation(shaderManager.getShader(), finalcolorname.append(".color").c_str());
 
-	glUniform3f(lightPositionLoc, this->sceneLightManager.getCurrentLightPosition().x
-								 ,this->sceneLightManager.getCurrentLightPosition().y
-								 ,this->sceneLightManager.getCurrentLightPosition().z);
+		std::string finalpositionname = lightname+std::to_string(i)+lightnameend;
+		lightPositionLoc = glGetUniformLocation(shaderManager.getShader(), finalpositionname.append(".position").c_str());
 
-	//In case that our selected/active light was a point
-	if (this->sceneLightManager.getLightType() ==1 || this->sceneLightManager.getLightType() == 2)
-	{
-		glUniform1f(lightConstantLoc,  this->sceneLightManager.getCurrentLightConstantValue());
-		glUniform1f(lightLinearLoc,    this->sceneLightManager.getCurrentLightLinearValue());
-		glUniform1f(lightQuadraticLoc, this->sceneLightManager.getCurrentLightQuadraticValue());
-		glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff());
-		if (this->sceneLightManager.getLightType() == 2)
+		std::string finalspecularname = lightname+std::to_string(i)+lightnameend;
+		lightSpecLoc = glGetUniformLocation(shaderManager.getShader(), finalspecularname.append(".specular").c_str());
+
+		std::string finalconstantname = lightname+std::to_string(i)+lightnameend;
+		lightConstantLoc = glGetUniformLocation(shaderManager.getShader(), finalconstantname.append(".constant").c_str());
+
+		std::string finallinearname = lightname+std::to_string(i)+lightnameend;
+		lightLinearLoc = glGetUniformLocation(shaderManager.getShader(), finallinearname.append(".linear").c_str());
+
+		std::string finalquadraticname = lightname+std::to_string(i)+lightnameend;
+		lightQuadraticLoc = glGetUniformLocation(shaderManager.getShader(), finalquadraticname.append(".quadratic").c_str());
+
+		std::string finalcutoffname = lightname+std::to_string(i)+lightnameend;
+		lightCutOffLoc = glGetUniformLocation(shaderManager.getShader(), finalcutoffname.append(".cutoff").c_str());
+
+		std::string finaloutcutoffname = lightname+std::to_string(i)+lightnameend;
+		lightOutCutOffLoc = glGetUniformLocation(shaderManager.getShader(), finaloutcutoffname.append(".outcutoff").c_str());
+
+		std::string finalaimname = lightname+std::to_string(i)+lightnameend;
+		lightAimLoc = glGetUniformLocation(shaderManager.getShader(), finalaimname.append(".aim").c_str());
+
+		std::string finaltypename = lightname+std::to_string(i)+lightnameend;
+		lightTypeLoc = glGetUniformLocation(shaderManager.getShader(), finaltypename.append(".type").c_str());
+
+
+
+		//Update my current Light (Todo: Make a update module)
+		glUniform1i(lightTypeLoc,this->sceneLightManager.getLightType());
+
+		glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor().x
+								 ,this->sceneLightManager.getCurrentLightColor().y
+								 ,this->sceneLightManager.getCurrentLightColor().z);
+
+		glUniform3f(lightAmbLoc,  this->sceneLightManager.getCurrentLightAmb().x
+								 ,this->sceneLightManager.getCurrentLightAmb().y
+								 ,this->sceneLightManager.getCurrentLightAmb().z);
+
+		glUniform3f(lightSpecLoc, this->sceneLightManager.getCurrentLightSpec().x
+								 ,this->sceneLightManager.getCurrentLightSpec().y
+								 ,this->sceneLightManager.getCurrentLightSpec().z);
+
+		glUniform3f(lightPositionLoc, this->sceneLightManager.getCurrentLightPosition().x
+									 ,this->sceneLightManager.getCurrentLightPosition().y
+									 ,this->sceneLightManager.getCurrentLightPosition().z);
+
+		//In case that our selected/active light was a point
+		if (this->sceneLightManager.getLightType() ==1 || this->sceneLightManager.getLightType() == 2)
 		{
-			glm::vec3 newaimSpot = glm::vec3{0.0f,0.0f,0.0f}-this->myMeshLight.getPosition();
-			this->sceneLightManager.setNewAim(newaimSpot);
-			glUniform3f(lightAimLoc,  this->sceneLightManager.getCurrentAim().x
-								     ,this->sceneLightManager.getCurrentAim().y
-								     ,this->sceneLightManager.getCurrentAim().z);
+			glUniform1f(lightConstantLoc,  this->sceneLightManager.getCurrentLightConstantValue());
+			glUniform1f(lightLinearLoc,    this->sceneLightManager.getCurrentLightLinearValue());
+			glUniform1f(lightQuadraticLoc, this->sceneLightManager.getCurrentLightQuadraticValue());
+			if (this->sceneLightManager.getLightType() == 2)
+			{
+				glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff());
+				glUniform1f(lightOutCutOffLoc, this->sceneLightManager.getCurrentLightOutCutOff());
+				glm::vec3 newaimSpot = glm::vec3{0.0f,0.0f,0.0f}-this->myMeshLight.getPosition();
+				this->sceneLightManager.setNewAim(newaimSpot);
+				glUniform3f(lightAimLoc,  this->sceneLightManager.getCurrentAim().x
+										 ,this->sceneLightManager.getCurrentAim().y
+										 ,this->sceneLightManager.getCurrentAim().z);
+			}
 		}
-	}
+	}//End Recolect Light Info
 
+
+	viewPosLoc = glGetUniformLocation(shaderManager.getShader(), "cameraPosition");
 	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
 	GLint matShininess  = glGetUniformLocation(shaderManager.getShader(),"mat.shininess");
 	glUniform1f(matShininess,90.0f);
@@ -184,7 +232,6 @@ void RenderEngine::doRender(){
 
 	this->setSceneTextures();
 
-	model = glm::rotate(model,-0.0f,glm::vec3(1.0f, 0.0f, 0.0f));
 	glm::mat4 view;
 	view = this->cameraViewport.getCameraViewMatrix();
 	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);

@@ -39,7 +39,8 @@ public:
 	float     getConstant();
 	float     getLinear();
 	float     getQuadratic();
-	float     getCutoff();
+	float     getCutoff();// Give us the result of Cos Phi
+	float     getOuterCutOff(); //Give us the result of Cos Epsilon
 	glm::vec3 getAim();
 
 	void setPosition(glm::vec3 position);
@@ -50,6 +51,7 @@ public:
 	void setLinear(float linear);
 	void setQuadratic(float quadratic);
 	void setCutoff(float cutoff);
+	void setOuterCutoff(float outercutoff);
 	void setAim(glm::vec3 newaim);
 
 private:
@@ -59,5 +61,6 @@ private:
 	float     linear;
 	float     quadratic;
 	float     cutoff;
+	float     outcutoff;
 };
 

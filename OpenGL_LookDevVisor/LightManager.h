@@ -87,13 +87,22 @@ public:
 
 	//Spot Light
 	float     getCurrentLightCutoff();
+	float     getCurrentLightOutCutOff();
 	glm::vec3 getCurrentAim();
 
+
+	// Create a Light, type:
+	// 0 = Directional
+	// 1 = Point
+	// 2 = Spotlight
+	void     createNewLight(int type,glm::vec3 position);
 	// Return Type Light
 	// 0 = Directional
 	// 1 = Point
 	// 2 = Spotlight
 	int      getLightType();
+	int 	 getSceneNumberLightsActive();
+
 
 private:
 	std::vector<Light*> sceneLights;

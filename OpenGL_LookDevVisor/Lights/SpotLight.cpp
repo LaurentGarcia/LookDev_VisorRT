@@ -14,8 +14,10 @@ SpotLight::SpotLight() {
 	this->constant  = 1.0f;
 	this->linear    = 0.5f;
 	this->quadratic = 0.2f;
-	this->cutoff    = 180.0f;
-	this->aim = glm::vec3{0.0f,0.0f,0.0f};
+	this->cutoff    = 12.5f;
+	this->outcutoff = 13.5f;
+	this->aim 		= glm::vec3{0.0f,0.0f,0.0f};
+	this->position  = glm::vec3{0.0f,0.0f,0.0f};
 
 }
 
@@ -74,6 +76,11 @@ void SpotLight::setCutoff(float cutoff)
 	this->cutoff = cutoff;
 };
 
+void SpotLight::setOuterCutoff(float outercutoff)
+{
+	this->outcutoff = outercutoff;
+}
+
 void SpotLight::setAim(glm::vec3 newaim)
 {
 	this->aim = newaim;
@@ -108,9 +115,13 @@ void SpotLight::setQuadratic(float quadratic)
 
 float SpotLight::getCutoff()
 {
-	return this->cutoff;
+	return glm::cos(glm::radians(this->cutoff));
 }
 
+float SpotLight::getOuterCutOff()
+{
+	return glm::cos(glm::radians(this->outcutoff));
+}
 glm::vec3 SpotLight::getAim()
 {
 	return this->aim;
