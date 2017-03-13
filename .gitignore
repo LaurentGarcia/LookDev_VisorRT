@@ -291,3 +291,5 @@ paket-files/
 __pycache__/
 *.pyc
 >>>>>>> Agregar .gitignore y .gitattributes.
+/OpenGL_LookDevVisor/Shaders/frg_Light.glsl
+/OpenGL_LookDevVisor/Shaders/vtx_Light.glsl

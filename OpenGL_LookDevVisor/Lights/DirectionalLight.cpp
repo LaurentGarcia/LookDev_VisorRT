@@ -10,10 +10,16 @@
 DirectionalLight::DirectionalLight() {
 	// TODO Auto-generated constructor stub
 	Light::type = lightType::directional;
+	Light::on = false;
 }
 
 DirectionalLight::~DirectionalLight() {
 	// TODO Auto-generated destructor stub
+}
+
+bool DirectionalLight::getOn()
+{
+	return this->on;
 }
 
 glm::vec3 DirectionalLight::getPosition()
@@ -41,6 +47,11 @@ Light::lightType DirectionalLight::getType()
 	return Light::type;
 };
 
+
+void DirectionalLight::setOn(bool activated)
+{
+	this->on = activated;
+}
 
 void DirectionalLight::setPosition(glm::vec3 position)
 {

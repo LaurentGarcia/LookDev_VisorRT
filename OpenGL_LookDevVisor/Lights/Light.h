@@ -42,13 +42,17 @@ public:
 	virtual glm::vec3 getKd() = 0;
 	virtual glm::vec3 getKs() = 0;
 	virtual lightType getType() = 0;
+	virtual bool      getOn() = 0;
 
+	virtual void setOn(bool activated) = 0;
 	virtual void setPosition(glm::vec3 position) = 0;
 	virtual void setKa(glm::vec3 ka) = 0;
 	virtual void setKd(glm::vec3 kd) = 0;
 	virtual void setKs(glm::vec3 ks) = 0;
 
 protected:
+
+	bool       on;
 	lightType  type;
 	glm::vec3  position;
 	glm::vec3  ka;

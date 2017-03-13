@@ -112,7 +112,7 @@ void RenderEngine::setShaderSceneTransformations()
 }
 
 //Per light in the scene we need pass the info to our shader
-
+//ToDo: 
 void RenderEngine::setShaderLightingCalculation()
 {
 	//1. First We get the number lights that we have in the scene.
@@ -134,6 +134,7 @@ void RenderEngine::setShaderLightingCalculation()
 	std::string lightname = "lights[";
 	std::string lightnameend = "]";
 
+	//Update all Lighting contribution in the scene
 	for (int i=0; i<numlightscene;i++){
 		//Shaders Lighting Parameters Localization
 		std::string finalambientname = lightname+std::to_string(i)+lightnameend;
@@ -171,8 +172,8 @@ void RenderEngine::setShaderLightingCalculation()
 
 
 
-		//Update my current Light (Todo: Make a update module)
-		glUniform1i(lightTypeLoc,this->sceneLightManager.getLightType());
+		//Update my current Light (Todo: Select Light and modify desired light)
+		glUniform1i(lightTypeLoc,this->sceneLightManager.getCurrentLightType());
 
 		glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor().x
 								 ,this->sceneLightManager.getCurrentLightColor().y
@@ -191,12 +192,12 @@ void RenderEngine::setShaderLightingCalculation()
 									 ,this->sceneLightManager.getCurrentLightPosition().z);
 
 		//In case that our selected/active light was a point
-		if (this->sceneLightManager.getLightType() ==1 || this->sceneLightManager.getLightType() == 2)
+		if (this->sceneLightManager.getCurrentLightType() ==1 || this->sceneLightManager.getCurrentLightType() == 2)
 		{
 			glUniform1f(lightConstantLoc,  this->sceneLightManager.getCurrentLightConstantValue());
 			glUniform1f(lightLinearLoc,    this->sceneLightManager.getCurrentLightLinearValue());
 			glUniform1f(lightQuadraticLoc, this->sceneLightManager.getCurrentLightQuadraticValue());
-			if (this->sceneLightManager.getLightType() == 2)
+			if (this->sceneLightManager.getCurrentLightType() == 2)
 			{
 				glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff());
 				glUniform1f(lightOutCutOffLoc, this->sceneLightManager.getCurrentLightOutCutOff());

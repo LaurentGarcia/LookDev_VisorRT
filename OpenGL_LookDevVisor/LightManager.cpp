@@ -9,10 +9,10 @@
 
 Light_Manager::Light_Manager() {
 	// TODO Auto-generated constructor stub
-	Light* sun = new DirectionalLight;
-	this->sceneLights.push_back(sun);
-	Light* point = new PointLight;
-	this->sceneLights.push_back(point);
+	//Light* sun = new DirectionalLight;
+	//this->sceneLights.push_back(sun);
+	//Light* point = new PointLight;
+	//this->sceneLights.push_back(point);
 	Light* spot = new SpotLight;
 	this->sceneLights.push_back(spot);
 }
@@ -217,7 +217,7 @@ void Light_Manager::createNewLight(int type, glm::vec3 position)
 	}
 }
 
-int  Light_Manager::getLightType()
+int  Light_Manager::getCurrentLightType()
 {
 	return this->sceneLights.back()->getType();
 };
@@ -225,4 +225,9 @@ int  Light_Manager::getLightType()
 int  Light_Manager::getSceneNumberLightsActive()
 {
 	return this->sceneLights.size();
+};
+
+bool  Light_Manager::getIsCurrentLightOn() 
+{
+	return this->sceneLights.back()->getOn();
 };

@@ -14,11 +14,16 @@ PointLight::PointLight() {
 	this->constant = 1.0f;
 	this->linear   = 0.5f;
 	this->quadratic= 0.2f;
-
+	this->on = false;
 }
 
 PointLight::~PointLight() {
 	// TODO Auto-generated destructor stub
+}
+
+bool PointLight::getOn()
+{
+	return on;
 }
 
 glm::vec3 PointLight::getPosition()
@@ -46,6 +51,11 @@ Light::lightType PointLight::getType()
 	return Light::type;
 };
 
+
+void PointLight::setOn(bool activated)
+{
+	this->on = activated;
+}
 
 void PointLight::setPosition(glm::vec3 position)
 {

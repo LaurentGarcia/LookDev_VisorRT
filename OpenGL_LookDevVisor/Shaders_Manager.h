@@ -9,6 +9,10 @@
 	#include <string>
 	#include <fstream>
 	#include <iostream>
+	#include <stdexcept>
+	#include <math.h>
+	#include <vector>
+	#include "Texture.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>

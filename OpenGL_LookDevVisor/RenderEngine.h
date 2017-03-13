@@ -5,15 +5,18 @@
  *      Author: lcarro
  */
 
-#ifndef RENDERENGINE_H_
-#define RENDERENGINE_H_
+#pragma once
 #ifdef _WIN32
-#include <iostream>
-#include <Windows.h>
-#define  GLEW_STATIC
-#include <glew.h>
-#include <glfw3.h>
-#include "WindowGL.h"
+	#include <iostream>
+	#include <Windows.h>
+	#define  GLEW_STATIC
+	#include <glew.h>
+	#include <glfw3.h>
+	#include "WindowGL.h"
+	#include "Camera.h"
+	#include "Shaders_Manager.h"
+	#include "LightManager.h"
+	#include "Mesh.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>
@@ -28,11 +31,11 @@
 
 // This class will be responsible to manage all the scene setup
 // And Coordinate the user input with the OpenGl.
+/* Todo> 1. Redefine the Window Callback for size and height
+		2. Create a config file and read the option
+		3. 
 
-
-
-
-//Todo> Redefine the Window Callback for size and height
+*/
 
 class RenderEngine {
 
@@ -43,10 +46,15 @@ public:
 		  int renderWidth  = 800;
 	      int renderHeight = 600;
 #ifdef _WIN32
-	const char* vertexShaderFile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
-	const char* fragmentshaderfile = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
+	const char* vertexShaderFileName = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
+	const char* fragmentshaderfileName = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
+	const char* vtxLightShaderFileName = "Shaders\\vtxlightshader.glsl";
+	const char* frgLightShaderFileName = "Shaders\\frglightshader.glsl";
 	const char* texture1 = "Textures\\container.jpg";
 	const char* texture2 = "Textures\\wall.jpg";
+	const char* texture3 = "Textures\\container2.png";
+	const char* texture4 = "Textures\\container2_specular.png";
+	const char* texture5 = "Textures\\emision_matrix.jpg";
 #elif __linux__
 	const char* vertexShaderFileName   = "Shaders/vertexshader.glsl";
 	const char* fragmentshaderfileName = "Shaders/fragmentshader.glsl";
@@ -100,4 +108,3 @@ private:
 	void setShaderLightingCalculation();
 };
 
-#endif /* RENDERENGINE_H_ */

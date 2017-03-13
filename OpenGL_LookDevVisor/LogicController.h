@@ -7,6 +7,7 @@
 #include <glew.h>
 #include <glfw3.h>
 #include "WindowGL.h"
+#include "RenderEngine.h"
 #elif __linux__
 #include <glew.h>
 #include <glfw3.h>

@@ -74,8 +74,8 @@
     <LibraryPath>C:\glew-2.0.0\lib\Release\x64;C:\glfw-3.2.1\build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\glm\glm-0.9.8.4;C:\Soil\src;C:\glfw-3.2.1\include\GLFW;C:\glew-2.0.0\include\GL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Soil\projects\VC9\x64\Release;C:\glfw-3.2.1\build\src\Release;C:\glew-2.0.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\assimp-3.1.1-win-binaries\include\;C:\glm\glm-0.9.8.4;C:\Soil\src;C:\glfw-3.2.1\include\GLFW;C:\glew-2.0.0\include\GL;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\assimp-3.1.1-win-binaries\lib64;C:\Soil\projects\VC9\x64\Release;C:\glfw-3.2.1\build\src\Release;C:\glew-2.0.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,7 +94,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SOIL.lib;opengl32.lib;glfw3.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SOIL.lib;opengl32.lib;glfw3.lib;glew32s.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -126,17 +126,51 @@
   <ItemGroup>
     <ClCompile Include="ApiConfiguration.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="LightManager.cpp" />
+    <ClCompile Include="Lights\DirectionalLight.cpp" />
+    <ClCompile Include="Lights\Light.cpp" />
+    <ClCompile Include="Lights\PointLight.cpp" />
+    <ClCompile Include="Lights\SpotLight.cpp" />
     <ClCompile Include="LogicController.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh\Mesh.cpp" />
+    <ClCompile Include="Mesh\Model.cpp" />
+    <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="Shaders_Manager.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="WindowGL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApiConfiguration.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="LightManager.h" />
+    <ClInclude Include="Lights\DirectionalLight.h" />
+    <ClInclude Include="Lights\Light.h" />
+    <ClInclude Include="Lights\PointLight.h" />
+    <ClInclude Include="Lights\SpotLight.h" />
     <ClInclude Include="LogicController.h" />
+    <ClInclude Include="Mesh\Mesh.h" />
+    <ClInclude Include="Mesh\Model.h" />
+    <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="Shaders_Manager.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="WindowGL.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\fragmentshader.glsl" />
+    <None Include="Shaders\frglightshader.glsl" />
+    <None Include="Shaders\frg_Light.glsl" />
+    <None Include="Shaders\vertexshader.glsl" />
+    <None Include="Shaders\vtxlightshader.glsl" />
+    <None Include="Shaders\vtx_Light.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="container.jpg" />
+    <Image Include="Textures\container.jpg" />
+    <Image Include="Textures\container2.png" />
+    <Image Include="Textures\container2_specular.png" />
+    <Image Include="Textures\emision_matrix.jpg" />
+    <Image Include="Textures\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

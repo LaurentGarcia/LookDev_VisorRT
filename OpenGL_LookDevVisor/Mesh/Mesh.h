@@ -16,6 +16,8 @@
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
+	#include <vector>
+	#include "Texture.h"
 #elif __linux__
 	#define  GLEW_STATIC
 	#include <glew.h>
@@ -24,40 +26,54 @@
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
+	#include <vector>
+	#include "Texture.h"
+
 #else
 #endif
+
 
 
 class Mesh {
 
 public:
 
-	Mesh();
+	struct vertex {
+		glm::vec3 position;
+		glm::vec3 normal;
+		glm::vec2 texCoord;
+	};
+
+
+
+	Mesh(std::vector<vertex> vertices,std::vector<GLuint> indices, std::vector<Texture> textures);
 	Mesh(bool islightingMesh);
 	virtual ~Mesh();
 
-	//Prototype Class Mesh
-	GLfloat VerticesApp[288];
-
-	GLuint getVAO();
-	GLuint getVBO();
-	void   Draw();
 
 	glm::vec3 getPosition();
 	glm::mat4 getModelMatrix();
+	
 	void   setPosition(glm::vec3 newposition);
 	void   setScale(glm::vec3 newscale);
 
+	void   Draw();
+
 private:
-
-
+	// Geo info
+	std::vector<vertex>  vertexdata;
+	std::vector<GLuint>  indexdata;
+	std::vector<Texture> textures;
 	GLuint VAO;
 	GLuint VBO;
 	GLuint EBO; // For vertex index
 	bool   meshLight;
 
+	// Transformations
 	glm::mat4 model;
 	glm::vec3 position;
+
+	void initOpenGlBuffers();
 };
 
 

@@ -15,6 +15,8 @@
  *      This class is a classic container pattern, with Polymorphic vector of Lights Objects:
  *
  *               1. All lights must implements Light Abstract Class
+ *				 2. The container works as LIFO structure, the latest light created is the first available at back.
+ *               3. Todo: User selection will reestructure the LIFO, making the first available at back , the light selected.
  *
  *      Work in Progress
  *
@@ -35,6 +37,7 @@
 	#include "Lights\Light.h"
 	#include "Lights\DirectionalLight.h"
 	#include "Lights\PointLight.h"
+	#include "Lights/SpotLight.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>
@@ -95,13 +98,15 @@ public:
 	// 0 = Directional
 	// 1 = Point
 	// 2 = Spotlight
+	// Always when user create a new light, it will be activated by default
 	void     createNewLight(int type,glm::vec3 position);
 	// Return Type Light
 	// 0 = Directional
 	// 1 = Point
 	// 2 = Spotlight
-	int      getLightType();
+	int      getCurrentLightType();
 	int 	 getSceneNumberLightsActive();
+	bool     getIsCurrentLightOn();
 
 
 private:

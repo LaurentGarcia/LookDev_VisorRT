@@ -18,13 +18,17 @@ SpotLight::SpotLight() {
 	this->outcutoff = 13.5f;
 	this->aim 		= glm::vec3{0.0f,0.0f,0.0f};
 	this->position  = glm::vec3{0.0f,0.0f,0.0f};
-
+	this->on = false;
 }
 
 SpotLight::~SpotLight() {
 	// TODO Auto-generated destructor stub
 }
 
+bool  SpotLight::getOn() 
+{
+	return this->on;
+};
 glm::vec3 SpotLight::getPosition()
 {
 	return Light::position;
@@ -99,6 +103,10 @@ float SpotLight::getQuadratic()
 	return this->quadratic;
 };
 
+void SpotLight::setOn(bool activated)
+{
+	this->on = activated;
+}
 void SpotLight::setConstant(float constant)
 {
 	this->constant = constant;
