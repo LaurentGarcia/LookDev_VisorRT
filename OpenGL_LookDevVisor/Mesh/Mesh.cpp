@@ -19,66 +19,7 @@ Mesh::Mesh(std::vector<vertex> vertices, std::vector<GLuint> indices, std::vecto
 
 Mesh::Mesh(bool islightingMesh)
 {
-	GLfloat arrayProxy[108] =  {
-			// Positions         //Text
-			-0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-
-			-0.5f, -0.5f,  0.5f,
-			0.5f, -0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-
-			0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f, -0.5f,
-			0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-
-			-0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f, -0.5f,
-			0.5f, -0.5f,  0.5f,
-			0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f, -0.5f,
-
-			-0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,};
-
-		for (int i=0; i<108; i++){
-			this->VerticesApp[i] = arrayProxy[i];
-		}
-
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(VerticesApp), VerticesApp, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-		glBindVertexArray(0);
-		this->meshLight = true;
-		glm::vec3 lightPos(1.0f, 1.3f, 1.4f);
-		setPosition(lightPos);
-		setScale(glm::vec3(0.2f));
+	//Todo, create a mesh light in maya and export to visualize.
 };
 Mesh::~Mesh() {
 	// TODO Auto-generated destructor stub
@@ -88,11 +29,33 @@ Mesh::~Mesh() {
 }
 
 
-void Mesh::Draw()
+void Mesh::Draw(Shader shader)
 {
+	GLuint diffuseNr = 1;
+	GLuint specularNr = 1;
+	for(GLuint i = 0; i < this->textures.size(); i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
+		// Retrieve texture number (the N in diffuse_textureN)
+		std::stringstream ss;
+		std::string number;
+		std::string name = this->textures[i].getTextureType();
+		if(name == "texture_diffuse")
+			ss << diffuseNr++; // Transfer GLuint to stream
+		else if(name == "texture_specular")
+			ss << specularNr++; // Transfer GLuint to stream
+		number = ss.str();
+
+		glUniform1f(glGetUniformLocation(shader.getShaderId(), ("material." + name + number).c_str()), i);
+		glBindTexture(GL_TEXTURE_2D, this->textures[i].getTexture());
+	}
+	glActiveTexture(GL_TEXTURE0);
+
+
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, this->indexdata.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
+
 };
 
 void   Mesh::setPosition(glm::vec3 newposition)
@@ -127,7 +90,7 @@ void Mesh::initOpenGlBuffers()
 	glBindVertexArray(this->VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	glBufferData(GL_ARRAY_BUFFER, this->vertexdata.size * sizeof(vertex), &this->indexdata[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->vertexdata.size() * sizeof(vertex), &this->indexdata[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indexdata.size()*sizeof(GLuint),&this->indexdata[0],GL_STATIC_DRAW);

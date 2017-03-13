@@ -17,7 +17,7 @@
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
 	#include <vector>
-	#include "Texture.h"
+	#include "../Texture.h"
 #elif __linux__
 	#define  GLEW_STATIC
 	#include <glew.h>
@@ -27,11 +27,12 @@
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
 	#include <vector>
+	#include <iosfwd>
+	#include <sstream>
 	#include "Texture.h"
-
+	#include "../Shader.h"
 #else
 #endif
-
 
 
 class Mesh {
@@ -44,8 +45,6 @@ public:
 		glm::vec2 texCoord;
 	};
 
-
-
 	Mesh(std::vector<vertex> vertices,std::vector<GLuint> indices, std::vector<Texture> textures);
 	Mesh(bool islightingMesh);
 	virtual ~Mesh();
@@ -57,7 +56,7 @@ public:
 	void   setPosition(glm::vec3 newposition);
 	void   setScale(glm::vec3 newscale);
 
-	void   Draw();
+	void   Draw(Shader shader);
 
 private:
 	// Geo info

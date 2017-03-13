@@ -17,30 +17,19 @@ RenderEngine::RenderEngine() {
 #endif
 
 	bool* shaderesult = new bool(false);
-	shaderManager.loadShader(vertexShaderFileName, fragmentshaderfileName, shaderesult,0);
+	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName);
 	if (shaderesult) {
 		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
 	};
 
-	this->shaderManager.loadTexture(texture1);
-	this->shaderManager.loadTexture(texture2);
-	this->shaderManager.loadTexture(texture3);
-	this->shaderManager.loadTexture(texture4);
-	this->shaderManager.loadTexture(texture5);
-	shaderManager.loadShader(vtxLightShaderFileName,frgLightShaderFileName,shaderesult,1);
-	if (shaderesult) {
-		std::cout << "Vertex shader Lighting and Fragment Shader Lighting Load: OK" << std::endl;
-	};
-
-	//Init a default Lighting rig
-
-	this->sceneLightManager.setNewLightPosition(glm::vec3{myMeshLight.getPosition().x,myMeshLight.getPosition().y,myMeshLight.getPosition().z});
+	this->sceneLightManager.setNewLightPosition(glm::vec3{1.2f, 1.0f, 2.0f});
 	this->sceneLightManager.setNewLightColor(glm::vec3{1.0f, 1.0f, 1.0f});
 	this->sceneLightManager.setNewLightSpecContribution(glm::vec3{0.9f, 0.9f, 0.9f});
 	this->sceneLightManager.setNewLightAmbientContribution(glm::vec3{0.2f, 0.2f, 0.2f});
 	this->sceneLightManager.setNewLightLinearValue(0.09f);
 	this->sceneLightManager.setNewLightQuadraticValue(0.032f);
 
+	this->scene = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/shinny.obj");//dummy
 }
 
 RenderEngine::~RenderEngine() {
@@ -88,23 +77,7 @@ void RenderEngine::setLightIntensity(int keyPressed)
 	}
 };
 
-void RenderEngine::setSceneTextures()
-{
-	glUseProgram(shaderManager.getShader());
-	//Diffuse
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[2].getTexture());
-	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "mat.diffuse"), 0);
-	//Specular
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[3].getTexture());
-	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "mat.specular"), 1);
-	//Emission
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, shaderManager.getTextures()[4].getTexture());
-	glUniform1i(glGetUniformLocation(shaderManager.getShader(), "mat.emission"), 2);
 
-}
 
 void RenderEngine::setShaderSceneTransformations()
 {
@@ -138,37 +111,37 @@ void RenderEngine::setShaderLightingCalculation()
 	for (int i=0; i<numlightscene;i++){
 		//Shaders Lighting Parameters Localization
 		std::string finalambientname = lightname+std::to_string(i)+lightnameend;
-		lightAmbLoc = glGetUniformLocation(shaderManager.getShader(), finalambientname.append(".ambient").c_str());
+		lightAmbLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalambientname.append(".ambient").c_str());
 
 		std::string finalcolorname = lightname+std::to_string(i)+lightnameend;
-		lightColorLoc = glGetUniformLocation(shaderManager.getShader(), finalcolorname.append(".color").c_str());
+		lightColorLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalcolorname.append(".color").c_str());
 
 		std::string finalpositionname = lightname+std::to_string(i)+lightnameend;
-		lightPositionLoc = glGetUniformLocation(shaderManager.getShader(), finalpositionname.append(".position").c_str());
+		lightPositionLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalpositionname.append(".position").c_str());
 
 		std::string finalspecularname = lightname+std::to_string(i)+lightnameend;
-		lightSpecLoc = glGetUniformLocation(shaderManager.getShader(), finalspecularname.append(".specular").c_str());
+		lightSpecLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalspecularname.append(".specular").c_str());
 
 		std::string finalconstantname = lightname+std::to_string(i)+lightnameend;
-		lightConstantLoc = glGetUniformLocation(shaderManager.getShader(), finalconstantname.append(".constant").c_str());
+		lightConstantLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalconstantname.append(".constant").c_str());
 
 		std::string finallinearname = lightname+std::to_string(i)+lightnameend;
-		lightLinearLoc = glGetUniformLocation(shaderManager.getShader(), finallinearname.append(".linear").c_str());
+		lightLinearLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finallinearname.append(".linear").c_str());
 
 		std::string finalquadraticname = lightname+std::to_string(i)+lightnameend;
-		lightQuadraticLoc = glGetUniformLocation(shaderManager.getShader(), finalquadraticname.append(".quadratic").c_str());
+		lightQuadraticLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalquadraticname.append(".quadratic").c_str());
 
 		std::string finalcutoffname = lightname+std::to_string(i)+lightnameend;
-		lightCutOffLoc = glGetUniformLocation(shaderManager.getShader(), finalcutoffname.append(".cutoff").c_str());
+		lightCutOffLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalcutoffname.append(".cutoff").c_str());
 
 		std::string finaloutcutoffname = lightname+std::to_string(i)+lightnameend;
-		lightOutCutOffLoc = glGetUniformLocation(shaderManager.getShader(), finaloutcutoffname.append(".outcutoff").c_str());
+		lightOutCutOffLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finaloutcutoffname.append(".outcutoff").c_str());
 
 		std::string finalaimname = lightname+std::to_string(i)+lightnameend;
-		lightAimLoc = glGetUniformLocation(shaderManager.getShader(), finalaimname.append(".aim").c_str());
+		lightAimLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalaimname.append(".aim").c_str());
 
 		std::string finaltypename = lightname+std::to_string(i)+lightnameend;
-		lightTypeLoc = glGetUniformLocation(shaderManager.getShader(), finaltypename.append(".type").c_str());
+		lightTypeLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finaltypename.append(".type").c_str());
 
 
 
@@ -201,7 +174,7 @@ void RenderEngine::setShaderLightingCalculation()
 			{
 				glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff());
 				glUniform1f(lightOutCutOffLoc, this->sceneLightManager.getCurrentLightOutCutOff());
-				glm::vec3 newaimSpot = glm::vec3{0.0f,0.0f,0.0f}-this->myMeshLight.getPosition();
+				glm::vec3 newaimSpot = glm::vec3{0.0f,0.0f,0.0f}-glm::vec3{1.2f, 1.0f, 2.0f};
 				this->sceneLightManager.setNewAim(newaimSpot);
 				glUniform3f(lightAimLoc,  this->sceneLightManager.getCurrentAim().x
 										 ,this->sceneLightManager.getCurrentAim().y
@@ -211,9 +184,9 @@ void RenderEngine::setShaderLightingCalculation()
 	}//End Recolect Light Info
 
 
-	viewPosLoc = glGetUniformLocation(shaderManager.getShader(), "cameraPosition");
+	viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
 	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
-	GLint matShininess  = glGetUniformLocation(shaderManager.getShader(),"mat.shininess");
+	GLint matShininess  = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"mat.shininess");
 	glUniform1f(matShininess,90.0f);
 
 }
@@ -231,37 +204,37 @@ void RenderEngine::doRender(){
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	this->setSceneTextures();
+	//this->setSceneTextures();
+
+	this->shaderManager.getCurrentShader().useShader();
+
 
 	glm::mat4 view;
 	view = this->cameraViewport.getCameraViewMatrix();
 	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
 
-	GLint viewLoc = glGetUniformLocation(shaderManager.getShader(), "view");
+	GLint viewLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	GLint projecLoc = glGetUniformLocation(shaderManager.getShader(), "projection");
+	GLint projecLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "projection");
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
-	GLint modelLoc = glGetUniformLocation(shaderManager.getShader(), "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
 
 
 	this->setShaderLightingCalculation();
 
-	//End Update Shading Parameters
+	glm::mat4 model;
+	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// It's a bit too big for our scene, so scale it down
+	GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	this->scene->Draw(this->shaderManager.getCurrentShader());
 
 
-	this->myActualMesh.Draw();
 
-	glUseProgram(shaderManager.getLightingShader());
-	viewLoc = glGetUniformLocation(shaderManager.getLightingShader(),"view");
-	projecLoc = glGetUniformLocation(shaderManager.getLightingShader(), "projection");
-	modelLoc = glGetUniformLocation(shaderManager.getLightingShader(), "model");
+	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	//glUniformMatrix4fv(projecLoc,1,GL_FALSE,glm::value_ptr(projection));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->myMeshLight.getModelMatrix()));
 
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(projecLoc,1,GL_FALSE,glm::value_ptr(projection));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->myMeshLight.getModelMatrix()));
-
-	this->myMeshLight.Draw();
 
 
 };

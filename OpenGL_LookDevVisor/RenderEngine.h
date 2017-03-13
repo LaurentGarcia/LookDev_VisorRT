@@ -16,7 +16,7 @@
 	#include "Camera.h"
 	#include "Shaders_Manager.h"
 	#include "LightManager.h"
-	#include "Mesh.h"
+	#include "Mesh/Mesh.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>
@@ -24,7 +24,8 @@
 	#include "Camera.h"
 	#include "Shaders_Manager.h"
 	#include "LightManager.h"
-	#include "Mesh.h"
+	#include "Mesh/Model.h"
+
 #else
 #endif
 
@@ -81,7 +82,7 @@ public:
 
 	Camera  getActualCamera();
 	GLfloat getDeltaTime();
-	void   doRender();
+	void    doRender();
 
 private:
 
@@ -99,12 +100,10 @@ private:
 	Camera  		cameraViewport;
 	Shaders_Manager shaderManager;
 	Light_Manager   sceneLightManager;
-	Mesh		    myActualMesh;
-	Mesh			myMeshLight = Mesh(1); // Calling to constructor specifing if it's a mesh light. Needs to be changed more generic
+    Model*          scene;
 
 	//Private functions
 	void setShaderSceneTransformations();
-	void setSceneTextures();
 	void setShaderLightingCalculation();
 };
 

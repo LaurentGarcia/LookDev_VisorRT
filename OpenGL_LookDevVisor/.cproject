@@ -27,6 +27,7 @@
 									<listOptionValue builtIn="false" value="/opt/glew-2.0.0/include/GL"/>
 									<listOptionValue builtIn="false" value="/home/lcarro/glfw/include/GLFW"/>
 									<listOptionValue builtIn="false" value="/home/lcarro/SOIL/Install/"/>
+									<listOptionValue builtIn="false" value="/home/lcarro/assimp-3.3.1/include/"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.files.279312895" name="Include files (-include)" superClass="gnu.cpp.compiler.option.include.files" valueType="includeFiles">
 									<listOptionValue builtIn="false" value="glew.h"/>
@@ -46,17 +47,20 @@
 								<option id="gnu.cpp.link.option.other.1512907008" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" valueType="stringList">
 									<listOptionValue builtIn="false" value="-rpath=/home/lcarro/glfw/src"/>
 									<listOptionValue builtIn="false" value="-rpath=/opt/glew-2.0.0/lib64"/>
+									<listOptionValue builtIn="false" value="-rpath=/home/lcarro/assimp-3.3.1/Build/code/"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1411455382" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="GLEW"/>
 									<listOptionValue builtIn="false" value="glfw"/>
 									<listOptionValue builtIn="false" value="SOIL"/>
+									<listOptionValue builtIn="false" value="assimp"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.574743975" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/home/lcarro/glfw/src"/>
 									<listOptionValue builtIn="false" value="/opt/glew-2.0.0/lib64"/>
 									<listOptionValue builtIn="false" value="/home/lcarro/SOIL/Install/"/>
+									<listOptionValue builtIn="false" value="/home/lcarro/assimp-3.3.1/Build/code/"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.481832384" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

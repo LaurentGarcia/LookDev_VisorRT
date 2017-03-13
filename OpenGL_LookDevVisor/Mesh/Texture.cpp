@@ -18,8 +18,8 @@ Texture::Texture(const char* textureName) {
 			std::cout << "Texture loaded size:" << widthTex1 << "*" << heightTex1;
 	#endif
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
 	//Texture option
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
@@ -38,5 +38,26 @@ Texture::~Texture() {
 }
 
 GLuint Texture::getTexture(){
-	return this->texture;
+	return this->textureId;
 };
+
+void Texture::setTextureType(std::string type)
+{
+	this->type = type;
+};
+
+void   Texture::setTexturePath(aiString path)
+{
+	this->path = path;
+};
+
+std::string Texture::getTextureType()
+{
+	return this->type;
+};
+
+aiString Texture::getTexturePath()
+{
+	return this->path;
+};
+

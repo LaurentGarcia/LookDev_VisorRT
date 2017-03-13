@@ -9,6 +9,7 @@
 	#include "..\WindowGL.h"
 	#include "..\Shaders_Manager.h"
 	#include "Mesh.h"
+	#include "Texture.h"
 	#include <assimp\Importer.hpp>
 	#include <assimp\scene.h>
 	#include <assimp\postprocess.h>
@@ -16,22 +17,34 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
+	#include "../Shader.h"
 	#include "../Shaders_Manager.h"
 	#include "Mesh.h"
+	#include "Texture.h"
+	#include <assimp/Importer.hpp>
+	#include <assimp/scene.h>
+	#include <assimp/postprocess.h>
 #else
 #endif
 
 class Model
 {
 public:
-	Model(GLchar* modelPathName);
+	Model(std::string modelPathName);
 	~Model();
 
-	void Draw();
+	void Draw(Shader shader);
 private:
-	std::vector<Mesh> meshes;
-	
-	const aiScene* scene;
 
+	//Model Class as container of Meshes
+	std::vector<Mesh> 	  meshes;
+	const aiScene* 		  scene;
+	std::string			  directory;
+	std::vector<Texture>  texturesLoaded;
+	//Private functions
+
+	void 		         processAssimpSceneTree(aiNode* node, const aiScene* scene);
+	Mesh 				 processAssimpMesh     (aiMesh* mesh, const aiScene* scene);
+	std::vector<Texture> loadMaterialTextures  (aiMaterial* mat, aiTextureType type, std::string typeName);
 };
 

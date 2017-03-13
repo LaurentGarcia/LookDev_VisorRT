@@ -14,11 +14,17 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <SOIL.h>
+	#include <assimp/Importer.hpp>
+	#include <assimp/scene.h>
+	#include <assimp/postprocess.h>
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
 	#include <SOIL.h>
+	#include <assimp/Importer.hpp>
+	#include <assimp/scene.h>
+	#include <assimp/postprocess.h>
 #else
 #endif
 
@@ -27,16 +33,22 @@ class Texture {
 public:
 
 	Texture(const char* textureName);
-
 	virtual ~Texture();
 
-	GLuint getTexture();
+	void   setTextureType(std::string type);
+	void   setTexturePath(aiString path);
+
+	std::string getTextureType();
+	GLuint 		getTexture();
+	aiString    getTexturePath();
 
 private:
 
-	GLuint texture;
-	int    widthTex;
-	int    heightTex;
+	GLuint      textureId;
+	std::string type;
+	aiString 	path;
+	int    		widthTex;
+	int    		heightTex;
 };
 
 #endif /* TEXTURE_H_ */

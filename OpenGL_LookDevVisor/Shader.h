@@ -1,7 +1,11 @@
-#pragma once
-// Class designed for help in shaders management
-// It provides utilities to load, unload and change Shaders in the app
+/*
+ * Shader.h
+ *
+ *  Created on: Mar 13, 2017
+ *      Author: lcarro
+ */
 
+#pragma once
 #ifdef _WIN32
 	#include <math.h>
 	#include <glew.h>
@@ -22,24 +26,24 @@
 	#include <stdexcept>
 	#include <math.h>
 	#include <vector>
-	#include "Shader.h"
+	#include "Mesh/Texture.h"
 #else
 #endif
 
-
-
-
-class Shaders_Manager
-{
-
+class Shader {
 public:
 
-	Shaders_Manager();
-	~Shaders_Manager();
+	Shader(const char* vtxShaderFile, const char* frgShaderFile);
+	virtual ~Shader();
 
-	void   createShader(const char* vtxShaderFile, const char* frgShaderFile);
-	Shader getCurrentShader();
+	GLuint getShaderId();
+	void   useShader();
+
 private:
-	std::vector<Shader> shaderCollection;
+
+	GLuint shaderId;
+	std::string readFile  (const char* filename);
+	void        loadShader( const char* vtxShaderFile, const char* frgShaderFile);
 };
+
 
