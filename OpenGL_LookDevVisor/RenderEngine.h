@@ -21,11 +21,13 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
-	#include "Camera.h"
+	#include "Camera/Camera.h"
 	#include "Shaders_Manager.h"
 	#include "LightManager.h"
 	#include "Mesh/Model.h"
-
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
 #else
 #endif
 
@@ -51,22 +53,12 @@ public:
 	const char* fragmentshaderfileName = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
 	const char* vtxLightShaderFileName = "Shaders\\vtxlightshader.glsl";
 	const char* frgLightShaderFileName = "Shaders\\frglightshader.glsl";
-	const char* texture1 = "Textures\\container.jpg";
-	const char* texture2 = "Textures\\wall.jpg";
-	const char* texture3 = "Textures\\container2.png";
-	const char* texture4 = "Textures\\container2_specular.png";
-	const char* texture5 = "Textures\\emision_matrix.jpg";
 #elif __linux__
 	const char* vertexShaderFileName   = "Shaders/vertexshader.glsl";
 	const char* fragmentshaderfileName = "Shaders/fragmentshader.glsl";
 	const char* vtxLightShaderFileName   = "Shaders/vtxlightshader.glsl";
 	const char* frgLightShaderFileName = "Shaders/frglightshader.glsl";
 
-	const char* texture1 = "Textures/container.jpg";
-	const char* texture2 = "Textures/wall.jpg";
-	const char* texture3 = "Textures/container2.png";
-	const char* texture4 = "Textures/container2_specular.png";
-	const char* texture5 = "Textures/emision_matrix.jpg";
 #else
 #endif
 	//End todo, config file;

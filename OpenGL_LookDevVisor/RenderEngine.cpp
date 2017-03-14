@@ -12,10 +12,6 @@ RenderEngine::RenderEngine() {
 
 	glEnable(GL_DEPTH_TEST);
 
-#if DEBUG
-	shaderManager.printVertexAttributes();
-#endif
-
 	bool* shaderesult = new bool(false);
 	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName);
 	if (shaderesult) {
@@ -29,7 +25,7 @@ RenderEngine::RenderEngine() {
 	this->sceneLightManager.setNewLightLinearValue(0.09f);
 	this->sceneLightManager.setNewLightQuadraticValue(0.032f);
 
-	this->scene = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/shinny.obj");//dummy
+	this->scene = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/cube.obj");//dummy
 }
 
 RenderEngine::~RenderEngine() {
@@ -185,7 +181,7 @@ void RenderEngine::setShaderLightingCalculation()
 
 
 	viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
-	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
+	//glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
 	GLint matShininess  = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"mat.shininess");
 	glUniform1f(matShininess,90.0f);
 
@@ -204,7 +200,6 @@ void RenderEngine::doRender(){
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//this->setSceneTextures();
 
 	this->shaderManager.getCurrentShader().useShader();
 
@@ -219,22 +214,13 @@ void RenderEngine::doRender(){
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 
-
-	this->setShaderLightingCalculation();
-
 	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f)); // Translate it down a bit so it's at the center of the scene
 	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// It's a bit too big for our scene, so scale it down
 	GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	this->scene->Draw(this->shaderManager.getCurrentShader());
 
-
-
-	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	//glUniformMatrix4fv(projecLoc,1,GL_FALSE,glm::value_ptr(projection));
-	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->myMeshLight.getModelMatrix()));
-
+    this->scene->Draw(this->shaderManager.getCurrentShader());
 
 
 };

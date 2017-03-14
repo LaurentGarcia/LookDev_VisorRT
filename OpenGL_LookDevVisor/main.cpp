@@ -24,13 +24,11 @@
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
 	#include "ApiConfiguration.h"
-	#include "Camera.h"
 	#include "WindowGL.h"
 	#include "RenderEngine.h"
 	#include "LogicController.h"
 #else
 #endif
-
 
 
 	//To be changed

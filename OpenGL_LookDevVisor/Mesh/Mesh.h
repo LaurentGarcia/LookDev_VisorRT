@@ -54,7 +54,7 @@ public:
 	glm::mat4 getModelMatrix();
 	
 	void   setPosition(glm::vec3 newposition);
-	void   setScale(glm::vec3 newscale);
+	void   setScale   (glm::vec3 newscale);
 
 	void   Draw(Shader shader);
 

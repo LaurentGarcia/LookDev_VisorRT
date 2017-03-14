@@ -28,6 +28,8 @@
 #else
 #endif
 
+#define DEBUG 1
+
 class Texture {
 
 public:

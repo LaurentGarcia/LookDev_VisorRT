@@ -12,6 +12,7 @@ Model::Model(std::string modelPathName)
 	    return;
 	}
 	this->directory = modelPathName.substr(0,modelPathName.find_last_of('/'));
+	std::cout << "Model loading from:" << this->directory << std::endl;
 	this->processAssimpSceneTree(scene->mRootNode,scene);
 }
 
@@ -36,6 +37,7 @@ void Model::processAssimpSceneTree(aiNode* node, const aiScene* scene)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		this->meshes.push_back(this->processAssimpMesh(mesh,scene));
+		std::cout<< "Loading Mesh: "<< this->scene->mMeshes[node->mMeshes[i]]->mName.C_Str() << std::endl;
 	};
 	for (GLuint i=0; i<node->mNumChildren;i++)
 	{
@@ -97,6 +99,9 @@ Mesh Model::processAssimpMesh(aiMesh* mesh, const aiScene* scene)
 		std::vector<Texture>specMaps    = this->loadMaterialTextures(material,aiTextureType_SPECULAR,"texture_specular");
 		textures.insert(textures.end(),specMaps.begin(),specMaps.end());
 	}
+	std::cout<<"Number of Vertex: "<< vertices.size()*3 << std::endl;
+	std::cout<<"Number of Index :"<< indices.size() << std::endl;
+	std::cout<<"Number of Textures:"<<textures.size() <<std::endl;
 	return Mesh(vertices, indices,textures);
 }
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
@@ -106,7 +111,12 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 	{
 		aiString str;
 		mat->GetTexture(type,i,&str);
-		Texture texture = Texture(str.C_Str());
+		//It gives me the texture name we need to include the path.
+		aiString straux(this->directory);
+		straux.Append("/");
+		straux.Append(str.C_Str());
+		std::cout<<straux.C_Str()<<std::endl;
+		Texture texture(straux.C_Str());
 		texture.setTextureType(typeName);
 		texture.setTexturePath(str);
 		modelTextures.push_back(texture);

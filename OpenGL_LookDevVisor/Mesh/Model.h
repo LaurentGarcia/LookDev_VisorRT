@@ -34,12 +34,13 @@ public:
 	~Model();
 
 	void Draw(Shader shader);
+
 private:
 
 	//Model Class as container of Meshes
 	std::vector<Mesh> 	  meshes;
 	const aiScene* 		  scene;
-	std::string			  directory;
+	std::string			  directory;// Current Model Directory
 	std::vector<Texture>  texturesLoaded;
 	//Private functions
 

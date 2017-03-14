@@ -2,9 +2,10 @@
 
 
 
+
 Camera::Camera()
 {
-	cameraPosition  = glm::vec3(0.0f, 0.0f,  3.0f);
+	cameraPosition  = glm::vec3(0.0f, 0.0f,  20.0f);
 	cameraTarget    = glm::vec3(0.0f, 0.0f,  0.0f);
 	cameraDirection = glm::normalize(cameraPosition-cameraTarget);
 	cameraUp		= glm::vec3(0.0f, 1.0f, 0.0f);
@@ -15,7 +16,7 @@ Camera::Camera()
 	phi				= 3.14f;
 	theta           = 0.0f;
 	cameraFov		= 45.0f;
-	distanceToOrigin= 5.0f;
+	distanceToOrigin= 20.0f;
 }
 
 

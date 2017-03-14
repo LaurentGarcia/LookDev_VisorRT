@@ -5,6 +5,8 @@
 in  vec2 TexCoord;
 in  vec3 FragPos;
 in  vec3 Normal;
+
+
 out vec4 color;
 
 
@@ -16,7 +18,7 @@ struct Material {
 	float 	  shininess;
 };
 
-// Interface to be conected with all scene lights
+// Interface to be connected with all scene lights
 struct Light{
 	vec3 position;
 	vec3 ambient;
@@ -34,6 +36,8 @@ struct Light{
 	int   type; // 0= Directional, 1=Point, 2=Spot
 };
 
+//To be changed
+uniform sampler2D texture_diffuse1;
 
 //Inputs
 uniform vec3 cameraPosition;
@@ -60,11 +64,11 @@ float attenuation(Light light)
 void ShadingCalculation(Light light)
 {
 	lightDir    = normalize(light.position-FragPos);
-	ambient 	= light.ambient*vec3(texture(mat.diffuse,TexCoord));
+	ambient 	= light.ambient*vec3(texture(texture_diffuse1,TexCoord));
 	
 	//Diffuse contribution
 	float diffIntensity = max(dot(norm,lightDir),0.0f); 
-	diffuseContribution = light.color*diffIntensity*vec3(texture(mat.diffuse,TexCoord)); 
+	diffuseContribution = light.color*diffIntensity*vec3(texture(texture_diffuse1,TexCoord)); 
 	
 	//Specular contribution
 	
@@ -97,18 +101,20 @@ vec3 spotLightCalculation(Light light)
 }
 void main()
 {   
-	norm		 = normalize(Normal);   
-	viewDir      = normalize(cameraPosition-FragPos);
+	//norm		 = normalize(Normal);   
+	//viewDir      = normalize(cameraPosition-FragPos);
 
-	vec3 lightsOutput;
-	for (int i=0; i<NR_POINT_LIGHTS;i++)
-	{
-		if (lights[i].type==0)
-			ShadingCalculation(lights[i]);
-		if (lights[i].type==1)
-			lightsOutput+=pointLightCalculation(lights[i]);
-		if (lights[i].type==2){
-			lightsOutput+=spotLightCalculation(lights[i]);}
-	}
-	color = vec4(lightsOutput,1.0f);
+	//vec3 lightsOutput;
+	//for (int i=0; i<NR_POINT_LIGHTS;i++)
+	//{
+	//	if (lights[i].type==0)
+	//		ShadingCalculation(lights[i]);
+	//	if (lights[i].type==1)
+	//		lightsOutput+=pointLightCalculation(lights[i]);
+	//	if (lights[i].type==2){
+	//		lightsOutput+=spotLightCalculation(lights[i]);}
+	//}
+	
+	//color = vec4(lightsOutput+0.4f,1.0f);
+	color = vec4(0.5f,0.5f,0.5f,1.0f);
 }

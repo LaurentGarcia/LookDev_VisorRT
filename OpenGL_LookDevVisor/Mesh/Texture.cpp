@@ -13,9 +13,9 @@ Texture::Texture(const char* textureName) {
 	image = SOIL_load_image(textureName, &widthTex, &heightTex, 0, SOIL_LOAD_RGB);
 	#if DEBUG
 		if (image == 0)
-			std::cout << "Texture not found";
+			std::cout << "Texture not found: " << textureName << std::endl;
 		else
-			std::cout << "Texture loaded size:" << widthTex1 << "*" << heightTex1;
+			std::cout << "Texture name:"<<textureName<<" and loaded size:" << widthTex << "*" << heightTex << std::endl;
 	#endif
 
 	glGenTextures(1, &textureId);
