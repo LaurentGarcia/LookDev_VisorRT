@@ -1,6 +1,6 @@
 #version 440 core
 
-#define NR_POINT_LIGHTS 3
+#define NR_POINT_LIGHTS 1
 
 in  vec2 TexCoord;
 in  vec3 FragPos;
@@ -64,17 +64,17 @@ float attenuation(Light light)
 void ShadingCalculation(Light light)
 {
 	lightDir    = normalize(light.position-FragPos);
-	ambient 	= light.ambient*vec3(texture(texture_diffuse1,TexCoord));
+	ambient 	= light.ambient;
 	
 	//Diffuse contribution
 	float diffIntensity = max(dot(norm,lightDir),0.0f); 
-	diffuseContribution = light.color*diffIntensity*vec3(texture(texture_diffuse1,TexCoord)); 
+	diffuseContribution = light.color*diffIntensity; 
 	
 	//Specular contribution
 	
 	vec3 reflectDir = reflect(-lightDir,norm);
 	float specAmount= pow(max(dot(viewDir,reflectDir),0.0),mat.shininess);
-	specularContribution = light.specular*(specAmount*vec3(texture(mat.specular,TexCoord)));
+	specularContribution = light.specular*specAmount;
 }
 
 vec3 pointLightCalculation(Light light)
@@ -101,20 +101,21 @@ vec3 spotLightCalculation(Light light)
 }
 void main()
 {   
-	//norm		 = normalize(Normal);   
-	//viewDir      = normalize(cameraPosition-FragPos);
+	norm		 = normalize(Normal);   
+	viewDir      = normalize(cameraPosition-FragPos);
 
-	//vec3 lightsOutput;
-	//for (int i=0; i<NR_POINT_LIGHTS;i++)
-	//{
-	//	if (lights[i].type==0)
-	//		ShadingCalculation(lights[i]);
-	//	if (lights[i].type==1)
-	//		lightsOutput+=pointLightCalculation(lights[i]);
-	//	if (lights[i].type==2){
-	//		lightsOutput+=spotLightCalculation(lights[i]);}
-	//}
+	vec3 lightsOutput;
+	for (int i=0; i<NR_POINT_LIGHTS;i++)
+	{
+		if (lights[i].type==0)
+			ShadingCalculation(lights[i]);
+		if (lights[i].type==1)
+			lightsOutput+=pointLightCalculation(lights[i]);
+		if (lights[i].type==2){
+			lightsOutput+=spotLightCalculation(lights[i]);
+		}
+	}
 	
-	//color = vec4(lightsOutput+0.4f,1.0f);
-	color = vec4(0.5f,0.5f,0.5f,1.0f);
+	color = vec4(lightsOutput,1.0f);
+
 }

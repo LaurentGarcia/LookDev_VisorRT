@@ -17,7 +17,7 @@ SpotLight::SpotLight() {
 	this->cutoff    = 12.5f;
 	this->outcutoff = 13.5f;
 	this->aim 		= glm::vec3{0.0f,0.0f,0.0f};
-	this->position  = glm::vec3{0.0f,0.0f,0.0f};
+	this->position  = glm::vec3{1.2f, 1.0f, 2.0f};
 	this->on = false;
 }
 

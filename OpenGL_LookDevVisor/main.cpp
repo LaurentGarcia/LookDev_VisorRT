@@ -40,7 +40,7 @@ int main()
 	ApiConfiguration initApi;
 	WindowGL		 windowLookDev = WindowGL(800, 600, "Look Development Real-Time Viewport");
 	LogicController  controllerApp = LogicController(windowLookDev);
-	RenderEngine    myEngine;
+	RenderEngine     myEngine;
 	controllerApp.SetupEngine(myEngine);
 
 

@@ -9,10 +9,10 @@
 
 Light_Manager::Light_Manager() {
 	// TODO Auto-generated constructor stub
-	//Light* sun = new DirectionalLight;
-	//this->sceneLights.push_back(sun);
-	//Light* point = new PointLight;
-	//this->sceneLights.push_back(point);
+//	Light* sun = new DirectionalLight;
+//	this->sceneLights.push_back(sun);
+//	Light* point = new PointLight;
+//	this->sceneLights.push_back(point);
 	Light* spot = new SpotLight;
 	this->sceneLights.push_back(spot);
 }

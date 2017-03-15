@@ -18,14 +18,15 @@ RenderEngine::RenderEngine() {
 		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
 	};
 
-	this->sceneLightManager.setNewLightPosition(glm::vec3{1.2f, 1.0f, 2.0f});
-	this->sceneLightManager.setNewLightColor(glm::vec3{1.0f, 1.0f, 1.0f});
-	this->sceneLightManager.setNewLightSpecContribution(glm::vec3{0.9f, 0.9f, 0.9f});
-	this->sceneLightManager.setNewLightAmbientContribution(glm::vec3{0.2f, 0.2f, 0.2f});
+	this->sceneLightManager.setNewLightPosition(glm::vec3{35.0f, 40.0f, 70.0f});
+	this->sceneLightManager.setNewLightColor(glm::vec3{0.6f, 0.5f, 0.5f});
+	this->sceneLightManager.setNewLightSpecContribution(glm::vec3{0.5f, 0.5f, 0.5f});
+	this->sceneLightManager.setNewLightAmbientContribution(glm::vec3{0.25f, 0.25f, 0.25f});
 	this->sceneLightManager.setNewLightLinearValue(0.09f);
 	this->sceneLightManager.setNewLightQuadraticValue(0.032f);
 
-	this->scene = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/cube.obj");//dummy
+	this->scene      = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/shinny.obj");//dummy
+	this->lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/light.obj");
 }
 
 RenderEngine::~RenderEngine() {
@@ -181,9 +182,10 @@ void RenderEngine::setShaderLightingCalculation()
 
 
 	viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
-	//glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
+	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
 	GLint matShininess  = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"mat.shininess");
 	glUniform1f(matShininess,90.0f);
+
 
 }
 
@@ -204,6 +206,7 @@ void RenderEngine::doRender(){
 	this->shaderManager.getCurrentShader().useShader();
 
 
+
 	glm::mat4 view;
 	view = this->cameraViewport.getCameraViewMatrix();
 	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
@@ -213,14 +216,15 @@ void RenderEngine::doRender(){
 	GLint projecLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "projection");
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+	this->setShaderLightingCalculation();
 
 	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -1.0f)); // Translate it down a bit so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// It's a bit too big for our scene, so scale it down
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(0.8f, 0.8f, 0.8f));	// It's a bit too big for our scene, so scale it down
 	GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
     this->scene->Draw(this->shaderManager.getCurrentShader());
-
+    this->lightdummy->Draw(this->shaderManager.getCurrentShader());
 
 };

@@ -5,8 +5,8 @@
 
 Camera::Camera()
 {
-	cameraPosition  = glm::vec3(0.0f, 0.0f,  20.0f);
-	cameraTarget    = glm::vec3(0.0f, 0.0f,  0.0f);
+	cameraPosition  = glm::vec3(0.0f, 0.0f,  3.0f);
+	cameraTarget    = glm::vec3(0.0f, 4.0f,  0.0f);
 	cameraDirection = glm::normalize(cameraPosition-cameraTarget);
 	cameraUp		= glm::vec3(0.0f, 1.0f, 0.0f);
 	cameraRight	    = glm::normalize(glm::cross(cameraUp, cameraDirection));
@@ -36,7 +36,10 @@ glm::mat4 Camera::getCameraViewMatrix(){
 	this->cameraPosition.x = x;
 	this->cameraPosition.y = y;
 	this->cameraPosition.z = z;
-
+//	GLfloat radius = 50.0f;
+//	GLfloat camX = sin(glfwGetTime()) * radius;
+//	GLfloat camZ = cos(glfwGetTime()) * radius;
+//	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	view = glm::lookAt(glm::vec3(x, y, z), glm::vec3(0.0f,0.0f,0.0f), cameraUp);
 	return this->view;
 };

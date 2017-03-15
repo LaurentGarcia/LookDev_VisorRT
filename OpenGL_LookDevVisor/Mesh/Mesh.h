@@ -39,13 +39,13 @@ class Mesh {
 
 public:
 
-	struct vertex {
-		glm::vec3 position;
-		glm::vec3 normal;
-		glm::vec2 texCoord;
+	struct Vertex {
+		glm::vec3 Position;
+		glm::vec3 Normal;
+		glm::vec2 TexCoords;
 	};
 
-	Mesh(std::vector<vertex> vertices,std::vector<GLuint> indices, std::vector<Texture> textures);
+	Mesh(std::vector<Vertex> vertices,std::vector<GLuint> indices, std::vector<Texture> textures);
 	Mesh(bool islightingMesh);
 	virtual ~Mesh();
 
@@ -60,15 +60,15 @@ public:
 
 private:
 	// Geo info
-	std::vector<vertex>  vertexdata;
-	std::vector<GLuint>  indexdata;
+	std::vector<Vertex>  vertices;
+	std::vector<GLuint>  indices;
 	std::vector<Texture> textures;
 	GLuint VAO;
 	GLuint VBO;
 	GLuint EBO; // For vertex index
 	bool   meshLight;
 
-	// Transformations
+	// Transformations, TODO
 	glm::mat4 model;
 	glm::vec3 position;
 

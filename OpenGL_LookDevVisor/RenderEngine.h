@@ -93,7 +93,7 @@ private:
 	Shaders_Manager shaderManager;
 	Light_Manager   sceneLightManager;
     Model*          scene;
-
+    Model*          lightdummy;
 	//Private functions
 	void setShaderSceneTransformations();
 	void setShaderLightingCalculation();

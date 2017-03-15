@@ -24,7 +24,7 @@ Model::~Model()
 
 void Model::Draw(Shader shader)
 {
-	for (int i=0; i<this->meshes.size();i++)
+	for (GLuint i=0; i<this->meshes.size();i++)
 	{
 		this->meshes[i].Draw(shader);
 	}
@@ -48,36 +48,39 @@ void Model::processAssimpSceneTree(aiNode* node, const aiScene* scene)
 Mesh Model::processAssimpMesh(aiMesh* mesh, const aiScene* scene)
 {
 	//This helper function will translate assimp model to our Mesh Class interface.
-	std::vector<Mesh::vertex> vertices;
+	std::vector<Mesh::Vertex> vertices;
 	std::vector<GLuint>       indices;
 	std::vector<Texture>      textures;
 
 
 	//Vertex Extraction
-	for (int i=0; i<mesh->mNumVertices;i++)
+	for (GLuint i=0; i<mesh->mNumVertices;i++)
 	{
-		Mesh::vertex vertex;
+		Mesh::Vertex vertex;
 		glm::vec3 vector3;
-		glm::vec2 vector2;
+
 
 		vector3.x = mesh->mVertices[i].x;
 		vector3.y = mesh->mVertices[i].y;
 		vector3.z = mesh->mVertices[i].z;
 
-		vertex.position=vector3;
+		vertex.Position=vector3;
 
 		vector3.x = mesh->mNormals[i].x;
 		vector3.y = mesh->mNormals[i].y;
 		vector3.z = mesh->mNormals[i].z;
 
-		vertex.normal = vector3;
+		vertex.Normal = vector3;
 
 		if (mesh->mTextureCoords[0])
 		{
+			glm::vec2 vector2;
 			vector2.x = mesh->mTextureCoords[0][i].x;
 			vector2.y = mesh->mTextureCoords[0][i].y;
-			vertex.texCoord = vector2;
+			vertex.TexCoords = vector2;
 		}
+		else
+		    vertex.TexCoords= glm::vec2(0.0f, 0.0f);
 		vertices.push_back(vertex); //We store the vertex for the current mesh
 
 	}
@@ -102,6 +105,7 @@ Mesh Model::processAssimpMesh(aiMesh* mesh, const aiScene* scene)
 	std::cout<<"Number of Vertex: "<< vertices.size()*3 << std::endl;
 	std::cout<<"Number of Index :"<< indices.size() << std::endl;
 	std::cout<<"Number of Textures:"<<textures.size() <<std::endl;
+	//Todo: Optimize the destruction of Mesh Objects.
 	return Mesh(vertices, indices,textures);
 }
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
