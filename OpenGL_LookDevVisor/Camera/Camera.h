@@ -29,8 +29,11 @@ public:
 	~Camera();
 
 	void doMovement(int keyPressed,GLfloat deltaTime);
+
 	void updateMouseRotation(GLfloat xoffset,GLfloat yoffset);
 	void updateCameraFov(GLfloat fov);
+	void updateLookAt(GLfloat pan);
+
 
 	glm::vec3 getCameraPosition();
 	glm::mat4 getCameraViewMatrix();

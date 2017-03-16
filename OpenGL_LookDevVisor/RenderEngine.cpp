@@ -48,7 +48,10 @@ void  RenderEngine::setRenderWindowSize(int h,int w){
 void  RenderEngine::updateCameraFov(GLfloat fov){
 	this->cameraViewport.updateCameraFov(fov);
 };
-
+void   RenderEngine::updatePanCamera(GLfloat pan)
+{
+	this->cameraViewport.updateLookAt(pan);
+};
 void   RenderEngine::setCameraView(GLfloat xoff,GLfloat yoff)
 {
 	this->cameraViewport.updateMouseRotation(xoff,yoff);
@@ -192,16 +195,15 @@ void RenderEngine::setShaderLightingCalculation()
 void RenderEngine::doRender(){
 
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	//Getting info about how many time it took make the last render
 	GLfloat currentFrame = glfwGetTime();
 	deltaTime     = currentFrame - lastFrameTime;
 	lastFrameTime = currentFrame;
 
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-
+	ImGui_CreateGpuUIMainWindow();
 
 	this->shaderManager.getCurrentShader().useShader();
 
@@ -227,4 +229,40 @@ void RenderEngine::doRender(){
     this->scene->Draw(this->shaderManager.getCurrentShader());
     this->lightdummy->Draw(this->shaderManager.getCurrentShader());
 
+    ImGui::Render();
+
 };
+
+
+//UI,is splitted between Logic Controller (Where the callbacks are defined) and here
+//Because depending of UI, we need to modify our Render.
+void ImGui_GPUStatisticsUI()
+{
+	bool show_another_window;
+	ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
+	ImGui::ShowMetricsWindow(&show_another_window);
+	ImGui::Text("Hello");
+	ImGui::End();
+}
+
+void RenderEngine::ImGui_CreateGpuUIMainWindow()
+{
+	bool show_test_window = true;
+	bool show_another_window = false;
+	static float f = 0.0f;
+	ImVec4 clear_color = ImColor(114, 144, 154);
+	ImGui::Text("ReelFx Look Development Viewport");
+	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+	ImGui::ColorEdit3("clear color", (float*)&clear_color);
+	if (ImGui::Button("Test Window"))
+		show_test_window ^= 1;
+	if (ImGui::Button("Gpu Statistics"))
+		show_another_window ^= 1;
+	if (show_another_window)
+		ImGui_GPUStatisticsUI();
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+};
+
+
+
+

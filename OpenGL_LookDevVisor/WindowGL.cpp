@@ -10,7 +10,6 @@ WindowGL::WindowGL(int wSize, int hSize, char* wName)
 		std::runtime_error("Error to creating the window");
 		glfwTerminate();
 	}else{
-		glfwSetWindowSizeCallback(this->window, WindowGL::window_size_callback);
 		glfwMakeContextCurrent(this->window);
 		glewExperimental = GLEW_OK;
 		if (glewInit()!= GLEW_OK){
@@ -35,4 +34,18 @@ WindowGL::~WindowGL()
 
 GLFWwindow* WindowGL::getWindowPointer() {
 	return this->window;
+};
+GLfloat     WindowGL::getWindowSizeX()
+{
+	int x;
+	int y;
+	glfwGetWindowSize(this->window,&x,&y);
+	return x;
+};
+GLfloat     WindowGL::getWindowSizeY()
+{
+	int x;
+	int y;
+	glfwGetWindowSize(this->window,&x,&y);
+	return y;
 };

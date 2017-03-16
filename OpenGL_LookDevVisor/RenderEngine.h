@@ -21,13 +21,14 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
+	#include "imgui/imgui.h"
 	#include "Camera/Camera.h"
 	#include "Shaders_Manager.h"
 	#include "LightManager.h"
 	#include "Mesh/Model.h"
-	#include <glm/glm.hpp>
-	#include <glm/gtc/matrix_transform.hpp>
-	#include <glm/gtc/type_ptr.hpp>
 #else
 #endif
 
@@ -68,6 +69,7 @@ public:
 
 	void   setRenderWindowSize(int h,int w);
 	void   updateCameraFov(GLfloat fov);
+	void   updatePanCamera(GLfloat pan);
 	void   setZoom(int keyPressed);
 	void   setCameraView(GLfloat xoff,GLfloat yoff);
 	void   setLightIntensity(int keyPressed);
@@ -88,13 +90,17 @@ private:
 	glm::mat4 model;
 	glm::mat4 projection;
 
-	//Objects
-	Camera  		cameraViewport;
-	Shaders_Manager shaderManager;
-	Light_Manager   sceneLightManager;
-    Model*          scene;
-    Model*          lightdummy;
-	//Private functions
+	//Objects and Pointers
+	Camera  		  cameraViewport;
+	Shaders_Manager   shaderManager;
+	Light_Manager     sceneLightManager;
+    Model*            scene;
+    Model*            lightdummy;
+
+    //UI and User Render Interaction
+    void ImGui_CreateGpuUIMainWindow();
+
+    //Private functions
 	void setShaderSceneTransformations();
 	void setShaderLightingCalculation();
 };

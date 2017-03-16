@@ -62,6 +62,10 @@ void Camera::doMovement(int keyPressed,GLfloat deltaTime){
 
 };
 
+void Camera::updateLookAt(GLfloat pan)
+{
+	this->cameraTarget += glm::vec3(0.0f,pan,0.0f);
+};
 void Camera::updateMouseRotation(GLfloat xoffset,GLfloat yoffset)
 {
 	this->pitch += yoffset;
