@@ -24,9 +24,11 @@ Model::~Model()
 
 void Model::Draw(Shader shader)
 {
-	for (GLuint i=0; i<this->meshes.size();i++)
-	{
-		this->meshes[i].Draw(shader);
+	if (!meshes.empty()){
+		for (GLuint i=0; i<this->meshes.size();i++)
+		{
+			this->meshes[i].Draw(shader);
+		}
 	}
 };
 

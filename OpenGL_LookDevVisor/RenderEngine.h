@@ -94,11 +94,16 @@ private:
 	Camera  		  cameraViewport;
 	Shaders_Manager   shaderManager;
 	Light_Manager     sceneLightManager;
-    Model*            scene;
+    Model*            scene = nullptr;
     Model*            lightdummy;
 
-    //UI and User Render Interaction
+    //UI and User Render Interaction plus variables
     void ImGui_CreateGpuUIMainWindow();
+    void ImGui_MainBarFunctions();
+    void ImGui_ShowHelpMarker(const char* desc);
+
+    glm::vec3   viewportBackgroundColor;
+    std::string i_geopath;
 
     //Private functions
 	void setShaderSceneTransformations();

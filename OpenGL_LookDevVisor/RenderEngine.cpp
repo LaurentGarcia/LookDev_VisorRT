@@ -25,7 +25,7 @@ RenderEngine::RenderEngine() {
 	this->sceneLightManager.setNewLightLinearValue(0.09f);
 	this->sceneLightManager.setNewLightQuadraticValue(0.032f);
 
-	this->scene      = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/shinny.obj");//dummy
+	this->viewportBackgroundColor = {0.2,0.2,0.2};
 	this->lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/light.obj");
 }
 
@@ -196,7 +196,7 @@ void RenderEngine::doRender(){
 
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClearColor(viewportBackgroundColor.x,viewportBackgroundColor.y,viewportBackgroundColor.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	//Getting info about how many time it took make the last render
 	GLfloat currentFrame = glfwGetTime();
@@ -222,11 +222,12 @@ void RenderEngine::doRender(){
 
 	glm::mat4 model;
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(0.8f, 0.8f, 0.8f));	// It's a bit too big for our scene, so scale it down
+	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// It's a bit too big for our scene, so scale it down
 	GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-    this->scene->Draw(this->shaderManager.getCurrentShader());
+    if (this->scene	!= nullptr)
+    	this->scene->Draw(this->shaderManager.getCurrentShader());
     this->lightdummy->Draw(this->shaderManager.getCurrentShader());
 
     ImGui::Render();
@@ -247,22 +248,87 @@ void ImGui_GPUStatisticsUI()
 
 void RenderEngine::ImGui_CreateGpuUIMainWindow()
 {
-	bool show_test_window = true;
-	bool show_another_window = false;
+	static bool show_test_window = false;
+	bool show_another_window = true;
 	static float f = 0.0f;
+	bool* windowTestOpen;
+
+	if(ImGui::BeginMainMenuBar()){
+	  if (ImGui::BeginMenu("File"))
+	        {
+		  	  	ImGui_MainBarFunctions();
+	            ImGui::EndMenu();
+	        }
+	        if (ImGui::BeginMenu("Windows"))
+	        {
+	            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+	            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+	            ImGui::Separator();
+	            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+	            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+	            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+	            ImGui::EndMenu();
+	        }
+	ImGui::EndMainMenuBar();
+	}
+
 	ImVec4 clear_color = ImColor(114, 144, 154);
 	ImGui::Text("ReelFx Look Development Viewport");
-	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-	ImGui::ColorEdit3("clear color", (float*)&clear_color);
 	if (ImGui::Button("Test Window"))
-		show_test_window ^= 1;
-	if (ImGui::Button("Gpu Statistics"))
-		show_another_window ^= 1;
-	if (show_another_window)
-		ImGui_GPUStatisticsUI();
+		show_test_window = 1;
+	if (show_test_window)
+		ImGui::ShowTestWindow(windowTestOpen);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 };
 
+void RenderEngine::ImGui_MainBarFunctions()
+{
+	//Static Variables that store the user inputs
+	static char buffer[512];
+	static float colBackground[3] = { viewportBackgroundColor.x,viewportBackgroundColor.y,viewportBackgroundColor.z };
 
+	ImGui::MenuItem(buffer, NULL, false, false);
+	if (ImGui::BeginMenu("Load Model"))
+	{
+	    if(ImGui::InputText("File Path", buffer, sizeof(buffer),ImGuiInputTextFlags_EnterReturnsTrue))
+	    {
+	    		std::cout<<"button pressed"<<std::endl;
+	    		fflush(stdout);
+	    		if (scene!=nullptr){
+	    			if (std::strcmp(i_geopath.c_str(),buffer)!= 0)
+	    			{
+	    				i_geopath = buffer;
+	    				this->scene = new Model(i_geopath);
+	    			}
+	    		}else
+	    		{
+	    			i_geopath = buffer;
+	    			this->scene = new Model(i_geopath);
+	    		}
 
+	    };
+	    ImGui::EndMenu();
+	  }
+	ImGui::Separator();
+	ImGui::LabelText("Viewport", "Values");
+	if(ImGui::ColorEdit3("Background Color", colBackground)){
+		this->viewportBackgroundColor.x = colBackground[0];
+		this->viewportBackgroundColor.y = colBackground[1];
+		this->viewportBackgroundColor.z = colBackground[2];
+	}
 
+	if (ImGui::MenuItem("Quit")) {}
+};
+
+void RenderEngine::ImGui_ShowHelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+    {
+		ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(450.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
