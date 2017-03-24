@@ -87,7 +87,6 @@ private:
 
 	GLfloat deltaTime;
 	GLfloat lastFrameTime;
-	glm::mat4 model;
 	glm::mat4 projection;
 
 	//Objects and Pointers

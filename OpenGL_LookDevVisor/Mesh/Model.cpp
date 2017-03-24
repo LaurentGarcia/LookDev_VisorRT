@@ -4,16 +4,33 @@
 
 Model::Model(std::string modelPathName)
 {
-	Assimp::Importer importer;
-	this->scene = importer.ReadFile(modelPathName,aiProcess_Triangulate | aiProcess_FlipUVs );
-	if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	//In case that user want to import an Alembic file:
+	std::string alembicfiletype = ".abc";
+
+	if ( !(modelPathName.find(".abc") == std::string::npos) )
 	{
-		std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-	    return;
+		std::cout<< "Importing Alembic Scene... "<< std::endl;
+		//Todo: Error Management for Open a bad file
+		this->abcScene = new Alembic::Abc::IArchive(Alembic::AbcCoreOgawa::ReadArchive(),modelPathName);
+		std::cout << "Succesfully Loaded Alembic File: " << abcScene->getName() << std::endl;
+		this->processAlembicSceneTree(modelPathName);
 	}
-	this->directory = modelPathName.substr(0,modelPathName.find_last_of('/'));
-	std::cout << "Model loading from:" << this->directory << std::endl;
-	this->processAssimpSceneTree(scene->mRootNode,scene);
+	else
+	{
+		Assimp::Importer importer;
+		this->scene = importer.ReadFile(modelPathName,aiProcess_Triangulate | aiProcess_FlipUVs );
+		if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+		{
+			std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+			return;
+		}
+		this->directory = modelPathName.substr(0,modelPathName.find_last_of('/'));
+		std::cout << "Model loading from:" << this->directory << std::endl;
+		this->processAssimpSceneTree(scene->mRootNode,scene);
+		//Initialization of model Matrix
+		this->modelTransformations = glm::translate(this->modelTransformations,glm::vec3(0.0f,0.0f,0.0f));
+		this->modelTransformations = glm::scale(this->modelTransformations,glm::vec3(0.3f,0.3f,0.3f));
+	}
 }
 
 
@@ -32,7 +49,49 @@ void Model::Draw(Shader shader)
 	}
 };
 
+// Alembic Helper Functions
+void Model::processAlembicSceneTree(std::string modelPathName)
+{
 
+	Alembic::Abc::IObject obj = this->abcScene->getTop();
+	unsigned int numChildren = obj.getNumChildren();
+	std::cout<< "Number of Children: "<< numChildren << " in alembic file." <<std::endl;
+
+	for(unsigned int i=0; i<numChildren; ++i)
+	{
+		std::cout<<obj.getChildHeader(i).getFullName()<<"\n";
+
+		Alembic::Abc::IObject child(obj,obj.getChildHeader(i).getName());
+
+		std::cout<<"Children "<<child.getNumChildren()<<"\n";
+
+		const Alembic::AbcGeom::MetaData &md = child.getMetaData();
+
+		std::cout<<md.serialize() <<"\n";
+
+	 for(unsigned int x=0; x<child.getNumChildren(); x++)
+	 {
+		       Alembic::Abc::IObject child2(child,child.getChildHeader(x).getName());
+		       std::cout<<"        Name:  "<<child2.getFullName()<<" and childrens: "<<child2.getNumChildren()<<std::endl;
+
+		 const Alembic::AbcGeom::MetaData &md2 = child2.getMetaData();
+		 std::cout<<md2.serialize() <<"\n";
+
+		 	 Alembic::Abc::IObject child3(child2,child2.getChildHeader(x).getName());
+		 	 const Alembic::AbcGeom::MetaData &md3 = child3.getMetaData();
+			 std::cout<<md3.serialize() <<"\n";
+
+
+		 if( Alembic::AbcGeom::IPolyMeshSchema::matches( md3 ) || Alembic::AbcGeom::ISubDSchema::matches( md3 ))
+		 {
+			 std::cout<<"Found a mesh "<<child2.getName()<<"\n";fflush(stdout);
+		 }
+	 }
+	}
+};
+
+
+// Assimp Helper Functions
 void Model::processAssimpSceneTree(aiNode* node, const aiScene* scene)
 {
 	for (GLuint i=0; i<node->mNumMeshes;i++)
@@ -130,3 +189,28 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 	return modelTextures;
 
 }
+
+void Model::setNewModelMatrix(glm::mat4 matrix)
+{
+	this->modelTransformations = matrix;
+};
+
+
+
+
+
+void Model::setNewScale   (glm::vec3 newscale)
+{
+	this->modelTransformations = glm::scale(this->modelTransformations,newscale);
+};
+void Model::setNewPosition(glm::vec3 newoffsetPosition)
+{
+	this->modelTransformations = glm::translate(this->modelTransformations,newoffsetPosition);
+};
+glm::mat4 Model::getModelMatrix()
+{
+	return this->modelTransformations;
+};
+
+
+

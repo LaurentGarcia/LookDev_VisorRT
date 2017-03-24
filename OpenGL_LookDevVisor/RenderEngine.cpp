@@ -220,14 +220,15 @@ void RenderEngine::doRender(){
 
 	this->setShaderLightingCalculation();
 
-	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// It's a bit too big for our scene, so scale it down
-	GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//glm::mat4 model;
+	//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
+	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// It's a bit too big for our scene, so scale it down
 
-    if (this->scene	!= nullptr)
+	if (this->scene!=nullptr){
+		GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->scene->getModelMatrix()));
     	this->scene->Draw(this->shaderManager.getCurrentShader());
+	}
     this->lightdummy->Draw(this->shaderManager.getCurrentShader());
 
     ImGui::Render();
@@ -309,12 +310,67 @@ void RenderEngine::ImGui_MainBarFunctions()
 	    };
 	    ImGui::EndMenu();
 	  }
+	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::LabelText("Viewport", "Values");
 	if(ImGui::ColorEdit3("Background Color", colBackground)){
 		this->viewportBackgroundColor.x = colBackground[0];
 		this->viewportBackgroundColor.y = colBackground[1];
 		this->viewportBackgroundColor.z = colBackground[2];
+	}
+	ImGui::Separator();
+	if (ImGui::TreeNode("Geometry Transformation")){
+		ImGui::Unindent();
+		ImGui::LabelText("Model (Geo)", "Values");
+		ImGui::Spacing();
+
+		static float vec1fscale[1]  = { 0.0f };
+		static float vec4foffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		if(ImGui::SliderFloat3("Offset (XYZ)",vec4foffset, -1.0f, 1.0f))
+		{
+			if (this->scene!=nullptr)
+			{
+				glm::vec3 newpos = {vec4foffset[0],vec4foffset[1],vec4foffset[2]};
+				this->scene->setNewPosition(newpos);
+
+			}
+		}
+		if (ImGui::Button("Reset Offset"))
+		{
+			if(this->scene!=nullptr)
+			{
+				glm::mat4 mataux;
+				this->scene->setNewModelMatrix(mataux);
+				vec4foffset[0] = 0.0f;
+				vec4foffset[1] = 0.0f;
+				vec4foffset[2] = 0.0f;
+
+			}
+
+			ImGui::SameLine();
+			ImGui_ShowHelpMarker("Reset Offset when you want come back to Origin");
+		}
+		if(ImGui::SliderFloat("Scale (XYZ)",vec1fscale, -1.0f, 1.0f))
+		{
+			if(this->scene!=nullptr)
+			{
+				this->scene->setNewScale(glm::vec3(vec1fscale[0],vec1fscale[0],vec1fscale[0]));
+			}
+		}
+		if (ImGui::Button("Reset Scale"))
+		{
+			if(this->scene!=nullptr)
+			{
+				glm::mat4 mataux;
+				this->scene->setNewModelMatrix(mataux);
+				vec1fscale[0] = 0.0f;
+			}
+			ImGui::SameLine();
+			ImGui::Text("Offset Reset, Model translated to Origin");
+		}
+		ImGui::Indent();
+		ImGui::TreePop();
 	}
 
 	if (ImGui::MenuItem("Quit")) {}
