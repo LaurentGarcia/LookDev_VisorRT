@@ -24,14 +24,11 @@ public:
 	WindowGL();
 	~WindowGL();
 	
-	static void window_size_callback(GLFWwindow* window, int width, int height)
-	{
-		glfwSetWindowSize(window, width, height);
-		glViewport(0, 0, width, height);
-	}
+
 
 	GLFWwindow* getWindowPointer();
-
+	GLfloat     getWindowSizeX();
+	GLfloat     getWindowSizeY();
 private:
 	GLFWwindow* window;
 };

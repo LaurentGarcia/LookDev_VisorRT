@@ -1,0 +1,754 @@
+
+
+## Widgets #
+
+## Graphs widgets #
+
+## Layout #
+> Child regions
+    Without border
+    Goto
+    50
+0000: scrollable region
+0001: scrollable region
+0002: scrollable region
+0003: scrollable region
+0004: scrollable region
+0005: scrollable region
+0006: scrollable region
+0007: scrollable region
+0008: scrollable region
+0009: scrollable region
+0010: scrollable region
+0011: scrollable region
+0012: scrollable region
+0013: scrollable region
+0014: scrollable region
+0015: scrollable region
+0016: scrollable region
+0017: scrollable region
+0018: scrollable region
+0019: scrollable region
+0020: scrollable region
+0021: scrollable region
+0022: scrollable region
+0023: scrollable region
+0024: scrollable region
+0025: scrollable region
+0026: scrollable region
+0027: scrollable region
+0028: scrollable region
+0029: scrollable region
+0030: scrollable region
+0031: scrollable region
+0032: scrollable region
+0033: scrollable region
+0034: scrollable region
+0035: scrollable region
+0036: scrollable region
+0037: scrollable region
+0038: scrollable region
+0039: scrollable region
+0040: scrollable region
+0041: scrollable region
+0042: scrollable region
+0043: scrollable region
+0044: scrollable region
+0045: scrollable region
+0046: scrollable region
+0047: scrollable region
+0048: scrollable region
+0049: scrollable region
+0050: scrollable region
+0051: scrollable region
+0052: scrollable region
+0053: scrollable region
+0054: scrollable region
+0055: scrollable region
+0056: scrollable region
+0057: scrollable region
+0058: scrollable region
+0059: scrollable region
+0060: scrollable region
+0061: scrollable region
+0062: scrollable region
+0063: scrollable region
+0064: scrollable region
+0065: scrollable region
+0066: scrollable region
+0067: scrollable region
+0068: scrollable region
+0069: scrollable region
+0070: scrollable region
+0071: scrollable region
+0072: scrollable region
+0073: scrollable region
+0074: scrollable region
+0075: scrollable region
+0076: scrollable region
+0077: scrollable region
+0078: scrollable region
+0079: scrollable region
+0080: scrollable region
+0081: scrollable region
+0082: scrollable region
+0083: scrollable region
+0084: scrollable region
+0085: scrollable region
+0086: scrollable region
+0087: scrollable region
+0088: scrollable region
+0089: scrollable region
+0090: scrollable region
+0091: scrollable region
+0092: scrollable region
+0093: scrollable region
+0094: scrollable region
+0095: scrollable region
+0096: scrollable region
+0097: scrollable region
+0098: scrollable region
+0099: scrollable region
+With border
+00000000
+00001663
+00002cc6
+00004329
+0000598c
+00006fef
+00008652
+00009cb5
+0000b318
+0000c97b
+0000dfde
+0000f641
+00010ca4
+00012307
+0001396a
+00014fcd
+00016630
+00017c93
+000192f6
+0001a959
+0001bfbc
+0001d61f
+0001ec82
+000202e5
+00021948
+00022fab
+0002460e
+00025c71
+000272d4
+00028937
+00029f9a
+0002b5fd
+0002cc60
+0002e2c3
+0002f926
+00030f89
+000325ec
+00033c4f
+000352b2
+00036915
+00037f78
+000395db
+0003ac3e
+0003c2a1
+0003d904
+0003ef67
+000405ca
+00041c2d
+00043290
+000448f3 00045f56
+000475b9
+00048c1c
+0004a27f
+0004b8e2
+0004cf45
+0004e5a8
+0004fc0b
+0005126e
+000528d1
+00053f34
+00055597
+00056bfa
+0005825d
+000598c0
+0005af23
+0005c586
+0005dbe9
+0005f24c
+000608af
+00061f12
+00063575
+00064bd8
+0006623b
+0006789e
+00068f01
+0006a564
+0006bbc7
+0006d22a
+0006e88d
+0006fef0
+00071553
+00072bb6
+00074219
+0007587c
+00076edf
+00078542
+00079ba5
+0007b208
+0007c86b
+0007dece
+0007f531
+00080b94
+000821f7
+0008385a
+00084ebd
+00086520
+00087b83
+000891e6
+0008a849
+> Widgets Width
+    PushItemWidth(100) (?)
+    131.000 float
+    PushItemWidth(GetWindowWidth() * 0.5f) (?)
+    131.000 float
+    PushItemWidth(GetContentRegionAvailWidth() * 0.5f) (?)
+    131.000 float
+    PushItemWidth(-100) (?)
+    131.000 float
+    PushItemWidth(-1) (?)
+    131.000 float
+> Basic Horizontal Layout
+    (Use ImGui::SameLine() to keep adding items to the right of the preceding item)
+    Two items: Hello Sailor
+    More spacing: Hello Sailor
+    Normal buttons Banana Apple Corniflower
+    Small buttons Like this one can fit within a text block.
+    Aligned x=150 x=300
+    Aligned x=150 x=300
+    [ ] My [ ] Tailor [ ] Is [ ] Rich
+    Combo 1.000 X 2.000 Y 3.000 Z
+    Lists:
+    A B
+> Groups
+    (Using ImGui::BeginGroup()/EndGroup() to layout items. BeginGroup() basically locks the horizontal position. EndGroup() bundles the whole group so that you can use functions such as IsItemHovered() on it.)
+    AAA BBB
+    CCC
+    DDD
+    EEE
+    ACTION REACTION
+    LEVERAGE
+    BUZZWORD
+    List
+> Text Baseline Alignment
+    (This is testing the vertical alignment that occurs on text to keep it at the same baseline as widgets. Lines only composed of text or "small" widgets fit in less vertical spaces than lines with normal widgets)
+    One
+    Two
+    Three Hello
+    World Banana
+    Banana Hello
+    World One
+    Two
+    Three
+    HOP Banana Hello
+    World Banana
+    HOP Hello
+    World Banana
+    TEST TEST TEST
+    Text aligned to Widget Widget Widget Widget
+    Button > Node
+        Item 0..
+        Item 1..
+        Item 2..
+        Item 3..
+        Item 4..
+        Item 5..
+    > Node Button
+        Item 0..
+        Item 1..
+        Item 2..
+        Item 3..
+        Item 4..
+        Item 5..
+    Button Bullet text
+    Node Button
+> Scrolling
+    (Use SetScrollHere() or SetScrollFromPosY() to scroll to a given position.)
+    [x] Track Line 50
+    Scroll To y = 200 px
+    Top
+    25%
+    Center
+    75%
+    Bottom
+> Horizontal Scrolling
+    Horizontal scrolling for a window has to be enabled explicitly via the ImGuiWindowFlags_HorizontalScrollbar flag.
+    You may want to explicitly specify content width by calling SetNextWindowContentWidth() before Begin().
+    4 Lines
+    << Scroll from code >>
+> Clipping
+    On a per-widget basis we are occasionally clipping text CPU-side if it won't fit in its frame. Otherwise we are doing coarser clipping + passing a scissor rectangle to the renderer. The system is designed to try minimizing both execution and CPU/GPU rendering cost.
+    103 100 size
+    (Click and drag)
+
+## Popups & Modal windows #
+> Popups
+    When a popup is active, it inhibits interacting with windows that are behind the popup. Clicking outside the popup closes it.
+    Select.. <None>
+    Toggle..
+    Popup Menu..
+    Below we are testing adding menu items to a regular window. It's rather unusual but should work!
+--------------------------------
+    Menu item CTRL+M
+    Menu inside a regular window
+--------------------------------
+> Context menus
+    Value = 0.500 (<-- right-click here)
+    (<-- right-click here)
+> Modals
+    Modal windows are like popups but the user cannot close them by clicking outside the window.
+    Delete..
+    Stacked modals..
+
+## Columns #
+
+## Filtering #
+Filter usage:
+  ""         display all lines
+  "xxx"      display lines containing "xxx"
+  "xxx,yyy"  display lines containing "xxx" or "yyy"
+  "-xxx"     hide lines containing "xxx" Filter (inc,-exc)
+aaa1.c
+bbb1.c
+ccc1.c
+aaa2.cpp
+bbb2.cpp
+ccc2.cpp
+abc.h
+hello, world
+
+## Keyboard, Mouse & Focus #
+> Tabbing
+    Use TAB/SHIFT+TAB to cycle through keyboard editable fields.
+    dummy 1
+    dummy 2
+    dummy 3
+    dummy 4 (tab skip)
+    dummy 5
+> Focus from code
+    Focus on 1 Focus on 2 Focus on 3
+    click on a button to set focus 1
+    click on a button to set focus 2
+    click on a button to set focus 3 (tab skip)
+    Item with focus: <none>
+    Cursor & selection are preserved when refocusing last used item in code.
+> Dragging
+    You can use ImGui::GetMouseDragDelta(0) to query for the dragged amount on any widget.
+    Drag Me
+> Keyboard & Mouse State
+    MousePos: (972, 648)
+    Mouse down:
+    Mouse clicked:
+    Mouse dbl-clicked:
+    Mouse released: b0
+    MouseWheel: 0.0
+    Keys down:
+    Keys pressed:
+    Keys release:
+    KeyMods: 
+    WantCaptureMouse: true
+    WantCaptureKeyboard: true
+    WantTextInput: false
+    Hovering me sets the
+    keyboard capture flag Holding me clears the
+    the keyboard capture flag
+> Mouse cursors
+    Your application can render a different mouse cursor based on what ImGui::GetMouseCursor() returns. You can also set io.MouseDrawCursor to ask ImGui to render the cursor for you in software.
+    [ ] io.MouseDrawCursor
+    Hover to see mouse cursors:
+    Mouse cursor 0
+    Mouse cursor 1
+    Mouse cursor 2
+    Mouse cursor 3
+    Mouse cursor 4
+    Mouse cursor 5
+    Mouse cursor 6
+
+
+## Widgets #
+
+## Graphs widgets #
+
+## Layout #
+> Child regions
+    Without border
+    Goto
+    50
+0000: scrollable region
+0001: scrollable region
+0002: scrollable region
+0003: scrollable region
+0004: scrollable region
+0005: scrollable region
+0006: scrollable region
+0007: scrollable region
+0008: scrollable region
+0009: scrollable region
+0010: scrollable region
+0011: scrollable region
+0012: scrollable region
+0013: scrollable region
+0014: scrollable region
+0015: scrollable region
+0016: scrollable region
+0017: scrollable region
+0018: scrollable region
+0019: scrollable region
+0020: scrollable region
+0021: scrollable region
+0022: scrollable region
+0023: scrollable region
+0024: scrollable region
+0025: scrollable region
+0026: scrollable region
+0027: scrollable region
+0028: scrollable region
+0029: scrollable region
+0030: scrollable region
+0031: scrollable region
+0032: scrollable region
+0033: scrollable region
+0034: scrollable region
+0035: scrollable region
+0036: scrollable region
+0037: scrollable region
+0038: scrollable region
+0039: scrollable region
+0040: scrollable region
+0041: scrollable region
+0042: scrollable region
+0043: scrollable region
+0044: scrollable region
+0045: scrollable region
+0046: scrollable region
+0047: scrollable region
+0048: scrollable region
+0049: scrollable region
+0050: scrollable region
+0051: scrollable region
+0052: scrollable region
+0053: scrollable region
+0054: scrollable region
+0055: scrollable region
+0056: scrollable region
+0057: scrollable region
+0058: scrollable region
+0059: scrollable region
+0060: scrollable region
+0061: scrollable region
+0062: scrollable region
+0063: scrollable region
+0064: scrollable region
+0065: scrollable region
+0066: scrollable region
+0067: scrollable region
+0068: scrollable region
+0069: scrollable region
+0070: scrollable region
+0071: scrollable region
+0072: scrollable region
+0073: scrollable region
+0074: scrollable region
+0075: scrollable region
+0076: scrollable region
+0077: scrollable region
+0078: scrollable region
+0079: scrollable region
+0080: scrollable region
+0081: scrollable region
+0082: scrollable region
+0083: scrollable region
+0084: scrollable region
+0085: scrollable region
+0086: scrollable region
+0087: scrollable region
+0088: scrollable region
+0089: scrollable region
+0090: scrollable region
+0091: scrollable region
+0092: scrollable region
+0093: scrollable region
+0094: scrollable region
+0095: scrollable region
+0096: scrollable region
+0097: scrollable region
+0098: scrollable region
+0099: scrollable region
+With border
+00000000
+00001663
+00002cc6
+00004329
+0000598c
+00006fef
+00008652
+00009cb5
+0000b318
+0000c97b
+0000dfde
+0000f641
+00010ca4
+00012307
+0001396a
+00014fcd
+00016630
+00017c93
+000192f6
+0001a959
+0001bfbc
+0001d61f
+0001ec82
+000202e5
+00021948
+00022fab
+0002460e
+00025c71
+000272d4
+00028937
+00029f9a
+0002b5fd
+0002cc60
+0002e2c3
+0002f926
+00030f89
+000325ec
+00033c4f
+000352b2
+00036915
+00037f78
+000395db
+0003ac3e
+0003c2a1
+0003d904
+0003ef67
+000405ca
+00041c2d
+00043290
+000448f3 00045f56
+000475b9
+00048c1c
+0004a27f
+0004b8e2
+0004cf45
+0004e5a8
+0004fc0b
+0005126e
+000528d1
+00053f34
+00055597
+00056bfa
+0005825d
+000598c0
+0005af23
+0005c586
+0005dbe9
+0005f24c
+000608af
+00061f12
+00063575
+00064bd8
+0006623b
+0006789e
+00068f01
+0006a564
+0006bbc7
+0006d22a
+0006e88d
+0006fef0
+00071553
+00072bb6
+00074219
+0007587c
+00076edf
+00078542
+00079ba5
+0007b208
+0007c86b
+0007dece
+0007f531
+00080b94
+000821f7
+0008385a
+00084ebd
+00086520
+00087b83
+000891e6
+0008a849
+> Widgets Width
+    PushItemWidth(100) (?)
+    131.000 float
+    PushItemWidth(GetWindowWidth() * 0.5f) (?)
+    131.000 float
+    PushItemWidth(GetContentRegionAvailWidth() * 0.5f) (?)
+    131.000 float
+    PushItemWidth(-100) (?)
+    131.000 float
+    PushItemWidth(-1) (?)
+    131.000 float
+> Basic Horizontal Layout
+    (Use ImGui::SameLine() to keep adding items to the right of the preceding item)
+    Two items: Hello Sailor
+    More spacing: Hello Sailor
+    Normal buttons Banana Apple Corniflower
+    Small buttons Like this one can fit within a text block.
+    Aligned x=150 x=300
+    Aligned x=150 x=300
+    [ ] My [ ] Tailor [ ] Is [ ] Rich
+    Combo 1.000 X 2.000 Y 3.000 Z
+    Lists:
+    A B
+> Groups
+    (Using ImGui::BeginGroup()/EndGroup() to layout items. BeginGroup() basically locks the horizontal position. EndGroup() bundles the whole group so that you can use functions such as IsItemHovered() on it.)
+    AAA BBB
+    CCC
+    DDD
+    EEE
+    ACTION REACTION
+    LEVERAGE
+    BUZZWORD
+    List
+> Text Baseline Alignment
+    (This is testing the vertical alignment that occurs on text to keep it at the same baseline as widgets. Lines only composed of text or "small" widgets fit in less vertical spaces than lines with normal widgets)
+    One
+    Two
+    Three Hello
+    World Banana
+    Banana Hello
+    World One
+    Two
+    Three
+    HOP Banana Hello
+    World Banana
+    HOP Hello
+    World Banana
+    TEST TEST TEST
+    Text aligned to Widget Widget Widget Widget
+    Button > Node
+        Item 0..
+        Item 1..
+        Item 2..
+        Item 3..
+        Item 4..
+        Item 5..
+    > Node Button
+        Item 0..
+        Item 1..
+        Item 2..
+        Item 3..
+        Item 4..
+        Item 5..
+    Button Bullet text
+    Node Button
+> Scrolling
+    (Use SetScrollHere() or SetScrollFromPosY() to scroll to a given position.)
+    [x] Track Line 50
+    Scroll To y = 200 px
+    Top
+    25%
+    Center
+    75%
+    Bottom
+> Horizontal Scrolling
+    Horizontal scrolling for a window has to be enabled explicitly via the ImGuiWindowFlags_HorizontalScrollbar flag.
+    You may want to explicitly specify content width by calling SetNextWindowContentWidth() before Begin().
+    4 Lines
+    << Scroll from code >>
+> Clipping
+    On a per-widget basis we are occasionally clipping text CPU-side if it won't fit in its frame. Otherwise we are doing coarser clipping + passing a scissor rectangle to the renderer. The system is designed to try minimizing both execution and CPU/GPU rendering cost.
+    103 100 size
+    (Click and drag)
+
+## Popups & Modal windows #
+> Popups
+    When a popup is active, it inhibits interacting with windows that are behind the popup. Clicking outside the popup closes it.
+    Select.. <None>
+    Toggle..
+    Popup Menu..
+    Below we are testing adding menu items to a regular window. It's rather unusual but should work!
+--------------------------------
+    Menu item CTRL+M
+    Menu inside a regular window
+--------------------------------
+> Context menus
+    Value = 0.500 (<-- right-click here)
+    (<-- right-click here)
+> Modals
+    Modal windows are like popups but the user cannot close them by clicking outside the window.
+    Delete..
+    Stacked modals..
+
+## Columns #
+
+## Filtering #
+Filter usage:
+  ""         display all lines
+  "xxx"      display lines containing "xxx"
+  "xxx,yyy"  display lines containing "xxx" or "yyy"
+  "-xxx"     hide lines containing "xxx" Filter (inc,-exc)
+aaa1.c
+bbb1.c
+ccc1.c
+aaa2.cpp
+bbb2.cpp
+ccc2.cpp
+abc.h
+hello, world
+
+## Keyboard, Mouse & Focus #
+> Tabbing
+    Use TAB/SHIFT+TAB to cycle through keyboard editable fields.
+    dummy 1
+    dummy 2
+    dummy 3
+    dummy 4 (tab skip)
+    dummy 5
+> Focus from code
+    Focus on 1 Focus on 2 Focus on 3
+    click on a button to set focus 1
+    click on a button to set focus 2
+    click on a button to set focus 3 (tab skip)
+    Item with focus: <none>
+    Cursor & selection are preserved when refocusing last used item in code.
+> Dragging
+    You can use ImGui::GetMouseDragDelta(0) to query for the dragged amount on any widget.
+    Drag Me
+> Keyboard & Mouse State
+    MousePos: (962, 659)
+    Mouse down:
+    Mouse clicked:
+    Mouse dbl-clicked:
+    Mouse released: b0
+    MouseWheel: 0.0
+    Keys down:
+    Keys pressed:
+    Keys release:
+    KeyMods: 
+    WantCaptureMouse: true
+    WantCaptureKeyboard: true
+    WantTextInput: false
+    Hovering me sets the
+    keyboard capture flag Holding me clears the
+    the keyboard capture flag
+> Mouse cursors
+    Your application can render a different mouse cursor based on what ImGui::GetMouseCursor() returns. You can also set io.MouseDrawCursor to ask ImGui to render the cursor for you in software.
+    [ ] io.MouseDrawCursor
+    Hover to see mouse cursors:
+    Mouse cursor 0
+    Mouse cursor 1
+    Mouse cursor 2
+    Mouse cursor 3
+    Mouse cursor 4
+    Mouse cursor 5
+    Mouse cursor 6

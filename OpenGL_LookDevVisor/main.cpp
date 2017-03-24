@@ -24,13 +24,11 @@
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
 	#include "ApiConfiguration.h"
-	#include "Camera.h"
 	#include "WindowGL.h"
 	#include "RenderEngine.h"
 	#include "LogicController.h"
 #else
 #endif
-
 
 
 	//To be changed
@@ -42,14 +40,18 @@ int main()
 	ApiConfiguration initApi;
 	WindowGL		 windowLookDev = WindowGL(800, 600, "Look Development Real-Time Viewport");
 	LogicController  controllerApp = LogicController(windowLookDev);
-	RenderEngine    myEngine;
+	controllerApp.SetupIO(windowLookDev.getWindowPointer());
+	RenderEngine     myEngine;
 	controllerApp.SetupEngine(myEngine);
+
 
 
 	while (!glfwWindowShouldClose(windowLookDev.getWindowPointer())){
 		glfwPollEvents();
+		//Init a new Frame for our UI
+		controllerApp.ImGui_ImplGlfwGL3_NewFrame();
+		//Calculate the pass
 		myEngine.doRender();
-		glBindVertexArray(0);
 		glfwSwapBuffers(windowLookDev.getWindowPointer());
 	};
 

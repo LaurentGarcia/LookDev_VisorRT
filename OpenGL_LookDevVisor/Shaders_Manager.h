@@ -9,6 +9,10 @@
 	#include <string>
 	#include <fstream>
 	#include <iostream>
+	#include <stdexcept>
+	#include <math.h>
+	#include <vector>
+	#include "Texture.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>
@@ -18,7 +22,7 @@
 	#include <stdexcept>
 	#include <math.h>
 	#include <vector>
-	#include "Texture.h"
+	#include "Shader.h"
 #else
 #endif
 
@@ -29,29 +33,13 @@ class Shaders_Manager
 {
 
 public:
+
 	Shaders_Manager();
 	~Shaders_Manager();
 
-	void loadShader( const char* vtxShaderFile, const char* frgShaderFile, bool* result);
-	GLuint getShader();
-	
-	void loadTexture(const char* textureName);
-	std::vector<Texture> getTextures();
-
-	void shaderUniformValues();
-	// Plataform debug
-	void printVertexAttributes();
-
+	void   createShader(const char* vtxShaderFile, const char* frgShaderFile);
+	Shader getCurrentShader();
 private:
-	//Todo: A dynamic list/structure to store name and pointers of shaders library
-	//Features to implement:
-	//   1. Application, detects new shaders in GLSL, compile it and provide feedback
-	//   2. Application shows the succesful shaders loaded and list in the UI
-	//   3. User selection, Shader manager give us the pointer to selected shader
-
-	GLuint myShader;
-	std::vector<Texture> myTextures;
-
-	std::string readFile(const char* filename);
+	std::vector<Shader> shaderCollection;
 };
 
