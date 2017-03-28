@@ -13,7 +13,9 @@ Model::Model(std::string modelPathName)
 		//Todo: Error Management for Open a bad file
 		this->abcScene = new Alembic::Abc::IArchive(Alembic::AbcCoreOgawa::ReadArchive(),modelPathName);
 		std::cout << "Succesfully Loaded Alembic File: " << abcScene->getName() << std::endl;
-		this->processAlembicSceneTree(modelPathName);
+		this->processAlembicSceneTreeRecursively(abcScene->getTop());
+		this->modelTransformations = glm::translate(this->modelTransformations,glm::vec3(0.0f,0.0f,0.0f));
+		this->modelTransformations = glm::scale(this->modelTransformations,glm::vec3(0.3f,0.3f,0.3f));
 	}
 	else
 	{
@@ -50,46 +52,124 @@ void Model::Draw(Shader shader)
 };
 
 // Alembic Helper Functions
-void Model::processAlembicSceneTree(std::string modelPathName)
+// Recursive function that evaluate the Alembic tree finding the meshes.
+
+void Model::processAlembicSceneTreeRecursively(Alembic::Abc::IObject objTop)
 {
+	const Alembic::AbcGeom::MetaData &md = objTop.getMetaData();
 
-	Alembic::Abc::IObject obj = this->abcScene->getTop();
-	unsigned int numChildren = obj.getNumChildren();
-	std::cout<< "Number of Children: "<< numChildren << " in alembic file." <<std::endl;
-
-	for(unsigned int i=0; i<numChildren; ++i)
+	if (Alembic::AbcGeom::IPolyMeshSchema::matches( md ) || Alembic::AbcGeom::ISubDSchema::matches( md ))
 	{
-		std::cout<<obj.getChildHeader(i).getFullName()<<"\n";
-
-		Alembic::Abc::IObject child(obj,obj.getChildHeader(i).getName());
-
-		std::cout<<"Children "<<child.getNumChildren()<<"\n";
-
-		const Alembic::AbcGeom::MetaData &md = child.getMetaData();
-
-		std::cout<<md.serialize() <<"\n";
-
-	 for(unsigned int x=0; x<child.getNumChildren(); x++)
-	 {
-		       Alembic::Abc::IObject child2(child,child.getChildHeader(x).getName());
-		       std::cout<<"        Name:  "<<child2.getFullName()<<" and childrens: "<<child2.getNumChildren()<<std::endl;
-
-		 const Alembic::AbcGeom::MetaData &md2 = child2.getMetaData();
-		 std::cout<<md2.serialize() <<"\n";
-
-		 	 Alembic::Abc::IObject child3(child2,child2.getChildHeader(x).getName());
-		 	 const Alembic::AbcGeom::MetaData &md3 = child3.getMetaData();
-			 std::cout<<md3.serialize() <<"\n";
-
-
-		 if( Alembic::AbcGeom::IPolyMeshSchema::matches( md3 ) || Alembic::AbcGeom::ISubDSchema::matches( md3 ))
-		 {
-			 std::cout<<"Found a mesh "<<child2.getName()<<"\n";fflush(stdout);
-		 }
-	 }
+		std::cout << "Processing Geo..:"<< objTop.getName() << std::endl;
+		this->meshes.push_back(this->processAlembicMesh(objTop));
 	}
-};
 
+	for (unsigned int i= 0; i<objTop.getNumChildren(); i++)
+	{
+		Alembic::Abc::IObject child(objTop,objTop.getChildHeader(i).getName());
+		this->processAlembicSceneTreeRecursively(child);
+	}
+
+}
+
+Mesh Model::processAlembicMesh (Alembic::AbcGeom::IPolyMesh mesh)
+{
+	//Alembic mesh proccesing
+	//Getting the info from Alembic Structure
+    // GeomParam in Alembic could be:
+	//      Indexed or not indexed
+	//      Indexed for example in UVs, means that the model could have two or more uv sets assigned.
+	//Thanks to appleseedHQ https://github.com/appleseedhq/appleseed/blob/master/src/appleseed/foundation/mesh/alembicmeshfilereader.cpp#L141
+
+	Alembic::AbcGeom::IPolyMeshSchema   meshSchema       = mesh.getSchema();
+	Alembic::AbcGeom::IN3fGeomParam     normal_parameter = meshSchema.getNormalsParam();
+	Alembic::AbcGeom::IV2fGeomParam		uvs_parameter    = meshSchema.getUVsParam();
+
+	//Creating the sampling for Normals and Uvs
+	Alembic::AbcGeom::IPolyMeshSchema::Sample mesh_samples;
+	meshSchema.get(mesh_samples);
+	Alembic::AbcGeom::IN3fGeomParam::Sample normal_samples(normal_parameter.getIndexedValue());
+	Alembic::AbcGeom::IV2fGeomParam::Sample uv_samples(uvs_parameter.getIndexedValue());
+
+	if(!normal_samples.valid() || !uv_samples.valid())
+	{
+		std::cout<<"Alembic mesh has no UV or Normals properly stored"<<std::endl;
+		return nullptr;
+	}
+
+	const Alembic::AbcGeom::V3f* vertex     = mesh_samples.getPositions()->get();
+	const Alembic::AbcGeom::N3f* normalsPtr = normal_samples.getVals()->get();
+	const Alembic::AbcGeom::V2f* uvPtr      = uv_samples.getVals()->get();
+
+	if (!normal_parameter.isIndexed() || !uvs_parameter.isIndexed())
+	{
+		std::cout<<"Invalid Normals or UV in Abc file. Unable to load it."<<std::endl;
+		std::cout<<"    Uv indexed: "<<uvs_parameter.isIndexed()<<std::endl;
+		std::cout<<"    Normals indexed: "<<normal_parameter.isIndexed()<<std::endl;
+		std::cout<<"    Uv Constant: "<<uvs_parameter.isConstant()<<std::endl;
+		std::cout<<"    Normals Constant: "<<normal_parameter.isConstant()<<std::endl;
+	}
+
+
+	std::vector<Mesh::Vertex> vertices;
+	std::vector<GLuint>       indices;
+	std::vector<Texture>      textures;
+
+	std::cout<<"Geo Vertex Number: "<< mesh_samples.getPositions()->size() << std::endl;
+	std::cout<<"Normals Number: "   << normal_samples.getVals()->size()    << std::endl;
+	std::cout<<"Uvs numbers:"       << uv_samples.getVals()->size()        << std::endl;
+
+
+	size_t current_normal_index = 0;
+	for (uint32_t i= 0; i< mesh_samples.getPositions()->size();i++)
+	{
+		Mesh::Vertex vertexInfo;
+
+		vertexInfo.Position.x = vertex[i].x;
+		vertexInfo.Position.y = vertex[i].y;
+		vertexInfo.Position.z = vertex[i].z;
+
+		vertexInfo.Normal.x   = normalsPtr[current_normal_index+i].x;
+		vertexInfo.Normal.y   = normalsPtr[current_normal_index+i].y;
+		vertexInfo.Normal.z   = normalsPtr[current_normal_index+i].z;
+
+		vertexInfo.TexCoords.x = uvPtr[i].x;
+		vertexInfo.TexCoords.y = uvPtr[i].y;
+
+		vertices.push_back(vertexInfo);
+	}
+
+
+	//Face Proccessing
+	const Alembic::Abc::int32_t* face_sizes   = mesh_samples.getFaceCounts()->get();
+	const Alembic::Abc::int32_t* face_indices = mesh_samples.getFaceIndices()->get();
+
+	std::cout<<"Face Index Numbers: "<<mesh_samples.getFaceIndices()->size()<< std::endl;
+	std::cout<<"Face  Numbers: "     <<mesh_samples.getFaceCounts()->size()<< std::endl;
+
+
+
+	//For Every Face
+
+	size_t current_vertex_index = 0;
+	for (uint32_t i = 0; i<mesh_samples.getFaceCounts()->size();i++ )
+	{
+		const uint32_t face_size = static_cast<uint32_t>(face_sizes[i]);
+		std::cout<<"Index per Face: "<<face_sizes[i]<< std::endl;
+
+		if (face_size<3)
+			continue;
+
+		for (uint32_t j=0; j<face_size; j++)
+		{
+			GLuint index = face_indices[current_vertex_index+j];
+			indices.push_back(index);
+		}
+		current_vertex_index += face_size;
+	}
+
+	return Mesh(vertices, indices,textures);
+};
 
 // Assimp Helper Functions
 void Model::processAssimpSceneTree(aiNode* node, const aiScene* scene)

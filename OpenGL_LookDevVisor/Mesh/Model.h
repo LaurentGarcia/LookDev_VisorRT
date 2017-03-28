@@ -63,9 +63,12 @@ private:
 
 
 	//Private functions
-	void                 processAlembicSceneTree(std::string modelPathName);
-	void 		         processAssimpSceneTree(aiNode* node, const aiScene* scene);
-	Mesh 				 processAssimpMesh     (aiMesh* mesh, const aiScene* scene);
-	std::vector<Texture> loadMaterialTextures  (aiMaterial* mat, aiTextureType type, std::string typeName);
+		//Alembic
+	void 		         processAlembicSceneTreeRecursively(Alembic::Abc::IObject objTop);
+	Mesh                 processAlembicMesh				   (Alembic::AbcGeom::IPolyMesh mesh);
+		//Assimp
+	void 		         processAssimpSceneTree            (aiNode* node, const aiScene* scene);
+	Mesh 				 processAssimpMesh                 (aiMesh* mesh, const aiScene* scene);
+	std::vector<Texture> loadMaterialTextures              (aiMaterial* mat, aiTextureType type, std::string typeName);
 };
 
