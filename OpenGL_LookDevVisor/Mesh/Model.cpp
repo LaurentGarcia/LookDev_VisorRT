@@ -1,7 +1,6 @@
 #include "Model.h"
 
 
-
 Model::Model(std::string modelPathName)
 {
 	//In case that user want to import an Alembic file:
@@ -72,8 +71,111 @@ void Model::processAlembicSceneTreeRecursively(Alembic::Abc::IObject objTop)
 
 }
 
+std::vector<Mesh::Vertex> Model::proccessAlembicNormals(std::vector<Mesh::Vertex> vertex,Alembic::AbcGeom::IPolyMeshSchema meshSchema)
+{
+	float delta = .000001;
+
+	struct Normal {GLfloat x;
+				   GLfloat y;
+				   GLfloat z;
+				   };
+
+	Alembic::AbcGeom::IPolyMeshSchema::Sample mesh_samples;
+	meshSchema.get(mesh_samples);
+
+	std::vector<Normal> abcNormals;
+    std::vector<Normal> uniqueNormals;
+
+	Alembic::AbcGeom::IN3fGeomParam         normal_parameter = meshSchema.getNormalsParam();
+	std::cout<<"Normals Parameter name: "<<normal_parameter.getName()<<std::endl;
+	std::cout<<"Array Extent: "<< normal_parameter.getArrayExtent()<< std::endl;
+    std::cout<<"Normals Parameter Inter: "<<normal_parameter.getInterpretation()<<std::endl;
+    std::cout<<"Normals Parameter Samples: "<<normal_parameter.getNumSamples()<<std::endl;
+
+
+    Alembic::AbcGeom::IN3fGeomParam::Sample n_samples(normal_parameter.getIndexedValue());
+	std::cout<<"Normals samples is Indexed: "<< n_samples.isIndexed()<<std::endl;
+	std::cout<<"Normals samples size: "<< n_samples.getVals()->size()<< std::endl;
+
+	const Alembic::AbcGeom::N3f* 			nPtr             = n_samples.getVals()->get();
+
+	for (unsigned int i= 0; i< n_samples.getVals()->size();i++)
+	{
+		Normal new_normal;
+		new_normal.x = nPtr[i].x;
+		new_normal.y = nPtr[i].y;
+		new_normal.z = nPtr[i].z;
+		abcNormals.push_back(new_normal);
+		printf("normal th %d: (%.6f,%.6f,%.6f) \n:",i,new_normal.x,new_normal.y,new_normal.z);fflush(stdout);
+	}
+
+	//Now we should eliminate duplicate normal, per face in the list
+	std::cout<<"Size of Normals getting from Alembic: "<< abcNormals.size()<<std::endl;
+
+	// We should get the normals, Alembic store per face normal, it means that we have repetitions in out vector.
+	//    1. Strategies:
+	//			1.1: Remove duplicates in vector list ( probably O(N) in complexity )
+	//			2.2: Get the unique elements:
+	//                   (1,2,3), (4,2,3),(5,4,3).... So first three vertex are unique in vector
+	//                                                Then the first element in the 3-tupla will be unique in case of triangle.
+
+	//Todo: Get from Alembic API this number
+//	int occurrence = 0;
+//	for (unsigned int i=0; i<abcNormals.size();i++)
+//	{
+//		occurrence = 0;
+//		// For our first vector in uniqueNormals where it's empty
+//		if (uniqueNormals.empty()){
+//			uniqueNormals.push_back(abcNormals[i]);
+//			occurrence =+ 1;
+//		}else
+//		{
+//			for (int j=0; j<uniqueNormals.size();j++)
+//			{
+//				if (std::fabs(abcNormals[i].x-uniqueNormals[j].x)<delta &&
+//					std::fabs(abcNormals[i].y-uniqueNormals[j].y)<delta &&
+//					std::fabs(abcNormals[i].z-uniqueNormals[j].z)<delta){
+//					occurrence+=1;
+//					break;
+//				}
+//			}
+//		}
+//		if (occurrence == 0)
+//			uniqueNormals.push_back(abcNormals[i]);
+//
+//	}
+
+	std::cout<<"Final Unique Normal List size: "<< uniqueNormals.size()<<std::endl;
+
+	// Todo: the three first index supposed to be unique
+
+	vertex[0].Normal.x = abcNormals[0].x;
+	vertex[0].Normal.y = abcNormals[0].y;
+	vertex[0].Normal.y = abcNormals[0].z;
+	vertex[1].Normal.x = abcNormals[2].x;
+	vertex[1].Normal.x = abcNormals[2].x;
+	vertex[1].Normal.x = abcNormals[2].x;
+	vertex[2].Normal.x = abcNormals[1].x;
+	vertex[2].Normal.x = abcNormals[1].x;
+	vertex[2].Normal.x = abcNormals[1].x;
+
+	for (int i = 3 ; (i < abcNormals.size()-2);){
+		vertex[i].Normal.x = abcNormals[i+2].x;
+		vertex[i].Normal.y = abcNormals[i+2].y;
+		vertex[i].Normal.z = abcNormals[i+2].z;
+
+		i+=2;
+	}
+	return vertex;
+}
+
 Mesh Model::processAlembicMesh (Alembic::AbcGeom::IPolyMesh mesh)
 {
+
+
+	std::vector<Mesh::Vertex> vertices;
+	std::vector<GLuint>       indices;
+	std::vector<Texture>      textures;
 	//Alembic mesh proccesing
 	//Getting the info from Alembic Structure
     // GeomParam in Alembic could be:
@@ -82,56 +184,29 @@ Mesh Model::processAlembicMesh (Alembic::AbcGeom::IPolyMesh mesh)
 	//Thanks to appleseedHQ https://github.com/appleseedhq/appleseed/blob/master/src/appleseed/foundation/mesh/alembicmeshfilereader.cpp#L141
 
 	Alembic::AbcGeom::IPolyMeshSchema   meshSchema       = mesh.getSchema();
-	Alembic::AbcGeom::IN3fGeomParam     normal_parameter = meshSchema.getNormalsParam();
 	Alembic::AbcGeom::IV2fGeomParam		uvs_parameter    = meshSchema.getUVsParam();
 
 	//Creating the sampling for Normals and Uvs
 	Alembic::AbcGeom::IPolyMeshSchema::Sample mesh_samples;
 	meshSchema.get(mesh_samples);
-	Alembic::AbcGeom::IN3fGeomParam::Sample normal_samples(normal_parameter.getIndexedValue());
 	Alembic::AbcGeom::IV2fGeomParam::Sample uv_samples(uvs_parameter.getIndexedValue());
 
-	if(!normal_samples.valid() || !uv_samples.valid())
+	if(!uv_samples.valid())
 	{
 		std::cout<<"Alembic mesh has no UV or Normals properly stored"<<std::endl;
 		return nullptr;
 	}
 
 	const Alembic::AbcGeom::V3f* vertex     = mesh_samples.getPositions()->get();
-	const Alembic::AbcGeom::N3f* normalsPtr = normal_samples.getVals()->get();
 	const Alembic::AbcGeom::V2f* uvPtr      = uv_samples.getVals()->get();
 
-	if (!normal_parameter.isIndexed() || !uvs_parameter.isIndexed())
-	{
-		std::cout<<"Invalid Normals or UV in Abc file. Unable to load it."<<std::endl;
-		std::cout<<"    Uv indexed: "<<uvs_parameter.isIndexed()<<std::endl;
-		std::cout<<"    Normals indexed: "<<normal_parameter.isIndexed()<<std::endl;
-		std::cout<<"    Uv Constant: "<<uvs_parameter.isConstant()<<std::endl;
-		std::cout<<"    Normals Constant: "<<normal_parameter.isConstant()<<std::endl;
-	}
-
-
-	std::vector<Mesh::Vertex> vertices;
-	std::vector<GLuint>       indices;
-	std::vector<Texture>      textures;
-
-	std::cout<<"Geo Vertex Number: "<< mesh_samples.getPositions()->size() << std::endl;
-	std::cout<<"Normals Number: "   << normal_samples.getVals()->size()    << std::endl;
-	std::cout<<"Uvs numbers:"       << uv_samples.getVals()->size()        << std::endl;
-
-
-	size_t current_normal_index = 0;
 	for (uint32_t i= 0; i< mesh_samples.getPositions()->size();i++)
 	{
 		Mesh::Vertex vertexInfo;
-
+		std::cout << i << "th vtx : " << vertex[i] << std::endl;
 		vertexInfo.Position.x = vertex[i].x;
 		vertexInfo.Position.y = vertex[i].y;
 		vertexInfo.Position.z = vertex[i].z;
-
-		vertexInfo.Normal.x   = normalsPtr[current_normal_index+i].x;
-		vertexInfo.Normal.y   = normalsPtr[current_normal_index+i].y;
-		vertexInfo.Normal.z   = normalsPtr[current_normal_index+i].z;
 
 		vertexInfo.TexCoords.x = uvPtr[i].x;
 		vertexInfo.TexCoords.y = uvPtr[i].y;
@@ -144,19 +219,14 @@ Mesh Model::processAlembicMesh (Alembic::AbcGeom::IPolyMesh mesh)
 	const Alembic::Abc::int32_t* face_sizes   = mesh_samples.getFaceCounts()->get();
 	const Alembic::Abc::int32_t* face_indices = mesh_samples.getFaceIndices()->get();
 
-	std::cout<<"Face Index Numbers: "<<mesh_samples.getFaceIndices()->size()<< std::endl;
-	std::cout<<"Face  Numbers: "     <<mesh_samples.getFaceCounts()->size()<< std::endl;
+	std::cout<<"Size of Face Indices array "<<mesh_samples.getFaceIndices()->size()<<std::endl;
 
-
-
-	//For Every Face
 
 	size_t current_vertex_index = 0;
+
 	for (uint32_t i = 0; i<mesh_samples.getFaceCounts()->size();i++ )
 	{
 		const uint32_t face_size = static_cast<uint32_t>(face_sizes[i]);
-		std::cout<<"Index per Face: "<<face_sizes[i]<< std::endl;
-
 		if (face_size<3)
 			continue;
 
@@ -167,6 +237,8 @@ Mesh Model::processAlembicMesh (Alembic::AbcGeom::IPolyMesh mesh)
 		}
 		current_vertex_index += face_size;
 	}
+
+	vertices = proccessAlembicNormals(vertices,meshSchema);
 
 	return Mesh(vertices, indices,textures);
 };

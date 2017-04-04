@@ -29,15 +29,16 @@ class DirectionalLight :public Light {
 
 public:
 
-	DirectionalLight();
+	DirectionalLight(std::string name);
 	virtual ~DirectionalLight();
 	//Implements the abstract Light Interface
-	bool      getOn();
-	glm::vec3 getPosition();
-	glm::vec3 getKa();
-	glm::vec3 getKd();
-	glm::vec3 getKs();
-	lightType getType();
+	bool        getOn();
+	glm::vec3   getPosition();
+	glm::vec3   getKa();
+	glm::vec3   getKd();
+	glm::vec3   getKs();
+	lightType   getType();
+	std::string getName();
 
 	void setOn(bool activated);
 	void setPosition(glm::vec3 position);

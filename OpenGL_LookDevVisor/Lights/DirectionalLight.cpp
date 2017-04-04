@@ -7,8 +7,9 @@
 
 #include "DirectionalLight.h"
 
-DirectionalLight::DirectionalLight() {
+DirectionalLight::DirectionalLight(std::string name) {
 	// TODO Auto-generated constructor stub
+	this->name = name;
 	Light::type = lightType::directional;
 	Light::on = false;
 }
@@ -47,6 +48,10 @@ Light::lightType DirectionalLight::getType()
 	return Light::type;
 };
 
+std::string DirectionalLight::getName()
+{
+	return this->name;
+}
 
 void DirectionalLight::setOn(bool activated)
 {

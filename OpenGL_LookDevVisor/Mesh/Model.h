@@ -17,6 +17,8 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
+	#include <forward_list>
+	#include <algorithm>
 	#include "../Shader.h"
 	#include "../Shaders_Manager.h"
 	#include "Mesh.h"
@@ -66,6 +68,8 @@ private:
 		//Alembic
 	void 		         processAlembicSceneTreeRecursively(Alembic::Abc::IObject objTop);
 	Mesh                 processAlembicMesh				   (Alembic::AbcGeom::IPolyMesh mesh);
+	std::vector<Mesh::Vertex> proccessAlembicNormals       (std::vector<Mesh::Vertex> vertex,
+			                                                Alembic::AbcGeom::IPolyMeshSchema meshSchema);
 		//Assimp
 	void 		         processAssimpSceneTree            (aiNode* node, const aiScene* scene);
 	Mesh 				 processAssimpMesh                 (aiMesh* mesh, const aiScene* scene);

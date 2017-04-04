@@ -29,19 +29,20 @@
 class PointLight : public Light{
 
 public:
-	PointLight();
+	PointLight(std::string name);
 	virtual ~PointLight();
 
 	//Implements the abstract Light Interface
-	bool      getOn();
-	glm::vec3 getPosition();
-	glm::vec3 getKa();
-	glm::vec3 getKd();
-	glm::vec3 getKs();
-	lightType getType();
-	float     getConstant();
-	float     getLinear();
-	float     getQuadratic();
+	bool        getOn();
+	glm::vec3   getPosition();
+	glm::vec3   getKa();
+	glm::vec3   getKd();
+	glm::vec3   getKs();
+	lightType   getType();
+	float       getConstant();
+	float       getLinear();
+	float       getQuadratic();
+	std::string getName();
 
 	void setOn(bool activated);
 	void setPosition(glm::vec3 position);

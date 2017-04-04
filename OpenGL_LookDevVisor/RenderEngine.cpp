@@ -18,12 +18,12 @@ RenderEngine::RenderEngine() {
 		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
 	};
 
-	this->sceneLightManager.setNewLightPosition(glm::vec3{35.0f, 40.0f, 70.0f});
-	this->sceneLightManager.setNewLightColor(glm::vec3{0.6f, 0.5f, 0.5f});
-	this->sceneLightManager.setNewLightSpecContribution(glm::vec3{0.5f, 0.5f, 0.5f});
-	this->sceneLightManager.setNewLightAmbientContribution(glm::vec3{0.25f, 0.25f, 0.25f});
-	this->sceneLightManager.setNewLightLinearValue(0.09f);
-	this->sceneLightManager.setNewLightQuadraticValue(0.032f);
+	this->sceneLightManager.setNewLightPosition(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{35.0f, 40.0f, 70.0f});
+	this->sceneLightManager.setNewLightColor(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.6f, 0.5f, 0.5f});
+	this->sceneLightManager.setNewLightSpecContribution(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.5f, 0.5f, 0.5f});
+	this->sceneLightManager.setNewLightAmbientContribution(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.25f, 0.25f, 0.25f});
+	this->sceneLightManager.setNewLightLinearValue(this->sceneLightManager.getSceneNumberLightsActive()-1,0.09f);
+	this->sceneLightManager.setNewLightQuadraticValue(this->sceneLightManager.getSceneNumberLightsActive()-1,0.032f);
 
 	this->viewportBackgroundColor = {0.2,0.2,0.2};
 	this->lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/light.obj");
@@ -61,22 +61,6 @@ void RenderEngine::setZoom(int keyPressed)
 {
 	this->cameraViewport.doMovement(keyPressed,deltaTime);
 };
-
-void RenderEngine::setLightIntensity(int keyPressed)
-{
-	if (keyPressed == GLFW_KEY_0){
-		glm::vec3 lightIntensity = this->sceneLightManager.getCurrentLightColor();
-		lightIntensity -= 0.1f;
-		this->sceneLightManager.setNewLightColor(lightIntensity);
-	}
-	if (keyPressed == GLFW_KEY_9)
-	{
-		glm::vec3 lightIntensity = this->sceneLightManager.getCurrentLightColor();
-		lightIntensity += 0.1f;
-		this->sceneLightManager.setNewLightColor(lightIntensity);
-	}
-};
-
 
 
 void RenderEngine::setShaderSceneTransformations()
@@ -146,39 +130,39 @@ void RenderEngine::setShaderLightingCalculation()
 
 
 		//Update my current Light (Todo: Select Light and modify desired light)
-		glUniform1i(lightTypeLoc,this->sceneLightManager.getCurrentLightType());
+		glUniform1i(lightTypeLoc,this->sceneLightManager.getCurrentLightType(i));
 
-		glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor().x
-								 ,this->sceneLightManager.getCurrentLightColor().y
-								 ,this->sceneLightManager.getCurrentLightColor().z);
+		glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor(i).x
+								 ,this->sceneLightManager.getCurrentLightColor(i).y
+								 ,this->sceneLightManager.getCurrentLightColor(i).z);
 
-		glUniform3f(lightAmbLoc,  this->sceneLightManager.getCurrentLightAmb().x
-								 ,this->sceneLightManager.getCurrentLightAmb().y
-								 ,this->sceneLightManager.getCurrentLightAmb().z);
+		glUniform3f(lightAmbLoc,  this->sceneLightManager.getCurrentLightAmb(i).x
+								 ,this->sceneLightManager.getCurrentLightAmb(i).y
+								 ,this->sceneLightManager.getCurrentLightAmb(i).z);
 
-		glUniform3f(lightSpecLoc, this->sceneLightManager.getCurrentLightSpec().x
-								 ,this->sceneLightManager.getCurrentLightSpec().y
-								 ,this->sceneLightManager.getCurrentLightSpec().z);
+		glUniform3f(lightSpecLoc, this->sceneLightManager.getCurrentLightSpec(i).x
+								 ,this->sceneLightManager.getCurrentLightSpec(i).y
+								 ,this->sceneLightManager.getCurrentLightSpec(i).z);
 
-		glUniform3f(lightPositionLoc, this->sceneLightManager.getCurrentLightPosition().x
-									 ,this->sceneLightManager.getCurrentLightPosition().y
-									 ,this->sceneLightManager.getCurrentLightPosition().z);
+		glUniform3f(lightPositionLoc, this->sceneLightManager.getCurrentLightPosition(i).x
+									 ,this->sceneLightManager.getCurrentLightPosition(i).y
+									 ,this->sceneLightManager.getCurrentLightPosition(i).z);
 
 		//In case that our selected/active light was a point
-		if (this->sceneLightManager.getCurrentLightType() ==1 || this->sceneLightManager.getCurrentLightType() == 2)
+		if (this->sceneLightManager.getCurrentLightType(i) ==1 || this->sceneLightManager.getCurrentLightType(i) == 2)
 		{
-			glUniform1f(lightConstantLoc,  this->sceneLightManager.getCurrentLightConstantValue());
-			glUniform1f(lightLinearLoc,    this->sceneLightManager.getCurrentLightLinearValue());
-			glUniform1f(lightQuadraticLoc, this->sceneLightManager.getCurrentLightQuadraticValue());
-			if (this->sceneLightManager.getCurrentLightType() == 2)
+			glUniform1f(lightConstantLoc,  this->sceneLightManager.getCurrentLightConstantValue(i));
+			glUniform1f(lightLinearLoc,    this->sceneLightManager.getCurrentLightLinearValue(i));
+			glUniform1f(lightQuadraticLoc, this->sceneLightManager.getCurrentLightQuadraticValue(i));
+			if (this->sceneLightManager.getCurrentLightType(i) == 2)
 			{
-				glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff());
-				glUniform1f(lightOutCutOffLoc, this->sceneLightManager.getCurrentLightOutCutOff());
+				glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff(i));
+				glUniform1f(lightOutCutOffLoc, this->sceneLightManager.getCurrentLightOutCutOff(i));
 				glm::vec3 newaimSpot = glm::vec3{0.0f,0.0f,0.0f}-glm::vec3{1.2f, 1.0f, 2.0f};
-				this->sceneLightManager.setNewAim(newaimSpot);
-				glUniform3f(lightAimLoc,  this->sceneLightManager.getCurrentAim().x
-										 ,this->sceneLightManager.getCurrentAim().y
-										 ,this->sceneLightManager.getCurrentAim().z);
+				this->sceneLightManager.setNewAim(i,newaimSpot);
+				glUniform3f(lightAimLoc,  this->sceneLightManager.getCurrentAim(i).x
+										 ,this->sceneLightManager.getCurrentAim(i).y
+										 ,this->sceneLightManager.getCurrentAim(i).z);
 			}
 		}
 	}//End Recolect Light Info
@@ -247,6 +231,7 @@ void ImGui_GPUStatisticsUI()
 	ImGui::End();
 }
 
+//Main Bar Functionality
 void RenderEngine::ImGui_CreateGpuUIMainWindow()
 {
 	static bool show_test_window = false;
@@ -256,20 +241,28 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 
 	if(ImGui::BeginMainMenuBar()){
 	  if (ImGui::BeginMenu("File"))
-	        {
-		  	  	ImGui_MainBarFunctions();
-	            ImGui::EndMenu();
-	        }
-	        if (ImGui::BeginMenu("Windows"))
-	        {
-	            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-	            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-	            ImGui::Separator();
-	            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-	            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-	            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-	            ImGui::EndMenu();
-	        }
+	  {
+		  ImGui_MainBarFunctions();
+	      ImGui::EndMenu();
+	  }
+	  if (ImGui::BeginMenu("Lights"))
+	  {
+		  ImGui_LightsBarFunctions();
+	      ImGui::EndMenu();
+	  }
+	  if(ImGui::BeginMenu("Shading"))
+	  {
+
+		  ImGui::EndMenu();
+	  }
+	  if(ImGui::BeginMenu("Stats"))
+	  {
+		  ImGui::EndMenu();
+	  }
+	  if(ImGui::BeginMenu("Help"))
+	  {
+		  ImGui::EndMenu();
+	  }
 	ImGui::EndMainMenuBar();
 	}
 
@@ -282,6 +275,37 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 };
 
+// Lights Menu
+
+void RenderEngine::ImGui_LightsBarFunctions()
+{
+	const char* lightsNames[this->sceneLightManager.getSceneNumberLightsActive()];
+	for (int i = 0; i< this->sceneLightManager.getSceneNumberLightsActive();i++)
+	{
+		lightsNames[i] = this->sceneLightManager.getCurrentLightName(i).c_str();
+	}
+	std::string n_lightsActive = std::to_string(this->sceneLightManager.getSceneNumberLightsActive());
+
+	static char buffer[512] = ("Scene Lighting Options");
+	ImGui::MenuItem(buffer, NULL, false, false);
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	ImGui::Text("Number Lights in the Scene: "); ImGui::SameLine(0, 20);
+    ImGui::TextColored(ImVec4(1,1,0,1),n_lightsActive.c_str());
+
+    ImGui::Spacing();
+    ImGui::Separator();
+
+    std::cout<< "testing: "<< lightsNames[0]<<std::endl;
+    static int item = -1;
+    ImGui::Combo("Scene Lights", &item, lightsNames, IM_ARRAYSIZE(lightsNames)); ImGui::SameLine();
+
+
+
+}
+
+// File / Main Button Functionality
 void RenderEngine::ImGui_MainBarFunctions()
 {
 	//Static Variables that store the user inputs
@@ -324,7 +348,8 @@ void RenderEngine::ImGui_MainBarFunctions()
 		ImGui::LabelText("Model (Geo)", "Values");
 		ImGui::Spacing();
 
-		static float vec1fscale[1]  = { 0.0f };
+		static float vec1fscale[1]     = { 0.0f };
+		static float lastvec1fscale[1];
 		static float vec4foffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 		if(ImGui::SliderFloat3("Offset (XYZ)",vec4foffset, -1.0f, 1.0f))
@@ -351,11 +376,11 @@ void RenderEngine::ImGui_MainBarFunctions()
 			ImGui::SameLine();
 			ImGui_ShowHelpMarker("Reset Offset when you want come back to Origin");
 		}
-		if(ImGui::SliderFloat("Scale (XYZ)",vec1fscale, -1.0f, 1.0f))
+		if(ImGui::SliderFloat("Scale (XYZ)",vec1fscale, -0.1f, 0.1f))
 		{
 			if(this->scene!=nullptr)
 			{
-				this->scene->setNewScale(glm::vec3(vec1fscale[0],vec1fscale[0],vec1fscale[0]));
+			this->scene->setNewScale(glm::vec3(vec1fscale[0],vec1fscale[0],vec1fscale[0]));
 			}
 		}
 		if (ImGui::Button("Reset Scale"))

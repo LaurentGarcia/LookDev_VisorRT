@@ -7,10 +7,10 @@
 
 #include "PointLight.h"
 
-PointLight::PointLight() {
+PointLight::PointLight(std::string name) {
 	// TODO Auto-generated constructor stub
 	Light::type = lightType::point;
-
+	this->name  = name;
 	this->constant = 1.0f;
 	this->linear   = 0.5f;
 	this->quadratic= 0.2f;
@@ -51,7 +51,10 @@ Light::lightType PointLight::getType()
 	return Light::type;
 };
 
-
+std::string PointLight::getName()
+{
+	return this->name;
+}
 void PointLight::setOn(bool activated)
 {
 	this->on = activated;

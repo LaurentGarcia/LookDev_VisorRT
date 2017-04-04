@@ -7,10 +7,10 @@
 
 #include "SpotLight.h"
 
-SpotLight::SpotLight() {
+SpotLight::SpotLight(std::string name) {
 	// TODO Auto-generated constructor stub
 	Light::type = lightType::spot;
-
+	this->name  = name;
 	this->constant  = 1.0f;
 	this->linear    = 0.5f;
 	this->quadratic = 0.2f;
@@ -54,6 +54,10 @@ Light::lightType SpotLight::getType()
 	return Light::type;
 };
 
+std::string SpotLight::getName()
+{
+	return this->name;
+}
 
 void SpotLight::setPosition(glm::vec3 position)
 {

@@ -274,14 +274,6 @@ void LogicController::key_callback(GLFWwindow* window, int key, int scancode, in
 	{
 		myEngine->setZoom(key);
 	}
-	if (key == GLFW_KEY_9)
-	{
-		myEngine->setLightIntensity(key);
-	}
-	if (key == GLFW_KEY_0)
-	{
-		myEngine->setLightIntensity(key);
-	}
 
 	//Implementing ImguiCallback
 	ImGuiIO& io = ImGui::GetIO();

@@ -21,6 +21,7 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
+	#include <string>
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
@@ -31,6 +32,8 @@
 	#include "Mesh/Model.h"
 #else
 #endif
+
+#define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 
 // This class will be responsible to manage all the scene setup
@@ -98,6 +101,7 @@ private:
 
     //UI and User Render Interaction plus variables
     void ImGui_CreateGpuUIMainWindow();
+    void ImGui_LightsBarFunctions();
     void ImGui_MainBarFunctions();
     void ImGui_ShowHelpMarker(const char* desc);
 
