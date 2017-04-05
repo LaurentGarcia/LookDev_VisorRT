@@ -7,6 +7,9 @@
 
 #include "RenderEngine.h"
 
+// Static variables, control windows open status
+static bool light_window_open = false;
+
 RenderEngine::RenderEngine() {
 	// TODO Auto-generated constructor stub
 
@@ -227,13 +230,14 @@ void ImGui_GPUStatisticsUI()
 	bool show_another_window;
 	ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
 	ImGui::ShowMetricsWindow(&show_another_window);
-	ImGui::Text("Hello");
+	ImGui::Text("Gpu Statistics");
 	ImGui::End();
 }
 
 //Main Bar Functionality
 void RenderEngine::ImGui_CreateGpuUIMainWindow()
 {
+	static bool light_editor_open = false;
 	static bool show_test_window = false;
 	bool show_another_window = true;
 	static float f = 0.0f;
@@ -252,7 +256,6 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 	  }
 	  if(ImGui::BeginMenu("Shading"))
 	  {
-
 		  ImGui::EndMenu();
 	  }
 	  if(ImGui::BeginMenu("Stats"))
@@ -266,6 +269,7 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 	ImGui::EndMainMenuBar();
 	}
 
+
 	ImVec4 clear_color = ImColor(114, 144, 154);
 	ImGui::Text("ReelFx Look Development Viewport");
 	if (ImGui::Button("Test Window"))
@@ -273,18 +277,23 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 	if (show_test_window)
 		ImGui::ShowTestWindow(windowTestOpen);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	if (light_window_open)
+		ImGui_ShowLightWindowEdit(&light_window_open);
 };
 
 // Lights Menu
 
 void RenderEngine::ImGui_LightsBarFunctions()
 {
-	const char* lightsNames[this->sceneLightManager.getSceneNumberLightsActive()];
-	for (int i = 0; i< this->sceneLightManager.getSceneNumberLightsActive();i++)
+	unsigned int size = this->sceneLightManager.getSceneNumberLightsActive();
+	const char* lightsNames[size];
+
+	for (int i = 0; i<size;i++)
 	{
 		lightsNames[i] = this->sceneLightManager.getCurrentLightName(i).c_str();
 	}
-	std::string n_lightsActive = std::to_string(this->sceneLightManager.getSceneNumberLightsActive());
+	std::string n_lightsActive = std::to_string(size);
+
 
 	static char buffer[512] = ("Scene Lighting Options");
 	ImGui::MenuItem(buffer, NULL, false, false);
@@ -297,13 +306,45 @@ void RenderEngine::ImGui_LightsBarFunctions()
     ImGui::Spacing();
     ImGui::Separator();
 
-    std::cout<< "testing: "<< lightsNames[0]<<std::endl;
     static int item = -1;
-    ImGui::Combo("Scene Lights", &item, lightsNames, IM_ARRAYSIZE(lightsNames)); ImGui::SameLine();
+    ImGui::ListBox("Scene Lights", &item, lightsNames, size); ImGui::SameLine();
 
+    if (ImGui::Button("Edit Lights"))
+    {
+    	light_window_open = true;
+    }
+    // New Light to be included
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Text("Add New Light");
 
-
+    static char newuserlightname[128];
+    ImGui::InputText("Name", newuserlightname, sizeof(newuserlightname));ImGui::SameLine();
+    static int light_type = 0;
+    ImGui::Combo("Type", &light_type, "Directional\0Point\0Spot\0\0");
+    if (ImGui::Button("New Light"))
+    {
+    	std::string newlight(newuserlightname);
+    	this->sceneLightManager.createNewLight(light_type,glm::vec3(0.0f,0.0f,0.0f),newlight);
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Delete Light"))
+    {
+    	std::string name(lightsNames[item]);
+    	this->sceneLightManager.deleteLight(item,name);
+    };
 }
+
+void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
+{
+	ImGuiWindowFlags window_flags = 0;
+	ImGui::SetNextWindowSize(ImVec2(550,680), ImGuiSetCond_FirstUseEver);
+	ImGui::Begin("Light Editor", isopen, window_flags);
+
+
+	ImGui::End();
+};
+
 
 // File / Main Button Functionality
 void RenderEngine::ImGui_MainBarFunctions()

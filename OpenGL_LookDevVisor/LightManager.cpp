@@ -13,7 +13,7 @@ Light_Manager::Light_Manager() {
 //	this->sceneLights.push_back(sun);
 //	Light* point = new PointLight;
 //	this->sceneLights.push_back(point);
-	Light* spot = new SpotLight ("spotdummy");
+	Light* spot = new SpotLight ("SpotLight Dummy");
 	this->sceneLights.push_back(spot);
 }
 
@@ -215,6 +215,22 @@ void Light_Manager::createNewLight(int type, glm::vec3 position,std::string name
 		break;
 	}
 }
+
+void Light_Manager::deleteLight(int n_light,std::string name)
+{
+	std::vector<Light*> newvector;
+
+	for (int i = 0; i<this->sceneLights.size(); i++)
+	{
+		if (i!=n_light)
+			newvector.push_back(this->sceneLights[i]);
+		else{
+			if(this->sceneLights[i]->getName()==name)
+				delete this->sceneLights[i]; // Free memory allocated
+		}
+	}
+	this->sceneLights = newvector;
+};
 
 int  Light_Manager::getCurrentLightType(int n_light)
 {

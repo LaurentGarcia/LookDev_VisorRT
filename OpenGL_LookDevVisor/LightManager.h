@@ -105,6 +105,7 @@ public:
 	// Always when user create a new light, it will be activated by default
 	// It will be stored at the end of queue
 	void     createNewLight(int type,glm::vec3 position,std::string name);
+	void     deleteLight(int n_light,std::string name);
 
 	// Return Type Light
 	// 0 = Directional

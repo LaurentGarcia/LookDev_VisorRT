@@ -33,7 +33,7 @@
 #else
 #endif
 
-#define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
+#define ARRAYSIZE(x)  (sizeof(x) / sizeof(*x))
 
 
 // This class will be responsible to manage all the scene setup
@@ -104,6 +104,7 @@ private:
     void ImGui_LightsBarFunctions();
     void ImGui_MainBarFunctions();
     void ImGui_ShowHelpMarker(const char* desc);
+    void ImGui_ShowLightWindowEdit(bool* isopen);
 
     glm::vec3   viewportBackgroundColor;
     std::string i_geopath;
