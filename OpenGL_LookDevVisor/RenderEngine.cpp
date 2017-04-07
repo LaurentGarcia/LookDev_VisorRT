@@ -29,7 +29,10 @@ RenderEngine::RenderEngine() {
 	this->sceneLightManager.setNewLightQuadraticValue(this->sceneLightManager.getSceneNumberLightsActive()-1,0.032f);
 
 	this->viewportBackgroundColor = {0.2,0.2,0.2};
-	this->lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/light.obj");
+
+	//Default Light Created in the scene
+	Model* lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
+	this->lightMeshes[this->sceneLightManager.getCurrentLightName(0)] = lightdummy;
 }
 
 RenderEngine::~RenderEngine() {
@@ -216,10 +219,23 @@ void RenderEngine::doRender(){
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->scene->getModelMatrix()));
     	this->scene->Draw(this->shaderManager.getCurrentShader());
 	}
-    this->lightdummy->Draw(this->shaderManager.getCurrentShader());
+
+	this->renderLightsGeo();
 
     ImGui::Render();
 
+};
+
+
+
+void RenderEngine::renderLightsGeo()
+{
+	// Light and model must be aligned with the same position
+	for (int i = 0; i<this->sceneLightManager.getSceneNumberLightsActive();i++)
+	{
+		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->setNewPosition(this->sceneLightManager.getCurrentLightPosition(i));
+		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getCurrentShader());
+	}
 };
 
 
@@ -324,11 +340,17 @@ void RenderEngine::ImGui_LightsBarFunctions()
     ImGui::Combo("Type", &light_type, "Directional\0Point\0Spot\0\0");
     if (ImGui::Button("New Light"))
     {
-    	std::string newlight(newuserlightname);
+    	std::string newlight(newuserlightname);//ToDO:: change to relative folders
     	this->sceneLightManager.createNewLight(light_type,glm::vec3(0.0f,0.0f,0.0f),newlight);
+    	if(light_type == 0)
+    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/directionalLight.obj");
+    	if(light_type == 1)
+    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/pointLight.obj");
+    	if(light_type == 2)
+    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
     }
     ImGui::SameLine();
-    if(ImGui::Button("Delete Light"))
+    if(ImGui::Button("Delete Light")) //ToDo: Eliminate light from the map
     {
     	std::string name(lightsNames[item]);
     	this->sceneLightManager.deleteLight(item,name);
@@ -341,8 +363,50 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 	ImGui::SetNextWindowSize(ImVec2(550,680), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Light Editor", isopen, window_flags);
 
+	ImGui::Text("Lighting tool, per light adjustment, any change will be reflected on the desired light in real time");
+	ImGui::Spacing();
+	ImGui::Separator();
 
+	unsigned int size = this->sceneLightManager.getSceneNumberLightsActive();
+	const char* lightsNames[size];
+	for (int i = 0; i<size;i++)
+	{
+		lightsNames[i] = this->sceneLightManager.getCurrentLightName(i).c_str();
+	}
+	static int item = -1;
+	ImGui::ListBox("Selected Light", &item, lightsNames, size); ImGui::SameLine();
+
+	// For the selected light we need to offer the following parameters
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Light Options");
+
+	std::cout<<"item: "<< item << std::endl;
+	if (item != -1){
+		glm::vec3 vec3;
+		// Light Color
+		{
+			vec3= this->sceneLightManager.getCurrentLightColor(item);
+			static float col1[3] = { vec3.x,vec3.y,vec3.z};
+			ImGui::ColorEdit3("color", col1);
+			ImGui::SameLine(); ImGui_ShowHelpMarker("Light Color control .\nCTRL+click on individual component to input value.\n");
+			vec3.x = col1[0]; vec3.y = col1[1]; vec3.z = col1[2];
+			this->sceneLightManager.setNewLightColor(item,vec3);
+		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		// Specular color contribution
+		{
+			vec3= this->sceneLightManager.getCurrentLightSpec(item);
+			static float spc1[3] = { vec3.x,vec3.y,vec3.z};
+			ImGui::ColorEdit3("spec", spc1);
+			ImGui::SameLine(); ImGui_ShowHelpMarker("Specular Light Control.\nCTRL+click on individual component to input value.\n");
+			vec3.x = spc1[0]; vec3.y = spc1[1]; vec3.z = spc1[2];
+			this->sceneLightManager.setNewLightSpecContribution(item,vec3);
+		}
+	}
 	ImGui::End();
+
 };
 
 

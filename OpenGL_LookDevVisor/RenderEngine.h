@@ -22,6 +22,7 @@
 	#include <glfw3.h>
 	#include <iostream>
 	#include <string>
+	#include <map>
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
@@ -80,6 +81,7 @@ public:
 	Camera  getActualCamera();
 	GLfloat getDeltaTime();
 	void    doRender();
+	void    renderLightsGeo();
 
 private:
 
@@ -97,7 +99,7 @@ private:
 	Shaders_Manager   shaderManager;
 	Light_Manager     sceneLightManager;
     Model*            scene = nullptr;
-    Model*            lightdummy;
+    std::map<std::string,Model*>lightMeshes;
 
     //UI and User Render Interaction plus variables
     void ImGui_CreateGpuUIMainWindow();
