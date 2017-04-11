@@ -379,11 +379,30 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 	// For the selected light we need to offer the following parameters
 	ImGui::Spacing();
 	ImGui::Separator();
-	ImGui::Text("Light Options");
+	ImGui::Text("Light Position");
 
 	std::cout<<"item: "<< item << std::endl;
 	if (item != -1){
 		glm::vec3 vec3;
+		//Move the light
+		{
+			static float vec4foffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			if(ImGui::SliderFloat3("Offset (XYZ)",vec4foffset, -1.0f, 1.0f))
+			{
+				glm::vec3 newuserpos = {vec4foffset[0],vec4foffset[1],vec4foffset[2]};
+
+
+			}
+			vec3= this->sceneLightManager.getCurrentLightPosition(item);
+			static float col1[3] = { vec3.x,vec3.y,vec3.z};
+			ImGui::ColorEdit3("color", col1);
+			ImGui::SameLine(); ImGui_ShowHelpMarker("Light Color control .\nCTRL+click on individual component to input value.\n");
+			vec3.x = col1[0]; vec3.y = col1[1]; vec3.z = col1[2];
+			this->sceneLightManager.setNewLightColor(item,vec3);
+		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Text("Light Attributes");
 		// Light Color
 		{
 			vec3= this->sceneLightManager.getCurrentLightColor(item);
