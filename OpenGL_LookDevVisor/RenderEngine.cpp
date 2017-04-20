@@ -17,6 +17,8 @@ RenderEngine::RenderEngine() {
 
 	bool* shaderesult = new bool(false);
 	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName);
+
+
 	if (shaderesult) {
 		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
 	};
@@ -32,6 +34,7 @@ RenderEngine::RenderEngine() {
 
 	//Default Light Created in the scene
 	Model* lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
+	lightdummy->setNewPosition(glm::vec3{35.0f, 40.0f, 70.0f});
 	this->lightMeshes[this->sceneLightManager.getCurrentLightName(0)] = lightdummy;
 }
 
@@ -232,8 +235,8 @@ void RenderEngine::renderLightsGeo()
 {
 	// Light and model must be aligned with the same position
 	for (int i = 0; i<this->sceneLightManager.getSceneNumberLightsActive();i++)
-	{
-		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->setNewPosition(this->sceneLightManager.getCurrentLightPosition(i));
+	{   GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->getModelMatrix()));
 		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getCurrentShader());
 	}
 };
@@ -386,19 +389,14 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 		glm::vec3 vec3;
 		//Move the light
 		{
-			static float vec4foffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-			if(ImGui::SliderFloat3("Offset (XYZ)",vec4foffset, -1.0f, 1.0f))
+			float vec4foffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			if(ImGui::SliderFloat3("Light Offset (XYZ)",vec4foffset, -0.2f, 0.2f))
 			{
 				glm::vec3 newuserpos = {vec4foffset[0],vec4foffset[1],vec4foffset[2]};
-
-
+				this->sceneLightManager.setNewLightPosition(item,newuserpos);
+				std::cout<<"New light position:"<<this->sceneLightManager.getCurrentLightPosition(item).x<<std::endl;
+				this->lightMeshes[this->sceneLightManager.getCurrentLightName(item)]->setNewPosition(newuserpos);
 			}
-			vec3= this->sceneLightManager.getCurrentLightPosition(item);
-			static float col1[3] = { vec3.x,vec3.y,vec3.z};
-			ImGui::ColorEdit3("color", col1);
-			ImGui::SameLine(); ImGui_ShowHelpMarker("Light Color control .\nCTRL+click on individual component to input value.\n");
-			vec3.x = col1[0]; vec3.y = col1[1]; vec3.z = col1[2];
-			this->sceneLightManager.setNewLightColor(item,vec3);
 		}
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -406,8 +404,8 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 		// Light Color
 		{
 			vec3= this->sceneLightManager.getCurrentLightColor(item);
-			static float col1[3] = { vec3.x,vec3.y,vec3.z};
-			ImGui::ColorEdit3("color", col1);
+			float col1[3] = { vec3.x,vec3.y,vec3.z};
+			ImGui::ColorEdit3("Kd", col1);
 			ImGui::SameLine(); ImGui_ShowHelpMarker("Light Color control .\nCTRL+click on individual component to input value.\n");
 			vec3.x = col1[0]; vec3.y = col1[1]; vec3.z = col1[2];
 			this->sceneLightManager.setNewLightColor(item,vec3);
@@ -417,12 +415,78 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 		// Specular color contribution
 		{
 			vec3= this->sceneLightManager.getCurrentLightSpec(item);
-			static float spc1[3] = { vec3.x,vec3.y,vec3.z};
-			ImGui::ColorEdit3("spec", spc1);
+			float spc1[3] = { vec3.x,vec3.y,vec3.z};
+			ImGui::ColorEdit3("Ks", spc1);
 			ImGui::SameLine(); ImGui_ShowHelpMarker("Specular Light Control.\nCTRL+click on individual component to input value.\n");
 			vec3.x = spc1[0]; vec3.y = spc1[1]; vec3.z = spc1[2];
 			this->sceneLightManager.setNewLightSpecContribution(item,vec3);
 		}
+		ImGui::Spacing();
+	    ImGui::Separator();
+	    // Ambient Contribution
+	    {
+	    	vec3= this->sceneLightManager.getCurrentLightAmb(item);
+	    	float Amb1[3] = { vec3.x,vec3.y,vec3.z};
+	    	ImGui::ColorEdit3("Ka", Amb1);
+	    	ImGui::SameLine(); ImGui_ShowHelpMarker("Specular Light Control.\nCTRL+click on individual component to input value.\n");
+	    	vec3.x = Amb1[0]; vec3.y = Amb1[1]; vec3.z = Amb1[2];
+	    	this->sceneLightManager.setNewLightAmbientContribution(item,vec3);
+	    }
+	    //Constant Decay
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightConstantValue(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Kc", &f);
+	    	this->sceneLightManager.setNewLightConstant(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    //Linear Decay
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightLinearValue(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Kl", &f);
+	    	this->sceneLightManager.setNewLightLinearValue(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    //Quadratic decay
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightQuadraticValue(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Kq", &f);
+	    	this->sceneLightManager.setNewLightQuadraticValue(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    // Cutoff Angle
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightCutoffFloat(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Cutoff Angle", &f);
+	    	this->sceneLightManager.setNewLightCutoff(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    // Cutoff Falloff
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightOutCutOffFloat(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Outter Angle", &f);
+	    	this->sceneLightManager.setNewLightOutterCutoff(item,f);
+	    	ImGui::PopItemWidth();
+	    }
 	}
 	ImGui::End();
 

@@ -62,7 +62,7 @@ void PointLight::setOn(bool activated)
 
 void PointLight::setPosition(glm::vec3 position)
 {
-	Light::position = position;
+	Light::position += position;
 };
 
 void PointLight::setKa(glm::vec3 ka)

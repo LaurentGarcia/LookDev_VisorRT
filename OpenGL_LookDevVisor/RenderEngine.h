@@ -99,6 +99,7 @@ private:
 	Shaders_Manager   shaderManager;
 	Light_Manager     sceneLightManager;
     Model*            scene = nullptr;
+
     std::map<std::string,Model*>lightMeshes;
 
     //UI and User Render Interaction plus variables

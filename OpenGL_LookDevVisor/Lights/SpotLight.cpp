@@ -61,7 +61,7 @@ std::string SpotLight::getName()
 
 void SpotLight::setPosition(glm::vec3 position)
 {
-	Light::position = position;
+	Light::position += position;
 };
 
 void SpotLight::setKa(glm::vec3 ka)
@@ -123,6 +123,16 @@ void SpotLight::setLinear(float linear)
 void SpotLight::setQuadratic(float quadratic)
 {
 	this->quadratic = quadratic;
+}
+
+float SpotLight::getCutoffFloat()
+{
+	return this->cutoff;
+}
+
+float SpotLight::getOutterCutOffFloat()
+{
+	return this->outcutoff;
 }
 
 float SpotLight::getCutoff()

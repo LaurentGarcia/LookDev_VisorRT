@@ -42,6 +42,8 @@ public:
 	float       getConstant();
 	float       getLinear();
 	float       getQuadratic();
+	float       getCutoffFloat();
+	float       getOutterCutOffFloat();
 	float       getCutoff();// Give us the result of Cos Phi
 	float       getOuterCutOff(); //Give us the result of Cos Epsilon
 	glm::vec3   getAim();

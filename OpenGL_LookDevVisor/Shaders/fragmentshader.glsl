@@ -1,6 +1,6 @@
 #version 440 core
 
-#define NR_POINT_LIGHTS 1
+#define NR_POINT_LIGHTS 8
 
 in  vec2 TexCoord;
 in  vec3 FragPos;

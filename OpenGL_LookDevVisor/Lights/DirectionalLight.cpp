@@ -60,7 +60,7 @@ void DirectionalLight::setOn(bool activated)
 
 void DirectionalLight::setPosition(glm::vec3 position)
 {
-	Light::position = position;
+	Light::position += position;
 };
 
 void DirectionalLight::setKa(glm::vec3 ka)

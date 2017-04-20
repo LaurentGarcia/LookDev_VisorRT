@@ -58,6 +58,17 @@ void Light_Manager::setNewLightAmbientContribution (int n_light,glm::vec3 newamb
 
 //Point Light properties
 
+void Light_Manager::setNewLightConstant             (int n_light,float constant)
+{
+	if (this->sceneLights[n_light]->getType()==Light::point)
+	{
+		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights[n_light]);
+		p->setConstant(constant);
+		p = nullptr;
+	}
+};
+
+
 void  Light_Manager::setNewLightQuadraticValue      (int n_light,float quadratic)
 {
 	if (this->sceneLights[n_light]->getType()==Light::point)
@@ -144,6 +155,15 @@ void Light_Manager::setNewLightCutoff(int n_light,float cutoff)
 	}
 }
 
+void Light_Manager::setNewLightOutterCutoff(int n_light,float outter_cutoff)
+{
+	if (this->sceneLights[n_light]->getType()==Light::spot)
+	{
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
+		p->setOuterCutoff(outter_cutoff);
+		p = nullptr;
+	}
+};
 
 glm::vec3 Light_Manager::getCurrentAim(int n_light)
 {
@@ -155,6 +175,32 @@ glm::vec3 Light_Manager::getCurrentAim(int n_light)
 		return aim;
 	}else{
 		return glm::vec3{};
+	}
+}
+
+
+float Light_Manager::getCurrentLightCutoffFloat(int n_light)
+{
+	if (this->sceneLights[n_light]->getType()==Light::spot)
+	{
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
+		float cutoff = p->getCutoffFloat();
+		p = nullptr;
+		return cutoff;
+	}else{
+		return 0;
+	}
+}
+float Light_Manager::getCurrentLightOutCutOffFloat(int n_light)
+{
+	if (this->sceneLights[n_light]->getType()==Light::spot)
+	{
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
+		float outtercutoff = p->getOutterCutOffFloat();
+		p = nullptr;
+		return outtercutoff;
+	}else{
+		return 0;
 	}
 }
 

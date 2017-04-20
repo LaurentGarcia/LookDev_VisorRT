@@ -61,8 +61,8 @@ private:
 	std::vector<Texture>  texturesLoaded;
 
 	//Matrix transformation
-	glm::mat4             modelTransformations;
-
+	glm::mat4              modelTransformations;
+	std::vector<glm::mat4> modelLightsTransformations;
 
 	//Private functions
 		//Alembic

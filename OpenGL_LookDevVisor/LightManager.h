@@ -74,11 +74,13 @@ public:
 	void      setNewLightAmbientContribution (int n_light,glm::vec3 newamb);
 
 	//Point Light properties
+	void      setNewLightConstant            (int n_light,float constant);
 	void      setNewLightQuadraticValue      (int n_light,float quadratic);
 	void	  setNewLightLinearValue		 (int n_light,float value);
 
 	//Spot Light properties
 	void      setNewLightCutoff              (int n_light,float cutoff);
+	void      setNewLightOutterCutoff        (int n_light,float outter_cutoff);
     void      setNewAim						 (int n_light,glm::vec3 newaim);
 
 
@@ -93,8 +95,10 @@ public:
 	float     getCurrentLightConstantValue(int n_light);
 
 	//Spot Light
-	float     getCurrentLightCutoff(int n_light);
-	float     getCurrentLightOutCutOff(int n_light);
+	float     getCurrentLightCutoffFloat(int n_light);
+	float     getCurrentLightOutCutOffFloat(int n_light);
+	float     getCurrentLightCutoff(int n_light);// Give us the result of Cos Phi
+	float     getCurrentLightOutCutOff(int n_light);//Give us the result of Cos Epsilon
 	glm::vec3 getCurrentAim(int n_light);
 
 
