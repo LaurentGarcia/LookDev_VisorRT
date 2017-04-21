@@ -13,10 +13,11 @@ static bool light_window_open = false;
 RenderEngine::RenderEngine() {
 	// TODO Auto-generated constructor stub
 
+	std::cout<<"Init Viewport..."<<std::endl;
 	glEnable(GL_DEPTH_TEST);
 
 	bool* shaderesult = new bool(false);
-	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName);
+	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName,"phong_default");
 
 
 	if (shaderesult) {
@@ -275,6 +276,7 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 	  }
 	  if(ImGui::BeginMenu("Shading"))
 	  {
+		  ImGUI_ShadingBarFunctions();
 		  ImGui::EndMenu();
 	  }
 	  if(ImGui::BeginMenu("Stats"))
@@ -384,7 +386,6 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 	ImGui::Separator();
 	ImGui::Text("Light Position");
 
-	std::cout<<"item: "<< item << std::endl;
 	if (item != -1){
 		glm::vec3 vec3;
 		//Move the light
@@ -394,7 +395,6 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 			{
 				glm::vec3 newuserpos = {vec4foffset[0],vec4foffset[1],vec4foffset[2]};
 				this->sceneLightManager.setNewLightPosition(item,newuserpos);
-				std::cout<<"New light position:"<<this->sceneLightManager.getCurrentLightPosition(item).x<<std::endl;
 				this->lightMeshes[this->sceneLightManager.getCurrentLightName(item)]->setNewPosition(newuserpos);
 			}
 		}
@@ -493,6 +493,48 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 };
 
 
+// Shading Menu
+
+void RenderEngine::ImGUI_ShadingBarFunctions()
+{
+
+	static char buffer[512] = ("Scene Shading Options");
+	ImGui::MenuItem(buffer, NULL, false, false);
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Current Shaders in the Scene: "); ImGui::SameLine(0, 10);
+	ImGui::TextColored(ImVec4(1,1,0,1),this->shaderManager.getShaderName(0).c_str());
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	static char texbuffer[512];
+	if (ImGui::BeginMenu("Load Texture"))
+	{
+		if(ImGui::InputText("Texture:", texbuffer, sizeof(buffer),ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			this->shaderManager.loadTextureFromFile(texbuffer);
+		};
+	ImGui::EndMenu();
+	}
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Textures Loaded In The Scene:");
+	ImGui::Columns(3, "mycolumns3", false);  // 3-ways, no border
+	ImGui::Separator();
+	for (int i = 0; n < this->shaderManager.getNumberTextures(); i++)
+	{
+		char label[32];
+	    sprintf(label, "Texture %d", i);
+	    if (ImGui::Selectable(label)) {}
+	        //if (ImGui::Button(label, ImVec2(-1,0))) {}
+	         ImGui::NextColumn();
+	 }
+}
+
+
+
+
+
 // File / Main Button Functionality
 void RenderEngine::ImGui_MainBarFunctions()
 {
@@ -505,7 +547,6 @@ void RenderEngine::ImGui_MainBarFunctions()
 	{
 	    if(ImGui::InputText("File Path", buffer, sizeof(buffer),ImGuiInputTextFlags_EnterReturnsTrue))
 	    {
-	    		std::cout<<"button pressed"<<std::endl;
 	    		fflush(stdout);
 	    		if (scene!=nullptr){
 	    			if (std::strcmp(i_geopath.c_str(),buffer)!= 0)

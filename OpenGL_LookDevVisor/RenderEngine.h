@@ -98,13 +98,14 @@ private:
 	Camera  		  cameraViewport;
 	Shaders_Manager   shaderManager;
 	Light_Manager     sceneLightManager;
-    Model*            scene = nullptr;
+    Model*            scene = nullptr; // At the moment in the viewport will be 1 Model.
 
     std::map<std::string,Model*>lightMeshes;
 
     //UI and User Render Interaction plus variables
     void ImGui_CreateGpuUIMainWindow();
     void ImGui_LightsBarFunctions();
+    void ImGUI_ShadingBarFunctions();
     void ImGui_MainBarFunctions();
     void ImGui_ShowHelpMarker(const char* desc);
     void ImGui_ShowLightWindowEdit(bool* isopen);

@@ -33,15 +33,18 @@
 class Shader {
 public:
 
-	Shader(const char* vtxShaderFile, const char* frgShaderFile);
+	Shader(const char* vtxShaderFile, const char* frgShaderFile,std::string s_name);
 	virtual ~Shader();
 
-	GLuint getShaderId();
-	void   useShader();
+	GLuint      getShaderId();
+	std::string getShaderName();
+	void        useShader();
 
 private:
 
-	GLuint shaderId;
+	GLuint      shaderId;
+	std::string s_name;
+
 	std::string readFile  (const char* filename);
 	void        loadShader( const char* vtxShaderFile, const char* frgShaderFile);
 };
