@@ -8,7 +8,8 @@
 #include "RenderEngine.h"
 
 // Static variables, control windows open status
-static bool light_window_open = false;
+static bool light_window_open   = false;
+static bool shading_window_open = false;
 
 RenderEngine::RenderEngine() {
 	// TODO Auto-generated constructor stub
@@ -97,7 +98,6 @@ void RenderEngine::setShaderLightingCalculation()
 	GLint lightOutCutOffLoc;
 	GLint lightAimLoc;
 	GLint lightTypeLoc;
-	GLint viewPosLoc;
 	std::string lightname = "lights[";
 	std::string lightnameend = "]";
 
@@ -177,14 +177,18 @@ void RenderEngine::setShaderLightingCalculation()
 		}
 	}//End Recolect Light Info
 
+}
 
-	viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
-	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
+void RenderEngine::updateShaderInputsParameters ()//Todo
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texSelection["kd"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(), "mat.diffuse"), 0);
 	GLint matShininess  = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"mat.shininess");
 	glUniform1f(matShininess,90.0f);
 
+};
 
-}
 
 void RenderEngine::doRender(){
 
@@ -218,10 +222,15 @@ void RenderEngine::doRender(){
 	//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
 	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// It's a bit too big for our scene, so scale it down
 
+	GLint viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
+	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
+
+	this->updateShaderInputsParameters(); //User Interface updating Shader
+
 	if (this->scene!=nullptr){
 		GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->scene->getModelMatrix()));
-    	this->scene->Draw(this->shaderManager.getCurrentShader());
+    	this->scene->Draw(this->shaderManager.getCurrentShader(),this->texSelection);
 	}
 
 	this->renderLightsGeo();
@@ -238,7 +247,7 @@ void RenderEngine::renderLightsGeo()
 	for (int i = 0; i<this->sceneLightManager.getSceneNumberLightsActive();i++)
 	{   GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->getModelMatrix()));
-		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getCurrentShader());
+		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getCurrentShader(),this->texSelection);
 	}
 };
 
@@ -300,6 +309,8 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	if (light_window_open)
 		ImGui_ShowLightWindowEdit(&light_window_open);
+	if (shading_window_open)
+		ImGUI_ShowShadingWindowEdit(&shading_window_open);
 };
 
 // Lights Menu
@@ -504,13 +515,16 @@ void RenderEngine::ImGUI_ShadingBarFunctions()
 	ImGui::Separator();
 	ImGui::Text("Current Shaders in the Scene: "); ImGui::SameLine(0, 10);
 	ImGui::TextColored(ImVec4(1,1,0,1),this->shaderManager.getShaderName(0).c_str());
-
+	if (ImGui::Button("Shader Edit"))
+	{
+		shading_window_open = true;
+	}
 	ImGui::Spacing();
 	ImGui::Separator();
 	static char texbuffer[512];
 	if (ImGui::BeginMenu("Load Texture"))
 	{
-		if(ImGui::InputText("Texture:", texbuffer, sizeof(buffer),ImGuiInputTextFlags_EnterReturnsTrue))
+		if(ImGui::InputText("Texture File", texbuffer, sizeof(buffer),ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			this->shaderManager.loadTextureFromFile(texbuffer);
 		};
@@ -519,18 +533,61 @@ void RenderEngine::ImGUI_ShadingBarFunctions()
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Text("Textures Loaded In The Scene:");
-	ImGui::Columns(3, "mycolumns3", false);  // 3-ways, no border
+	ImGui::Columns(3, "TextureColumns", false);  // 3-ways, no border
 	ImGui::Separator();
-	for (int i = 0; n < this->shaderManager.getNumberTextures(); i++)
+	for (int i = 0; i < this->shaderManager.getNumberTextures(); i++)
 	{
 		char label[32];
-	    sprintf(label, "Texture %d", i);
+	    sprintf(label, this->shaderManager.getTextureName(i).c_str(), i);
 	    if (ImGui::Selectable(label)) {}
 	        //if (ImGui::Button(label, ImVec2(-1,0))) {}
 	         ImGui::NextColumn();
 	 }
 }
 
+
+void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
+{
+	ImGuiWindowFlags window_flags = 0;
+	ImGui::SetNextWindowSize(ImVec2(550,680), ImGuiSetCond_FirstUseEver);
+	ImGui::Begin("Shader Editor", isopen, window_flags);
+
+	ImGui::Text("Shader tool,any change will be reflected in real time");
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	unsigned int size = this->shaderManager.getNumberShaders();
+	const char* shadersNames[size];
+	for (int i = 0; i<size;i++)
+	{
+		shadersNames[i] = this->shaderManager.getShaderName(i).c_str();
+	}
+	size = this->shaderManager.getNumberTextures();
+	const char * texturesNames[size];
+	for (int i = 0; i<size;i++)
+	{
+		texturesNames[i] = this->shaderManager.getTextureName(i).c_str();
+	}
+
+	static int shaderSelected = -1;
+	ImGui::ListBox("Shader", &shaderSelected, shadersNames, size); //ImGui::SameLine();
+
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	static int  kdTextureSelected = -1;
+	const char* items[this->shaderManager.getNumberTextures()];
+	for (int i = 0; i < this->shaderManager.getNumberTextures();i++)
+	{
+		items[i] = this->shaderManager.getTextureName(i).c_str();
+	}
+    // User selection Texture for Color
+	ImGui::Combo("Kd Tex", &kdTextureSelected, items,this->shaderManager.getNumberTextures());
+	this->texSelection["kd"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(kdTextureSelected));
+
+
+	ImGui::End();
+}
 
 
 

@@ -36,6 +36,14 @@ public:
 	Shader(const char* vtxShaderFile, const char* frgShaderFile,std::string s_name);
 	virtual ~Shader();
 
+	//Textures functions
+	void        setKdTexture(std::string kd_name);
+	void        setKsTexture(std::string ks_name);
+	void        setKeTexture(std::string ke_name);
+	std::string getKdTextureName();
+	std::string getKsTextureName();
+	std::string getKeTextureName();
+
 	GLuint      getShaderId();
 	std::string getShaderName();
 	void        useShader();
@@ -43,7 +51,11 @@ public:
 private:
 
 	GLuint      shaderId;
-	std::string s_name;
+
+	std::string s_name;// Shader name
+	std::string kd_name;// Texture diffuse Applied
+	std::string ks_name;// Texture Specular Applied
+	std::string ke_name;// Texture emission Applied.
 
 	std::string readFile  (const char* filename);
 	void        loadShader( const char* vtxShaderFile, const char* frgShaderFile);

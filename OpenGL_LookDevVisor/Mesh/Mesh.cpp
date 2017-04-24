@@ -32,7 +32,7 @@ Mesh::~Mesh() {
 }
 
 
-void Mesh::Draw(Shader shader)
+void Mesh::Draw(Shader shader,std::map<std::string,GLuint>textures)
 {
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;

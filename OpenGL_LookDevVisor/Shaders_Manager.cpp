@@ -69,7 +69,6 @@ bool Shaders_Manager::loadTextureFromFile (std::string t_file)
 
 	std::string t_name = t_file.substr(t_file.find_last_of("/\\") + 1);
 
-
 	GLuint texID;
 	glGenTextures(1,&texID);
 	int width,height;
@@ -98,3 +97,13 @@ bool Shaders_Manager::loadTextureFromFile (std::string t_file)
 int Shaders_Manager::getNumberTextures(){
 	return this->textureList.size();
 }
+
+std::string Shaders_Manager::getTextureName(int n_texture)
+{
+	return this->textureList[n_texture];
+}
+
+GLuint Shaders_Manager::getTextureId(std::string t_name)
+{
+	return this->texturePool[t_name];
+};

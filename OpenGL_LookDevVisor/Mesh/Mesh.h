@@ -29,6 +29,7 @@
 	#include <vector>
 	#include <iosfwd>
 	#include <sstream>
+	#include <map>
 	#include "Texture.h"
 	#include "../Shader.h"
 #else
@@ -56,7 +57,7 @@ public:
 	void   setPosition(glm::vec3 newposition);
 	void   setScale   (glm::vec3 newscale);
 
-	void   Draw(Shader shader);
+	void   Draw(Shader shader,std::map<std::string,GLuint>textures);
 
 private:
 	// Geo info

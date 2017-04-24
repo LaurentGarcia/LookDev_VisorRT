@@ -40,12 +40,12 @@ Model::~Model()
 }
 
 
-void Model::Draw(Shader shader)
+void Model::Draw(Shader shader, std::map<std::string,GLuint>textures)
 {
 	if (!meshes.empty()){
 		for (GLuint i=0; i<this->meshes.size();i++)
 		{
-			this->meshes[i].Draw(shader);
+			this->meshes[i].Draw(shader,textures);
 		}
 	}
 };

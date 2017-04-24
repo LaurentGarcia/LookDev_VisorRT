@@ -71,16 +71,16 @@ public:
 	RenderEngine();
 	virtual ~RenderEngine();
 
-	void   setRenderWindowSize(int h,int w);
-	void   updateCameraFov(GLfloat fov);
-	void   updatePanCamera(GLfloat pan);
-	void   setZoom(int keyPressed);
-	void   setCameraView(GLfloat xoff,GLfloat yoff);
-	void   setLightIntensity(int keyPressed);
+	void   setRenderWindowSize  (int h,int w);
+	void   updateCameraFov      (GLfloat fov);
+	void   updatePanCamera      (GLfloat pan);
+	void   setZoom              (int keyPressed);
+	void   setCameraView        (GLfloat xoff,GLfloat yoff);
+	void   setLightIntensity    (int keyPressed);
 
 	Camera  getActualCamera();
-	GLfloat getDeltaTime();
-	void    doRender();
+	GLfloat getDeltaTime   ();
+	void    doRender       ();
 	void    renderLightsGeo();
 
 private:
@@ -100,21 +100,24 @@ private:
 	Light_Manager     sceneLightManager;
     Model*            scene = nullptr; // At the moment in the viewport will be 1 Model.
 
-    std::map<std::string,Model*>lightMeshes;
+    std::map<std::string,Model*>  lightMeshes;
+    std::map<std::string,GLuint>  texSelection;
 
     //UI and User Render Interaction plus variables
-    void ImGui_CreateGpuUIMainWindow();
-    void ImGui_LightsBarFunctions();
-    void ImGUI_ShadingBarFunctions();
-    void ImGui_MainBarFunctions();
-    void ImGui_ShowHelpMarker(const char* desc);
-    void ImGui_ShowLightWindowEdit(bool* isopen);
+    void ImGui_CreateGpuUIMainWindow  ();
+    void ImGui_LightsBarFunctions     ();
+    void ImGUI_ShadingBarFunctions    ();
+    void ImGui_MainBarFunctions		  ();
+    void ImGui_ShowHelpMarker         (const char* desc);
+    void ImGui_ShowLightWindowEdit    (bool* isopen);
+    void ImGUI_ShowShadingWindowEdit  (bool* isopen);
 
     glm::vec3   viewportBackgroundColor;
     std::string i_geopath;
 
     //Private functions
 	void setShaderSceneTransformations();
-	void setShaderLightingCalculation();
+	void setShaderLightingCalculation ();
+	void updateShaderInputsParameters ();
 };
 

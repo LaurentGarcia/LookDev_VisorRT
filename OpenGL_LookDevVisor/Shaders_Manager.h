@@ -43,7 +43,7 @@ public:
 	Shader getCurrentShader();
 
 	int         getNumberShaders    ();                   // It gives us the number of shaders stored
-	Shader      getSelectedShader   (std::string s_name); // It gives us the OpenGl Shader ID
+	Shader      getSelectedShader   (std::string s_name); // It gives us the Shader
 	std::string getShaderName	    (int n_shader);       // It gives us the shader name
 	void        deleteSelectedShader(std::string s_name); // Delete the desire Shader.
 
@@ -53,7 +53,9 @@ public:
 	    //            OpenGL_ID.
 	    //    - False: the function will return false because it could not possible to find the texture.
 	bool        loadTextureFromFile (std::string t_file);
-	int         getNumberTextures();
+	int         getNumberTextures   ();
+	std::string getTextureName      (int n_texture);
+	GLuint      getTextureId        (std::string t_name);
 
 private:
 	std::vector<Shader>          shaderCollection;

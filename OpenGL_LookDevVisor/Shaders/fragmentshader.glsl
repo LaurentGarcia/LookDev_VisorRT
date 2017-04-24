@@ -36,15 +36,12 @@ struct Light{
 	int   type; // 0= Directional, 1=Point, 2=Spot
 };
 
-//To be changed
-uniform sampler2D texture_diffuse1;
 
 //Inputs
 uniform vec3 cameraPosition;
 uniform Material mat;
 uniform Light lights[NR_POINT_LIGHTS];
 
-//
 
 //Shader Global Variables
 vec3 ambient;

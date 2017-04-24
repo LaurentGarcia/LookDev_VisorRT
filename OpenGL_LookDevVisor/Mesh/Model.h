@@ -46,7 +46,7 @@ public:
 	glm::mat4 getModelMatrix();
 
 	//Draw
-	void Draw(Shader shader);
+	void Draw(Shader shader,std::map<std::string,GLuint>textures);
 
 
 private:
