@@ -575,7 +575,7 @@ void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
 	ImGui::Spacing();
 	ImGui::Separator();
 
-	static int  kdTextureSelected = -1;
+	static int  kdTextureSelected = 0;
 	const char* items[this->shaderManager.getNumberTextures()];
 	for (int i = 0; i < this->shaderManager.getNumberTextures();i++)
 	{
@@ -583,7 +583,8 @@ void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
 	}
     // User selection Texture for Color
 	ImGui::Combo("Kd Tex", &kdTextureSelected, items,this->shaderManager.getNumberTextures());
-	this->texSelection["kd"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(kdTextureSelected));
+	if(this->shaderManager.getNumberTextures() != 0)
+		this->texSelection["kd"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(kdTextureSelected));
 
 
 	ImGui::End();

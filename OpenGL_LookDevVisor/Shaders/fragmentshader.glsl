@@ -113,6 +113,6 @@ void main()
 		}
 	}
 	
-	color = vec4(lightsOutput,1.0f);
+	color = vec4(lightsOutput*vec3(texture(mat.diffuse, TexCoord)),1.0f);
 
 }

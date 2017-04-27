@@ -100,7 +100,7 @@ int Shaders_Manager::getNumberTextures(){
 
 std::string Shaders_Manager::getTextureName(int n_texture)
 {
-	return this->textureList[n_texture];
+		return this->textureList[n_texture];
 }
 
 GLuint Shaders_Manager::getTextureId(std::string t_name)
