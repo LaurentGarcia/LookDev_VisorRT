@@ -109,3 +109,23 @@ std::string Shader::getShaderName()
 {
 	return this->s_name;
 }
+
+void  Shader::setRoughness(GLfloat newroughness)
+{
+	this->roughness = newroughness;
+}
+float Shader::getRoughness()
+{
+	return this->roughness;
+};
+
+
+void Shader::setNormalAct(bool act)
+{
+	this->normalAct = act;
+}
+
+bool Shader::getNormalAct()
+{
+	return this->normalAct;
+}

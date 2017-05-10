@@ -11,6 +11,9 @@
 static bool light_window_open   = false;
 static bool shading_window_open = false;
 
+
+
+
 RenderEngine::RenderEngine() {
 	// TODO Auto-generated constructor stub
 
@@ -18,6 +21,7 @@ RenderEngine::RenderEngine() {
 	glEnable(GL_DEPTH_TEST);
 
 	bool* shaderesult = new bool(false);
+	shaderManager.createShader(vtxLightShaderFileName,frgLightShaderFileName,"light_shader");
 	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName,"phong_default");
 
 
@@ -181,11 +185,29 @@ void RenderEngine::setShaderLightingCalculation()
 
 void RenderEngine::updateShaderInputsParameters ()//Todo
 {
+	// Kd
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texSelection["kd"]);
 	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(), "mat.diffuse"), 0);
-	GLint matShininess  = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"mat.shininess");
-	glUniform1f(matShininess,90.0f);
+	// Ks
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->texSelection["ks"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(), "mat.metallic"), 1);
+	// Kn
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D,this->texSelection["kn"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.normalmap"),2);
+	//Active normal
+	GLint activatedNormal = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"normalActive");
+	glUniform1i(activatedNormal,this->shaderManager.getCurrentShader().getNormalAct());
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D,this->texSelection["kr"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.roughness"),3);
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D,this->texSelection["ao"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.ao"),4);
 
 };
 
@@ -210,11 +232,22 @@ void RenderEngine::doRender(){
 	glm::mat4 view;
 	view = this->cameraViewport.getCameraViewMatrix();
 	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
-
 	GLint viewLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	GLint projecLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "projection");
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+	int numlightscene = this->sceneLightManager.getSceneNumberLightsActive();
+	for (int i = 0; i< numlightscene;i++)
+	{
+		std::string lightname = "lightPos[";
+		std::string lightnameend = "]";
+		std::string finalLightname = lightname+std::to_string(i)+lightnameend;
+		GLint lightpos = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalLightname.c_str());
+		glUniform3f(lightpos,this->sceneLightManager.getCurrentLightPosition(i).x,
+							 this->sceneLightManager.getCurrentLightPosition(i).y,
+							 this->sceneLightManager.getCurrentLightPosition(i).z);
+	};
 
 	this->setShaderLightingCalculation();
 
@@ -569,12 +602,14 @@ void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
 		texturesNames[i] = this->shaderManager.getTextureName(i).c_str();
 	}
 
-	static int shaderSelected = -1;
-	ImGui::ListBox("Shader", &shaderSelected, shadersNames, size); //ImGui::SameLine();
+	//static int shaderSelected = -1;
+	//ImGui::ListBox("Shader", &shaderSelected, shadersNames, size); //ImGui::SameLine();
 
 	ImGui::Spacing();
 	ImGui::Separator();
 
+	// Kd Diffuse
+	ImGui::Text("Color");
 	static int  kdTextureSelected = 0;
 	const char* items[this->shaderManager.getNumberTextures()];
 	for (int i = 0; i < this->shaderManager.getNumberTextures();i++)
@@ -582,9 +617,42 @@ void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
 		items[i] = this->shaderManager.getTextureName(i).c_str();
 	}
     // User selection Texture for Color
-	ImGui::Combo("Kd Tex", &kdTextureSelected, items,this->shaderManager.getNumberTextures());
+	ImGui::Combo("Albedo Tex", &kdTextureSelected, items,this->shaderManager.getNumberTextures());
 	if(this->shaderManager.getNumberTextures() != 0)
 		this->texSelection["kd"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(kdTextureSelected));
+
+	// Ks spec map & Controls
+	ImGui::Text("Metalness");
+	static int  ksTextureSelected = 0;
+	ImGui::Combo("Ks Tex", &ksTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+		this->texSelection["ks"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(ksTextureSelected));
+
+	// Ks normal map & Controls
+	ImGui::Text("Normal");
+	static int  knTextureSelected = 0;
+	ImGui::Combo("Kn Tex", &knTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+		this->texSelection["kn"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(knTextureSelected));
+	static bool active_normal;
+	ImGui::Checkbox("Active Normal",&active_normal);
+	this->shaderManager.getCurrentShaderEdit()->setNormalAct(active_normal);
+
+	ImGui::Text("Roughness");
+	static int  krTextureSelected = 0;
+	ImGui::Combo("Kr Tex", &krTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+			this->texSelection["kr"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(krTextureSelected));
+
+	ImGui::Text("AO");
+	static int  aoTextureSelected = 0;
+	ImGui::Combo("AO Tex", &aoTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+			this->texSelection["ao"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(aoTextureSelected));
+	ImGui::Spacing();
+	ImGui::Separator();
+
+
 
 
 	ImGui::End();

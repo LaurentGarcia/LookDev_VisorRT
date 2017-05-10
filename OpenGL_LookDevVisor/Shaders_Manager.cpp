@@ -1,5 +1,6 @@
 #include "Shaders_Manager.h"
-
+#define  STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 
 Shaders_Manager::Shaders_Manager()
@@ -22,6 +23,11 @@ void Shaders_Manager::createShader(const char* vtxShaderFile, const char* frgSha
 Shader Shaders_Manager::getCurrentShader()
 {
 	return this->shaderCollection.back();
+};
+
+Shader* Shaders_Manager::getCurrentShaderEdit()
+{
+	return &this->shaderCollection[this->shaderCollection.size()-1];
 };
 
 Shader Shaders_Manager::getSelectedShader(std::string s_name){
@@ -73,7 +79,7 @@ bool Shaders_Manager::loadTextureFromFile (std::string t_file)
 	glGenTextures(1,&texID);
 	int width,height;
 
-	unsigned char* tex = SOIL_load_image(t_file.c_str(),&width,&height,0,SOIL_LOAD_RGB);
+	unsigned char* tex = stbi_load(t_file.c_str(),&width,&height,0,STBI_rgb);
 	// Bind the image into OpenGL
 	glBindTexture(GL_TEXTURE_2D,texID);
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,tex);
@@ -84,7 +90,7 @@ bool Shaders_Manager::loadTextureFromFile (std::string t_file)
 	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
 	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D,0);
-	SOIL_free_image_data(tex);
+	stbi_image_free(tex);
 	if (tex!=0){
 		this->textureList.push_back(t_name);
 		this->texturePool[t_name] = texID;

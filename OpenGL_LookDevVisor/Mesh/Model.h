@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef _WIN32
 	#include <iostream>
 	#include <Windows.h>
@@ -58,7 +56,6 @@ private:
 	std::vector<Mesh> 	  meshes;
 	const aiScene* 		  scene;
 	std::string			  directory;// Current Model Directory
-	std::vector<Texture>  texturesLoaded;
 
 	//Matrix transformation
 	glm::mat4              modelTransformations;
@@ -73,6 +70,5 @@ private:
 		//Assimp
 	void 		         processAssimpSceneTree            (aiNode* node, const aiScene* scene);
 	Mesh 				 processAssimpMesh                 (aiMesh* mesh, const aiScene* scene);
-	std::vector<Texture> loadMaterialTextures              (aiMaterial* mat, aiTextureType type, std::string typeName);
 };
 

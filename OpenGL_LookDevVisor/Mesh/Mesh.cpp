@@ -10,11 +10,10 @@
 
 
 // Mesh constructor by default, no light mesh.
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices) {
 
 	this->vertices = vertices;
 	this->indices  = indices;
-	this->textures   = textures;
 	this->meshLight = false;
 	this->initOpenGlBuffers();
 }
@@ -34,30 +33,9 @@ Mesh::~Mesh() {
 
 void Mesh::Draw(Shader shader,std::map<std::string,GLuint>textures)
 {
-	GLuint diffuseNr = 1;
-	GLuint specularNr = 1;
-	for(GLuint i = 0; i < this->textures.size(); i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
-		// Retrieve texture number (the N in diffuse_textureN)
-		std::stringstream ss;
-		std::string number;
-		std::string name = this->textures[i].getTextureType();
-		if(name == "texture_diffuse")
-			ss << diffuseNr++; // Transfer GLuint to stream
-		else if(name == "texture_specular")
-			ss << specularNr++; // Transfer GLuint to stream
-		number = ss.str();
-
-		glUniform1f(glGetUniformLocation(shader.getShaderId(), ("material." + name + number).c_str()), i);
-		glBindTexture(GL_TEXTURE_2D, this->textures[i].getTexture());
-	}
-	glActiveTexture(GL_TEXTURE0);
-
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-
 };
 
 void   Mesh::setPosition(glm::vec3 newposition)
@@ -110,6 +88,15 @@ void Mesh::initOpenGlBuffers()
 	    glEnableVertexAttribArray(2);
 	    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 	                         (GLvoid*)offsetof(Vertex, TexCoords));
+	    // Tangents
+	    glEnableVertexAttribArray(3);
+	    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+	    					 (GLvoid*)offsetof(Vertex,Tangent));
+
+	   // Bi Tangents
+	   glEnableVertexAttribArray(4);
+	   glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+	    	    					 (GLvoid*)offsetof(Vertex,Tangent));
 
 	 glBindVertexArray(0);
 };

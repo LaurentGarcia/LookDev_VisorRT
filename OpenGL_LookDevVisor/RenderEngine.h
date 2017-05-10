@@ -59,10 +59,10 @@ public:
 	const char* vtxLightShaderFileName = "Shaders\\vtxlightshader.glsl";
 	const char* frgLightShaderFileName = "Shaders\\frglightshader.glsl";
 #elif __linux__
-	const char* vertexShaderFileName   = "Shaders/vertexshader.glsl";
-	const char* fragmentshaderfileName = "Shaders/fragmentshader.glsl";
-	const char* vtxLightShaderFileName   = "Shaders/vtxlightshader.glsl";
-	const char* frgLightShaderFileName = "Shaders/frglightshader.glsl";
+	const char* vertexShaderFileName   = "Shaders/vtx_PBR.glsl";
+	const char* fragmentshaderfileName = "Shaders/frg_PBR.glsl";
+	const char* vtxLightShaderFileName   = "Shaders/vtx_light.glsl";
+	const char* frgLightShaderFileName = "Shaders/frg_light.glsl";
 
 #else
 #endif

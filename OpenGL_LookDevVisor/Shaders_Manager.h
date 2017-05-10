@@ -40,7 +40,9 @@ public:
 
 	void   createShader(const char* vtxShaderFile, const char* frgShaderFile,std::string s_name);
 
-	Shader getCurrentShader();
+	//Get read Only Shader
+	Shader      getCurrentShader();
+	Shader*     getCurrentShaderEdit();
 
 	int         getNumberShaders    ();                   // It gives us the number of shaders stored
 	Shader      getSelectedShader   (std::string s_name); // It gives us the Shader

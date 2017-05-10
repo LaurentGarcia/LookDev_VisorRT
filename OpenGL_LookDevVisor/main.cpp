@@ -5,7 +5,6 @@
 	#define  GLEW_STATIC
 	#include <glew.h>
 	#include <glfw3.h>
-	#include <SOIL.h>
 	#include "ApiConfiguration.h"
 	#include "WindowGL.h"
 	#include "LogicController.h"
@@ -19,7 +18,6 @@
 	#include <glfw3.h>
 	#include <iostream>
 	#include "Shaders_Manager.h"
-	#include <SOIL.h>
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
@@ -29,7 +27,6 @@
 	#include "LogicController.h"
 #else
 #endif
-
 
 	//To be changed
 
