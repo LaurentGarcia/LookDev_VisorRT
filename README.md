@@ -6,7 +6,7 @@ LookDev Viewport,
 
 (This application is free, intended to learn propose and giving the tools to the user for evaluate, compile and use their own shaders. E-mail: laurent.garcia.carro at gmail)
 
-Lookdev viewport, is a OpenGL and c++ based application. The tool is able to load models format as .obj, fbx and all support formats than Assimp library supported. http://assimp.sourceforge.net/main_features_formats.html . In the future, I try to give support to load Alembic format too. The Viewport, give you the possibility to load any texture, creat lights, and in the coming month IBL lighting too. In this way the user probably a texture artist or TD shading artist could check the textures seeing in realtime how react under the different lights that user create.
+Lookdev viewport, is a OpenGL and c++ based application. The tool is able to load models format as .obj, fbx and all support formats than Assimp library supported. http://assimp.sourceforge.net/main_features_formats.html . In the future, I try to give support to load Alembic format too. The Viewport, give you the possibility to load any texture, creat lights, and in the coming month IBL lighting too. In this way the user probably a texture artist or TD shading artist could check the textures seeing in realtime and seeing how react under the different lights that user create.
 
 Lookdev Viewport has been designed to as standalone application, supporting Linux right now and in the incoming future windows too, It's a toy to debug our textures and the intention is quite simple. Trying to keep the user interface simple, intuitive and quick to use for an artist.
 
