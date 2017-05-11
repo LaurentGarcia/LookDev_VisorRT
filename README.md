@@ -23,4 +23,4 @@ And for model loading and import into openGl: http://assimp.sourceforge.net/main
 Binaries/Demo
 -------------
 
-To be continued!... soon!
+To be continued!... soon! :)
