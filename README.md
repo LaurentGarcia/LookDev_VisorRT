@@ -1,6 +1,5 @@
 # lookdev_Viewer
 
-LookDev Viewport,
 =====
 [![Build Status](https://github.com/LaurentGarcia/LookDev_VisorRT.git)](https://github.com/LaurentGarcia/LookDev_VisorRT)
 
@@ -10,6 +9,7 @@ Lookdev viewport, is a OpenGL and c++ based application. The tool is able to loa
 
 Lookdev Viewport has been designed to as standalone application, supporting Linux right now and in the incoming future windows too, It's a toy to debug our textures and the intention is quite simple. Trying to keep the user interface simple, intuitive and quick to use for an artist.
 
+![screenshot of current status](https://1.bp.blogspot.com/-A1wsIPfnh8E/WROO58iIZaI/AAAAAAAAQ8o/O2aWIiY5RgQ1vSWknhNNjUbbaQt3Z9nawCLcB/s1600/viewport2.jpg)
 
 Libraries/acknowledgment
 ------------------------
