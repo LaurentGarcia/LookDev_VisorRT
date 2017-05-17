@@ -10,7 +10,7 @@
 Texture::Texture(const char* textureName) {
 	// TODO Auto-generated constructor stub
 	unsigned char* image;
-	image = SOIL_load_image(textureName, &widthTex, &heightTex, 0, SOIL_LOAD_RGB);
+	//image = stbi_load(textureName, &widthTex, &heightTex, 0, STBI_rgb);
 	#if DEBUG
 		if (image == 0)
 			std::cout << "Texture not found: " << textureName << std::endl;
@@ -29,9 +29,17 @@ Texture::Texture(const char* textureName) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, widthTex, heightTex, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
+	//stbi_image_free(image);
 
 }
+
+
+Texture::Texture(const char* textureName,bool hdr)
+{
+	//SOIL_load_OGL_HDR_texture(textureName,)
+};
+
+
 
 Texture::~Texture() {
 	// TODO Auto-generated destructor stub

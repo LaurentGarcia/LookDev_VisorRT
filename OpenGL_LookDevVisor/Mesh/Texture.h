@@ -7,13 +7,13 @@
 
 #ifndef TEXTURE_H_
 #define TEXTURE_H_
+
 #ifdef _WIN32
 	#include <iostream>
 	#include <Windows.h>
 	#define  GLEW_STATIC
 	#include <glew.h>
 	#include <glfw3.h>
-	#include <SOIL.h>
 	#include <assimp/Importer.hpp>
 	#include <assimp/scene.h>
 	#include <assimp/postprocess.h>
@@ -21,13 +21,11 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
-	#include <SOIL.h>
 	#include <assimp/Importer.hpp>
 	#include <assimp/scene.h>
 	#include <assimp/postprocess.h>
 #else
 #endif
-
 #define DEBUG 1
 
 class Texture {
@@ -35,6 +33,8 @@ class Texture {
 public:
 
 	Texture(const char* textureName);
+	Texture(const char* textureName,bool hdr); //Method to load a HDR
+
 	virtual ~Texture();
 
 	void   setTextureType(std::string type);

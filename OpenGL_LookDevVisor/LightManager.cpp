@@ -13,7 +13,7 @@ Light_Manager::Light_Manager() {
 //	this->sceneLights.push_back(sun);
 //	Light* point = new PointLight;
 //	this->sceneLights.push_back(point);
-	Light* spot = new SpotLight;
+	Light* spot = new SpotLight ("SpotLight Dummy");
 	this->sceneLights.push_back(spot);
 }
 
@@ -21,70 +21,80 @@ Light_Manager::~Light_Manager() {
 	// TODO Auto-generated destructor stub
 }
 
-void Light_Manager::setNewLightPosition(glm::vec3 newpos)
+void Light_Manager::setNewLightPosition(int n_light,glm::vec3 newpos)
 {
-	this->sceneLights.back()->setPosition(newpos);
+	this->sceneLights[n_light]->setPosition(newpos);
 };
 
-glm::vec3 Light_Manager::getCurrentLightPosition()
+glm::vec3 Light_Manager::getCurrentLightPosition(int n_light)
 {
-	return this->sceneLights.back()->getPosition();
+	return this->sceneLights[n_light]->getPosition();
 };
-glm::vec3 Light_Manager::getCurrentLightColor()
+glm::vec3 Light_Manager::getCurrentLightColor(int n_light)
 {
-	return this->sceneLights.back()->getKd();
+	return this->sceneLights[n_light]->getKd();
 };
-glm::vec3 Light_Manager::getCurrentLightSpec()
+glm::vec3 Light_Manager::getCurrentLightSpec(int n_light)
 {
-	return this->sceneLights.back()->getKs();
+	return this->sceneLights[n_light]->getKs();
 };
-glm::vec3 Light_Manager::getCurrentLightAmb()
+glm::vec3 Light_Manager::getCurrentLightAmb(int n_light)
 {
-	return this->sceneLights.back()->getKa();
+	return this->sceneLights[n_light]->getKa();
 };
-void Light_Manager::setNewLightColor(glm::vec3 newlightcolor)
+void Light_Manager::setNewLightColor(int n_light,glm::vec3 newlightcolor)
 {
-	this->sceneLights.back()->setKd(newlightcolor);
+	this->sceneLights[n_light]->setKd(newlightcolor);
 };
-void Light_Manager::setNewLightSpecContribution    (glm::vec3 newspec)
+void Light_Manager::setNewLightSpecContribution    (int n_light,glm::vec3 newspec)
 {
-	this->sceneLights.back()->setKs(newspec);
+	this->sceneLights[n_light]->setKs(newspec);
 };
-void Light_Manager::setNewLightAmbientContribution (glm::vec3 newamb)
+void Light_Manager::setNewLightAmbientContribution (int n_light,glm::vec3 newamb)
 {
-	this->sceneLights.back()->setKa(newamb);
+	this->sceneLights[n_light]->setKa(newamb);
 };
 
 
 //Point Light properties
 
-
-void  Light_Manager::setNewLightQuadraticValue      (float quadratic)
+void Light_Manager::setNewLightConstant             (int n_light,float constant)
 {
-	if (this->sceneLights.back()->getType()==Light::point)
+	if (this->sceneLights[n_light]->getType()==Light::point)
 	{
-		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights.back());
+		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights[n_light]);
+		p->setConstant(constant);
+		p = nullptr;
+	}
+};
+
+
+void  Light_Manager::setNewLightQuadraticValue      (int n_light,float quadratic)
+{
+	if (this->sceneLights[n_light]->getType()==Light::point)
+	{
+		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights[n_light]);
 		p->setQuadratic(quadratic);
 		p = nullptr;
 	}
 }
 
-void Light_Manager::setNewLightLinearValue(float value)
+void Light_Manager::setNewLightLinearValue(int n_light,float value)
 {
-	if (this->sceneLights.back()->getType()==Light::point)
+	if (this->sceneLights[n_light]->getType()==Light::point)
 	{
-		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights.back());
+		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights[n_light]);
 		p->setLinear(value);
 		p = nullptr;
 	}
 }
 
 
-float Light_Manager::getCurrentLightQuadraticValue()
+float Light_Manager::getCurrentLightQuadraticValue(int n_light)
 {
-	if (this->sceneLights.back()->getType()==Light::point)
+	if (this->sceneLights[n_light]->getType()==Light::point)
 	{
-		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights.back());
+		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights[n_light]);
 		float Kq = p->getQuadratic();
 		p = nullptr;
 		return Kq;
@@ -94,11 +104,11 @@ float Light_Manager::getCurrentLightQuadraticValue()
 	}
 }
 
-float Light_Manager::getCurrentLightLinearValue()
+float Light_Manager::getCurrentLightLinearValue(int n_light)
 {
-	if (this->sceneLights.back()->getType()==Light::point)
+	if (this->sceneLights[n_light]->getType()==Light::point)
 	{
-		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights.back());
+		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights[n_light]);
 		float Kl = p->getLinear();
 		p = nullptr;
 		return Kl;
@@ -107,11 +117,11 @@ float Light_Manager::getCurrentLightLinearValue()
 	}
 };
 
-float Light_Manager::getCurrentLightConstantValue()
+float Light_Manager::getCurrentLightConstantValue(int n_light)
 {
-	if (this->sceneLights.back()->getType()==Light::point)
+	if (this->sceneLights[n_light]->getType()==Light::point)
 	{
-		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights.back());
+		PointLight* p= dynamic_cast<PointLight*>(this->sceneLights[n_light]);
 		float Kc = p->getConstant();
 		p = nullptr;
 		return Kc;
@@ -124,33 +134,42 @@ float Light_Manager::getCurrentLightConstantValue()
 
 //Spot Light
 
-void Light_Manager::setNewAim(glm::vec3 newaim)
+void Light_Manager::setNewAim(int n_light,glm::vec3 newaim)
 {
-	if (this->sceneLights.back()->getType()==Light::spot)
+	if (this->sceneLights[n_light]->getType()==Light::spot)
 		{
-			SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights.back());
+			SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
 			p->setAim(newaim);
 			p = nullptr;
 		}
 
 }
 
-void Light_Manager::setNewLightCutoff(float cutoff)
+void Light_Manager::setNewLightCutoff(int n_light,float cutoff)
 {
-	if (this->sceneLights.back()->getType()==Light::spot)
+	if (this->sceneLights[n_light]->getType()==Light::spot)
 	{
-		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights.back());
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
 		p->setCutoff(cutoff);
 		p = nullptr;
 	}
 }
 
-
-glm::vec3 Light_Manager::getCurrentAim()
+void Light_Manager::setNewLightOutterCutoff(int n_light,float outter_cutoff)
 {
-	if (this->sceneLights.back()->getType()==Light::spot)
+	if (this->sceneLights[n_light]->getType()==Light::spot)
 	{
-		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights.back());
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
+		p->setOuterCutoff(outter_cutoff);
+		p = nullptr;
+	}
+};
+
+glm::vec3 Light_Manager::getCurrentAim(int n_light)
+{
+	if (this->sceneLights[n_light]->getType()==Light::spot)
+	{
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
 		glm::vec3 aim = p->getAim();
 		p = nullptr;
 		return aim;
@@ -160,12 +179,38 @@ glm::vec3 Light_Manager::getCurrentAim()
 }
 
 
-
-float Light_Manager::getCurrentLightCutoff()
+float Light_Manager::getCurrentLightCutoffFloat(int n_light)
 {
-	if (this->sceneLights.back()->getType()==Light::spot)
+	if (this->sceneLights[n_light]->getType()==Light::spot)
 	{
-		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights.back());
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
+		float cutoff = p->getCutoffFloat();
+		p = nullptr;
+		return cutoff;
+	}else{
+		return 0;
+	}
+}
+float Light_Manager::getCurrentLightOutCutOffFloat(int n_light)
+{
+	if (this->sceneLights[n_light]->getType()==Light::spot)
+	{
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
+		float outtercutoff = p->getOutterCutOffFloat();
+		p = nullptr;
+		return outtercutoff;
+	}else{
+		return 0;
+	}
+}
+
+
+
+float Light_Manager::getCurrentLightCutoff(int n_light)
+{
+	if (this->sceneLights[n_light]->getType()==Light::spot)
+	{
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
 		float cutoff = p->getCutoff();
 		p = nullptr;
 		return cutoff;
@@ -174,11 +219,11 @@ float Light_Manager::getCurrentLightCutoff()
 	}
 }
 
-float Light_Manager::getCurrentLightOutCutOff()
+float Light_Manager::getCurrentLightOutCutOff(int n_light)
 {
-	if (this->sceneLights.back()->getType()==Light::spot)
+	if (this->sceneLights[n_light]->getType()==Light::spot)
 	{
-		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights.back());
+		SpotLight* p= dynamic_cast<SpotLight*>(this->sceneLights[n_light]);
 		float cutoutoff = p->getOuterCutOff();
 		p = nullptr;
 		return cutoutoff;
@@ -188,26 +233,26 @@ float Light_Manager::getCurrentLightOutCutOff()
 
 };
 
-void Light_Manager::createNewLight(int type, glm::vec3 position)
+void Light_Manager::createNewLight(int type, glm::vec3 position,std::string name)
 {
 	switch (type){
 	case 0:
 	{
-		Light* newlight = new DirectionalLight;
+		Light* newlight = new DirectionalLight(name);
 		newlight->setPosition(position);
 		this->sceneLights.push_back(newlight);
 		break;
 	}
 	case 1:
 	{
-		Light* newlight = new PointLight;
+		Light* newlight = new PointLight(name);
 		newlight->setPosition(position);
 		this->sceneLights.push_back(newlight);
 		break;
 	}
 	case 2:
 	{
-		Light* newlight = new SpotLight;
+		Light* newlight = new SpotLight(name);
 		newlight->setPosition(position);
 		this->sceneLights.push_back(newlight);
 		break;
@@ -217,9 +262,25 @@ void Light_Manager::createNewLight(int type, glm::vec3 position)
 	}
 }
 
-int  Light_Manager::getCurrentLightType()
+void Light_Manager::deleteLight(int n_light,std::string name)
 {
-	return this->sceneLights.back()->getType();
+	std::vector<Light*> newvector;
+
+	for (int i = 0; i<this->sceneLights.size(); i++)
+	{
+		if (i!=n_light)
+			newvector.push_back(this->sceneLights[i]);
+		else{
+			if(this->sceneLights[i]->getName()==name)
+				delete this->sceneLights[i]; // Free memory allocated
+		}
+	}
+	this->sceneLights = newvector;
+};
+
+int  Light_Manager::getCurrentLightType(int n_light)
+{
+	return this->sceneLights[n_light]->getType();
 };
 
 int  Light_Manager::getSceneNumberLightsActive()
@@ -227,7 +288,12 @@ int  Light_Manager::getSceneNumberLightsActive()
 	return this->sceneLights.size();
 };
 
-bool  Light_Manager::getIsCurrentLightOn() 
+bool  Light_Manager::getIsCurrentLightOn(int n_light)
 {
-	return this->sceneLights.back()->getOn();
+	return this->sceneLights[n_light]->getOn();
+};
+
+std::string Light_Manager::getCurrentLightName(int n_light)
+{
+	return this->sceneLights[n_light]->getName();
 };

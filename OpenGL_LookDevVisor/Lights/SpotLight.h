@@ -28,22 +28,26 @@
 
 class SpotLight : public Light{
 public:
-	SpotLight();
+	SpotLight(std::string name);
 	virtual ~SpotLight();
 
 	//Implements the abstract Light Interface
-	bool      getOn();
-	glm::vec3 getPosition();
-	glm::vec3 getKa();
-	glm::vec3 getKd();
-	glm::vec3 getKs();
-	lightType getType();
-	float     getConstant();
-	float     getLinear();
-	float     getQuadratic();
-	float     getCutoff();// Give us the result of Cos Phi
-	float     getOuterCutOff(); //Give us the result of Cos Epsilon
-	glm::vec3 getAim();
+	bool        getOn();
+	glm::vec3   getPosition();
+	glm::vec3   getKa();
+	glm::vec3   getKd();
+	glm::vec3   getKs();
+	lightType   getType();
+	std::string getName();
+	float       getConstant();
+	float       getLinear();
+	float       getQuadratic();
+	float       getCutoffFloat();
+	float       getOutterCutOffFloat();
+	float       getCutoff();// Give us the result of Cos Phi
+	float       getOuterCutOff(); //Give us the result of Cos Epsilon
+	glm::vec3   getAim();
+
 
 	void setOn(bool activated);
 	void setPosition(glm::vec3 position);

@@ -7,26 +7,41 @@
 
 #include "RenderEngine.h"
 
+// Static variables, control windows open status
+static bool light_window_open   = false;
+static bool shading_window_open = false;
+
+
+
+
 RenderEngine::RenderEngine() {
 	// TODO Auto-generated constructor stub
 
+	std::cout<<"Init Viewport..."<<std::endl;
 	glEnable(GL_DEPTH_TEST);
 
 	bool* shaderesult = new bool(false);
-	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName);
+	shaderManager.createShader(vtxLightShaderFileName,frgLightShaderFileName,"light_shader");
+	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName,"phong_default");
+
+
 	if (shaderesult) {
 		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
 	};
 
-	this->sceneLightManager.setNewLightPosition(glm::vec3{35.0f, 40.0f, 70.0f});
-	this->sceneLightManager.setNewLightColor(glm::vec3{0.6f, 0.5f, 0.5f});
-	this->sceneLightManager.setNewLightSpecContribution(glm::vec3{0.5f, 0.5f, 0.5f});
-	this->sceneLightManager.setNewLightAmbientContribution(glm::vec3{0.25f, 0.25f, 0.25f});
-	this->sceneLightManager.setNewLightLinearValue(0.09f);
-	this->sceneLightManager.setNewLightQuadraticValue(0.032f);
+	this->sceneLightManager.setNewLightPosition(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{35.0f, 40.0f, 70.0f});
+	this->sceneLightManager.setNewLightColor(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.6f, 0.5f, 0.5f});
+	this->sceneLightManager.setNewLightSpecContribution(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.5f, 0.5f, 0.5f});
+	this->sceneLightManager.setNewLightAmbientContribution(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.25f, 0.25f, 0.25f});
+	this->sceneLightManager.setNewLightLinearValue(this->sceneLightManager.getSceneNumberLightsActive()-1,0.09f);
+	this->sceneLightManager.setNewLightQuadraticValue(this->sceneLightManager.getSceneNumberLightsActive()-1,0.032f);
 
 	this->viewportBackgroundColor = {0.2,0.2,0.2};
-	this->lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/light.obj");
+
+	//Default Light Created in the scene
+	Model* lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
+	lightdummy->setNewPosition(glm::vec3{35.0f, 40.0f, 70.0f});
+	this->lightMeshes[this->sceneLightManager.getCurrentLightName(0)] = lightdummy;
 }
 
 RenderEngine::~RenderEngine() {
@@ -62,22 +77,6 @@ void RenderEngine::setZoom(int keyPressed)
 	this->cameraViewport.doMovement(keyPressed,deltaTime);
 };
 
-void RenderEngine::setLightIntensity(int keyPressed)
-{
-	if (keyPressed == GLFW_KEY_0){
-		glm::vec3 lightIntensity = this->sceneLightManager.getCurrentLightColor();
-		lightIntensity -= 0.1f;
-		this->sceneLightManager.setNewLightColor(lightIntensity);
-	}
-	if (keyPressed == GLFW_KEY_9)
-	{
-		glm::vec3 lightIntensity = this->sceneLightManager.getCurrentLightColor();
-		lightIntensity += 0.1f;
-		this->sceneLightManager.setNewLightColor(lightIntensity);
-	}
-};
-
-
 
 void RenderEngine::setShaderSceneTransformations()
 {
@@ -103,7 +102,6 @@ void RenderEngine::setShaderLightingCalculation()
 	GLint lightOutCutOffLoc;
 	GLint lightAimLoc;
 	GLint lightTypeLoc;
-	GLint viewPosLoc;
 	std::string lightname = "lights[";
 	std::string lightnameend = "]";
 
@@ -146,51 +144,73 @@ void RenderEngine::setShaderLightingCalculation()
 
 
 		//Update my current Light (Todo: Select Light and modify desired light)
-		glUniform1i(lightTypeLoc,this->sceneLightManager.getCurrentLightType());
+		glUniform1i(lightTypeLoc,this->sceneLightManager.getCurrentLightType(i));
 
-		glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor().x
-								 ,this->sceneLightManager.getCurrentLightColor().y
-								 ,this->sceneLightManager.getCurrentLightColor().z);
+		glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor(i).x
+								 ,this->sceneLightManager.getCurrentLightColor(i).y
+								 ,this->sceneLightManager.getCurrentLightColor(i).z);
 
-		glUniform3f(lightAmbLoc,  this->sceneLightManager.getCurrentLightAmb().x
-								 ,this->sceneLightManager.getCurrentLightAmb().y
-								 ,this->sceneLightManager.getCurrentLightAmb().z);
+		glUniform3f(lightAmbLoc,  this->sceneLightManager.getCurrentLightAmb(i).x
+								 ,this->sceneLightManager.getCurrentLightAmb(i).y
+								 ,this->sceneLightManager.getCurrentLightAmb(i).z);
 
-		glUniform3f(lightSpecLoc, this->sceneLightManager.getCurrentLightSpec().x
-								 ,this->sceneLightManager.getCurrentLightSpec().y
-								 ,this->sceneLightManager.getCurrentLightSpec().z);
+		glUniform3f(lightSpecLoc, this->sceneLightManager.getCurrentLightSpec(i).x
+								 ,this->sceneLightManager.getCurrentLightSpec(i).y
+								 ,this->sceneLightManager.getCurrentLightSpec(i).z);
 
-		glUniform3f(lightPositionLoc, this->sceneLightManager.getCurrentLightPosition().x
-									 ,this->sceneLightManager.getCurrentLightPosition().y
-									 ,this->sceneLightManager.getCurrentLightPosition().z);
+		glUniform3f(lightPositionLoc, this->sceneLightManager.getCurrentLightPosition(i).x
+									 ,this->sceneLightManager.getCurrentLightPosition(i).y
+									 ,this->sceneLightManager.getCurrentLightPosition(i).z);
 
 		//In case that our selected/active light was a point
-		if (this->sceneLightManager.getCurrentLightType() ==1 || this->sceneLightManager.getCurrentLightType() == 2)
+		if (this->sceneLightManager.getCurrentLightType(i) ==1 || this->sceneLightManager.getCurrentLightType(i) == 2)
 		{
-			glUniform1f(lightConstantLoc,  this->sceneLightManager.getCurrentLightConstantValue());
-			glUniform1f(lightLinearLoc,    this->sceneLightManager.getCurrentLightLinearValue());
-			glUniform1f(lightQuadraticLoc, this->sceneLightManager.getCurrentLightQuadraticValue());
-			if (this->sceneLightManager.getCurrentLightType() == 2)
+			glUniform1f(lightConstantLoc,  this->sceneLightManager.getCurrentLightConstantValue(i));
+			glUniform1f(lightLinearLoc,    this->sceneLightManager.getCurrentLightLinearValue(i));
+			glUniform1f(lightQuadraticLoc, this->sceneLightManager.getCurrentLightQuadraticValue(i));
+			if (this->sceneLightManager.getCurrentLightType(i) == 2)
 			{
-				glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff());
-				glUniform1f(lightOutCutOffLoc, this->sceneLightManager.getCurrentLightOutCutOff());
+				glUniform1f(lightCutOffLoc,    this->sceneLightManager.getCurrentLightCutoff(i));
+				glUniform1f(lightOutCutOffLoc, this->sceneLightManager.getCurrentLightOutCutOff(i));
 				glm::vec3 newaimSpot = glm::vec3{0.0f,0.0f,0.0f}-glm::vec3{1.2f, 1.0f, 2.0f};
-				this->sceneLightManager.setNewAim(newaimSpot);
-				glUniform3f(lightAimLoc,  this->sceneLightManager.getCurrentAim().x
-										 ,this->sceneLightManager.getCurrentAim().y
-										 ,this->sceneLightManager.getCurrentAim().z);
+				this->sceneLightManager.setNewAim(i,newaimSpot);
+				glUniform3f(lightAimLoc,  this->sceneLightManager.getCurrentAim(i).x
+										 ,this->sceneLightManager.getCurrentAim(i).y
+										 ,this->sceneLightManager.getCurrentAim(i).z);
 			}
 		}
 	}//End Recolect Light Info
 
-
-	viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
-	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
-	GLint matShininess  = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"mat.shininess");
-	glUniform1f(matShininess,90.0f);
-
-
 }
+
+void RenderEngine::updateShaderInputsParameters ()//Todo
+{
+	// Kd
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->texSelection["kd"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(), "mat.diffuse"), 0);
+	// Ks
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->texSelection["ks"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(), "mat.metallic"), 1);
+	// Kn
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D,this->texSelection["kn"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.normalmap"),2);
+	//Active normal
+	GLint activatedNormal = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"normalActive");
+	glUniform1i(activatedNormal,this->shaderManager.getCurrentShader().getNormalAct());
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D,this->texSelection["kr"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.roughness"),3);
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D,this->texSelection["ao"]);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.ao"),4);
+
+};
+
 
 void RenderEngine::doRender(){
 
@@ -212,11 +232,22 @@ void RenderEngine::doRender(){
 	glm::mat4 view;
 	view = this->cameraViewport.getCameraViewMatrix();
 	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
-
 	GLint viewLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	GLint projecLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "projection");
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+	int numlightscene = this->sceneLightManager.getSceneNumberLightsActive();
+	for (int i = 0; i< numlightscene;i++)
+	{
+		std::string lightname = "lightPos[";
+		std::string lightnameend = "]";
+		std::string finalLightname = lightname+std::to_string(i)+lightnameend;
+		GLint lightpos = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalLightname.c_str());
+		glUniform3f(lightpos,this->sceneLightManager.getCurrentLightPosition(i).x,
+							 this->sceneLightManager.getCurrentLightPosition(i).y,
+							 this->sceneLightManager.getCurrentLightPosition(i).z);
+	};
 
 	this->setShaderLightingCalculation();
 
@@ -224,15 +255,33 @@ void RenderEngine::doRender(){
 	//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
 	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// It's a bit too big for our scene, so scale it down
 
+	GLint viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
+	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
+
+	this->updateShaderInputsParameters(); //User Interface updating Shader
+
 	if (this->scene!=nullptr){
 		GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->scene->getModelMatrix()));
-    	this->scene->Draw(this->shaderManager.getCurrentShader());
+    	this->scene->Draw(this->shaderManager.getCurrentShader(),this->texSelection);
 	}
-    this->lightdummy->Draw(this->shaderManager.getCurrentShader());
+
+	this->renderLightsGeo();
 
     ImGui::Render();
 
+};
+
+
+
+void RenderEngine::renderLightsGeo()
+{
+	// Light and model must be aligned with the same position
+	for (int i = 0; i<this->sceneLightManager.getSceneNumberLightsActive();i++)
+	{   GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->getModelMatrix()));
+		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getCurrentShader(),this->texSelection);
+	}
 };
 
 
@@ -243,12 +292,14 @@ void ImGui_GPUStatisticsUI()
 	bool show_another_window;
 	ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
 	ImGui::ShowMetricsWindow(&show_another_window);
-	ImGui::Text("Hello");
+	ImGui::Text("Gpu Statistics");
 	ImGui::End();
 }
 
+//Main Bar Functionality
 void RenderEngine::ImGui_CreateGpuUIMainWindow()
 {
+	static bool light_editor_open = false;
 	static bool show_test_window = false;
 	bool show_another_window = true;
 	static float f = 0.0f;
@@ -256,22 +307,31 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 
 	if(ImGui::BeginMainMenuBar()){
 	  if (ImGui::BeginMenu("File"))
-	        {
-		  	  	ImGui_MainBarFunctions();
-	            ImGui::EndMenu();
-	        }
-	        if (ImGui::BeginMenu("Windows"))
-	        {
-	            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-	            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-	            ImGui::Separator();
-	            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-	            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-	            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-	            ImGui::EndMenu();
-	        }
+	  {
+		  ImGui_MainBarFunctions();
+	      ImGui::EndMenu();
+	  }
+	  if (ImGui::BeginMenu("Lights"))
+	  {
+		  ImGui_LightsBarFunctions();
+	      ImGui::EndMenu();
+	  }
+	  if(ImGui::BeginMenu("Shading"))
+	  {
+		  ImGUI_ShadingBarFunctions();
+		  ImGui::EndMenu();
+	  }
+	  if(ImGui::BeginMenu("Stats"))
+	  {
+		  ImGui::EndMenu();
+	  }
+	  if(ImGui::BeginMenu("Help"))
+	  {
+		  ImGui::EndMenu();
+	  }
 	ImGui::EndMainMenuBar();
 	}
+
 
 	ImVec4 clear_color = ImColor(114, 144, 154);
 	ImGui::Text("ReelFx Look Development Viewport");
@@ -280,8 +340,328 @@ void RenderEngine::ImGui_CreateGpuUIMainWindow()
 	if (show_test_window)
 		ImGui::ShowTestWindow(windowTestOpen);
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	if (light_window_open)
+		ImGui_ShowLightWindowEdit(&light_window_open);
+	if (shading_window_open)
+		ImGUI_ShowShadingWindowEdit(&shading_window_open);
 };
 
+// Lights Menu
+
+void RenderEngine::ImGui_LightsBarFunctions()
+{
+	unsigned int size = this->sceneLightManager.getSceneNumberLightsActive();
+	const char* lightsNames[size];
+
+	for (int i = 0; i<size;i++)
+	{
+		lightsNames[i] = this->sceneLightManager.getCurrentLightName(i).c_str();
+	}
+	std::string n_lightsActive = std::to_string(size);
+
+
+	static char buffer[512] = ("Scene Lighting Options");
+	ImGui::MenuItem(buffer, NULL, false, false);
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	ImGui::Text("Number Lights in the Scene: "); ImGui::SameLine(0, 20);
+    ImGui::TextColored(ImVec4(1,1,0,1),n_lightsActive.c_str());
+
+    ImGui::Spacing();
+    ImGui::Separator();
+
+    static int item = -1;
+    ImGui::ListBox("Scene Lights", &item, lightsNames, size); ImGui::SameLine();
+
+    if (ImGui::Button("Edit Lights"))
+    {
+    	light_window_open = true;
+    }
+    // New Light to be included
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Text("Add New Light");
+
+    static char newuserlightname[128];
+    ImGui::InputText("Name", newuserlightname, sizeof(newuserlightname));ImGui::SameLine();
+    static int light_type = 0;
+    ImGui::Combo("Type", &light_type, "Directional\0Point\0Spot\0\0");
+    if (ImGui::Button("New Light"))
+    {
+    	std::string newlight(newuserlightname);//ToDO:: change to relative folders
+    	this->sceneLightManager.createNewLight(light_type,glm::vec3(0.0f,0.0f,0.0f),newlight);
+    	if(light_type == 0)
+    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/directionalLight.obj");
+    	if(light_type == 1)
+    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/pointLight.obj");
+    	if(light_type == 2)
+    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Delete Light")) //ToDo: Eliminate light from the map
+    {
+    	std::string name(lightsNames[item]);
+    	this->sceneLightManager.deleteLight(item,name);
+    };
+}
+
+void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
+{
+	ImGuiWindowFlags window_flags = 0;
+	ImGui::SetNextWindowSize(ImVec2(550,680), ImGuiSetCond_FirstUseEver);
+	ImGui::Begin("Light Editor", isopen, window_flags);
+
+	ImGui::Text("Lighting tool, per light adjustment, any change will be reflected on the desired light in real time");
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	unsigned int size = this->sceneLightManager.getSceneNumberLightsActive();
+	const char* lightsNames[size];
+	for (int i = 0; i<size;i++)
+	{
+		lightsNames[i] = this->sceneLightManager.getCurrentLightName(i).c_str();
+	}
+	static int item = -1;
+	ImGui::ListBox("Selected Light", &item, lightsNames, size); ImGui::SameLine();
+
+	// For the selected light we need to offer the following parameters
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Light Position");
+
+	if (item != -1){
+		glm::vec3 vec3;
+		//Move the light
+		{
+			float vec4foffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			if(ImGui::SliderFloat3("Light Offset (XYZ)",vec4foffset, -0.2f, 0.2f))
+			{
+				glm::vec3 newuserpos = {vec4foffset[0],vec4foffset[1],vec4foffset[2]};
+				this->sceneLightManager.setNewLightPosition(item,newuserpos);
+				this->lightMeshes[this->sceneLightManager.getCurrentLightName(item)]->setNewPosition(newuserpos);
+			}
+		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Text("Light Attributes");
+		// Light Color
+		{
+			vec3= this->sceneLightManager.getCurrentLightColor(item);
+			float col1[3] = { vec3.x,vec3.y,vec3.z};
+			ImGui::ColorEdit3("Kd", col1);
+			ImGui::SameLine(); ImGui_ShowHelpMarker("Light Color control .\nCTRL+click on individual component to input value.\n");
+			vec3.x = col1[0]; vec3.y = col1[1]; vec3.z = col1[2];
+			this->sceneLightManager.setNewLightColor(item,vec3);
+		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		// Specular color contribution
+		{
+			vec3= this->sceneLightManager.getCurrentLightSpec(item);
+			float spc1[3] = { vec3.x,vec3.y,vec3.z};
+			ImGui::ColorEdit3("Ks", spc1);
+			ImGui::SameLine(); ImGui_ShowHelpMarker("Specular Light Control.\nCTRL+click on individual component to input value.\n");
+			vec3.x = spc1[0]; vec3.y = spc1[1]; vec3.z = spc1[2];
+			this->sceneLightManager.setNewLightSpecContribution(item,vec3);
+		}
+		ImGui::Spacing();
+	    ImGui::Separator();
+	    // Ambient Contribution
+	    {
+	    	vec3= this->sceneLightManager.getCurrentLightAmb(item);
+	    	float Amb1[3] = { vec3.x,vec3.y,vec3.z};
+	    	ImGui::ColorEdit3("Ka", Amb1);
+	    	ImGui::SameLine(); ImGui_ShowHelpMarker("Specular Light Control.\nCTRL+click on individual component to input value.\n");
+	    	vec3.x = Amb1[0]; vec3.y = Amb1[1]; vec3.z = Amb1[2];
+	    	this->sceneLightManager.setNewLightAmbientContribution(item,vec3);
+	    }
+	    //Constant Decay
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightConstantValue(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Kc", &f);
+	    	this->sceneLightManager.setNewLightConstant(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    //Linear Decay
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightLinearValue(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Kl", &f);
+	    	this->sceneLightManager.setNewLightLinearValue(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    //Quadratic decay
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightQuadraticValue(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Kq", &f);
+	    	this->sceneLightManager.setNewLightQuadraticValue(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    // Cutoff Angle
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightCutoffFloat(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Cutoff Angle", &f);
+	    	this->sceneLightManager.setNewLightCutoff(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	    // Cutoff Falloff
+	    ImGui::Spacing();
+	    ImGui::Separator();
+	    {
+	    	float f = 0.0f;
+	    	f = this->sceneLightManager.getCurrentLightOutCutOffFloat(item);
+	    	ImGui::PushItemWidth(100);
+	    	ImGui::DragFloat("Outter Angle", &f);
+	    	this->sceneLightManager.setNewLightOutterCutoff(item,f);
+	    	ImGui::PopItemWidth();
+	    }
+	}
+	ImGui::End();
+
+};
+
+
+// Shading Menu
+
+void RenderEngine::ImGUI_ShadingBarFunctions()
+{
+
+	static char buffer[512] = ("Scene Shading Options");
+	ImGui::MenuItem(buffer, NULL, false, false);
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Current Shaders in the Scene: "); ImGui::SameLine(0, 10);
+	ImGui::TextColored(ImVec4(1,1,0,1),this->shaderManager.getShaderName(0).c_str());
+	if (ImGui::Button("Shader Edit"))
+	{
+		shading_window_open = true;
+	}
+	ImGui::Spacing();
+	ImGui::Separator();
+	static char texbuffer[512];
+	if (ImGui::BeginMenu("Load Texture"))
+	{
+		if(ImGui::InputText("Texture File", texbuffer, sizeof(buffer),ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			this->shaderManager.loadTextureFromFile(texbuffer);
+		};
+	ImGui::EndMenu();
+	}
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Textures Loaded In The Scene:");
+	ImGui::Columns(3, "TextureColumns", false);  // 3-ways, no border
+	ImGui::Separator();
+	for (int i = 0; i < this->shaderManager.getNumberTextures(); i++)
+	{
+		char label[32];
+	    sprintf(label, this->shaderManager.getTextureName(i).c_str(), i);
+	    if (ImGui::Selectable(label)) {}
+	        //if (ImGui::Button(label, ImVec2(-1,0))) {}
+	         ImGui::NextColumn();
+	 }
+}
+
+
+void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
+{
+	ImGuiWindowFlags window_flags = 0;
+	ImGui::SetNextWindowSize(ImVec2(550,680), ImGuiSetCond_FirstUseEver);
+	ImGui::Begin("Shader Editor", isopen, window_flags);
+
+	ImGui::Text("Shader tool,any change will be reflected in real time");
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	unsigned int size = this->shaderManager.getNumberShaders();
+	const char* shadersNames[size];
+	for (int i = 0; i<size;i++)
+	{
+		shadersNames[i] = this->shaderManager.getShaderName(i).c_str();
+	}
+	size = this->shaderManager.getNumberTextures();
+	const char * texturesNames[size];
+	for (int i = 0; i<size;i++)
+	{
+		texturesNames[i] = this->shaderManager.getTextureName(i).c_str();
+	}
+
+	//static int shaderSelected = -1;
+	//ImGui::ListBox("Shader", &shaderSelected, shadersNames, size); //ImGui::SameLine();
+
+	ImGui::Spacing();
+	ImGui::Separator();
+
+	// Kd Diffuse
+	ImGui::Text("Color");
+	static int  kdTextureSelected = 0;
+	const char* items[this->shaderManager.getNumberTextures()];
+	for (int i = 0; i < this->shaderManager.getNumberTextures();i++)
+	{
+		items[i] = this->shaderManager.getTextureName(i).c_str();
+	}
+    // User selection Texture for Color
+	ImGui::Combo("Albedo Tex", &kdTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+		this->texSelection["kd"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(kdTextureSelected));
+
+	// Ks spec map & Controls
+	ImGui::Text("Metalness");
+	static int  ksTextureSelected = 0;
+	ImGui::Combo("Ks Tex", &ksTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+		this->texSelection["ks"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(ksTextureSelected));
+
+	// Ks normal map & Controls
+	ImGui::Text("Normal");
+	static int  knTextureSelected = 0;
+	ImGui::Combo("Kn Tex", &knTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+		this->texSelection["kn"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(knTextureSelected));
+	static bool active_normal;
+	ImGui::Checkbox("Active Normal",&active_normal);
+	this->shaderManager.getCurrentShaderEdit()->setNormalAct(active_normal);
+
+	ImGui::Text("Roughness");
+	static int  krTextureSelected = 0;
+	ImGui::Combo("Kr Tex", &krTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+			this->texSelection["kr"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(krTextureSelected));
+
+	ImGui::Text("AO");
+	static int  aoTextureSelected = 0;
+	ImGui::Combo("AO Tex", &aoTextureSelected, items,this->shaderManager.getNumberTextures());
+	if(this->shaderManager.getNumberTextures() != 0)
+			this->texSelection["ao"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(aoTextureSelected));
+	ImGui::Spacing();
+	ImGui::Separator();
+
+
+
+
+	ImGui::End();
+}
+
+
+
+
+// File / Main Button Functionality
 void RenderEngine::ImGui_MainBarFunctions()
 {
 	//Static Variables that store the user inputs
@@ -293,7 +673,6 @@ void RenderEngine::ImGui_MainBarFunctions()
 	{
 	    if(ImGui::InputText("File Path", buffer, sizeof(buffer),ImGuiInputTextFlags_EnterReturnsTrue))
 	    {
-	    		std::cout<<"button pressed"<<std::endl;
 	    		fflush(stdout);
 	    		if (scene!=nullptr){
 	    			if (std::strcmp(i_geopath.c_str(),buffer)!= 0)
@@ -324,7 +703,8 @@ void RenderEngine::ImGui_MainBarFunctions()
 		ImGui::LabelText("Model (Geo)", "Values");
 		ImGui::Spacing();
 
-		static float vec1fscale[1]  = { 0.0f };
+		static float vec1fscale[1]     = { 0.0f };
+		static float lastvec1fscale[1];
 		static float vec4foffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 		if(ImGui::SliderFloat3("Offset (XYZ)",vec4foffset, -1.0f, 1.0f))
@@ -351,11 +731,11 @@ void RenderEngine::ImGui_MainBarFunctions()
 			ImGui::SameLine();
 			ImGui_ShowHelpMarker("Reset Offset when you want come back to Origin");
 		}
-		if(ImGui::SliderFloat("Scale (XYZ)",vec1fscale, -1.0f, 1.0f))
+		if(ImGui::SliderFloat("Scale (XYZ)",vec1fscale, -0.1f, 0.1f))
 		{
 			if(this->scene!=nullptr)
 			{
-				this->scene->setNewScale(glm::vec3(vec1fscale[0],vec1fscale[0],vec1fscale[0]));
+			this->scene->setNewScale(glm::vec3(vec1fscale[0],vec1fscale[0],vec1fscale[0]));
 			}
 		}
 		if (ImGui::Button("Reset Scale"))

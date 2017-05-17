@@ -7,9 +7,10 @@
 
 #include "Shader.h"
 
-Shader::Shader(const char* vtxShaderFile, const char* frgShaderFile)
+Shader::Shader(const char* vtxShaderFile, const char* frgShaderFile,std::string s_name)
 {
 	this->loadShader(vtxShaderFile,frgShaderFile);
+	this->s_name = s_name;
 }
 
 Shader::~Shader() {
@@ -103,3 +104,28 @@ void Shader::useShader()
 {
 	glUseProgram(this->shaderId);
 };
+
+std::string Shader::getShaderName()
+{
+	return this->s_name;
+}
+
+void  Shader::setRoughness(GLfloat newroughness)
+{
+	this->roughness = newroughness;
+}
+float Shader::getRoughness()
+{
+	return this->roughness;
+};
+
+
+void Shader::setNormalAct(bool act)
+{
+	this->normalAct = act;
+}
+
+bool Shader::getNormalAct()
+{
+	return this->normalAct;
+}

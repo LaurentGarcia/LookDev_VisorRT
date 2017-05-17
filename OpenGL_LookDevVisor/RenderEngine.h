@@ -21,6 +21,8 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
+	#include <string>
+	#include <map>
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
@@ -31,6 +33,8 @@
 	#include "Mesh/Model.h"
 #else
 #endif
+
+#define ARRAYSIZE(x)  (sizeof(x) / sizeof(*x))
 
 
 // This class will be responsible to manage all the scene setup
@@ -55,10 +59,10 @@ public:
 	const char* vtxLightShaderFileName = "Shaders\\vtxlightshader.glsl";
 	const char* frgLightShaderFileName = "Shaders\\frglightshader.glsl";
 #elif __linux__
-	const char* vertexShaderFileName   = "Shaders/vertexshader.glsl";
-	const char* fragmentshaderfileName = "Shaders/fragmentshader.glsl";
-	const char* vtxLightShaderFileName   = "Shaders/vtxlightshader.glsl";
-	const char* frgLightShaderFileName = "Shaders/frglightshader.glsl";
+	const char* vertexShaderFileName   = "Shaders/vtx_PBR.glsl";
+	const char* fragmentshaderfileName = "Shaders/frg_PBR.glsl";
+	const char* vtxLightShaderFileName   = "Shaders/vtx_light.glsl";
+	const char* frgLightShaderFileName = "Shaders/frg_light.glsl";
 
 #else
 #endif
@@ -67,16 +71,17 @@ public:
 	RenderEngine();
 	virtual ~RenderEngine();
 
-	void   setRenderWindowSize(int h,int w);
-	void   updateCameraFov(GLfloat fov);
-	void   updatePanCamera(GLfloat pan);
-	void   setZoom(int keyPressed);
-	void   setCameraView(GLfloat xoff,GLfloat yoff);
-	void   setLightIntensity(int keyPressed);
+	void   setRenderWindowSize  (int h,int w);
+	void   updateCameraFov      (GLfloat fov);
+	void   updatePanCamera      (GLfloat pan);
+	void   setZoom              (int keyPressed);
+	void   setCameraView        (GLfloat xoff,GLfloat yoff);
+	void   setLightIntensity    (int keyPressed);
 
 	Camera  getActualCamera();
-	GLfloat getDeltaTime();
-	void    doRender();
+	GLfloat getDeltaTime   ();
+	void    doRender       ();
+	void    renderLightsGeo();
 
 private:
 
@@ -93,19 +98,26 @@ private:
 	Camera  		  cameraViewport;
 	Shaders_Manager   shaderManager;
 	Light_Manager     sceneLightManager;
-    Model*            scene = nullptr;
-    Model*            lightdummy;
+    Model*            scene = nullptr; // At the moment in the viewport will be 1 Model.
+
+    std::map<std::string,Model*>  lightMeshes;
+    std::map<std::string,GLuint>  texSelection;
 
     //UI and User Render Interaction plus variables
-    void ImGui_CreateGpuUIMainWindow();
-    void ImGui_MainBarFunctions();
-    void ImGui_ShowHelpMarker(const char* desc);
+    void ImGui_CreateGpuUIMainWindow  ();
+    void ImGui_LightsBarFunctions     ();
+    void ImGUI_ShadingBarFunctions    ();
+    void ImGui_MainBarFunctions		  ();
+    void ImGui_ShowHelpMarker         (const char* desc);
+    void ImGui_ShowLightWindowEdit    (bool* isopen);
+    void ImGUI_ShowShadingWindowEdit  (bool* isopen);
 
     glm::vec3   viewportBackgroundColor;
     std::string i_geopath;
 
     //Private functions
 	void setShaderSceneTransformations();
-	void setShaderLightingCalculation();
+	void setShaderLightingCalculation ();
+	void updateShaderInputsParameters ();
 };
 

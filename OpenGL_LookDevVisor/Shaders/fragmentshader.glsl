@@ -1,21 +1,24 @@
 #version 440 core
 
-#define NR_POINT_LIGHTS 1
+#define NR_POINT_LIGHTS 8
+
+out vec4 color; //Result to fragment color
 
 in  vec2 TexCoord;
 in  vec3 FragPos;
-in  vec3 Normal;
+in  vec3 TangentLightPos[NR_POINT_LIGHTS];
+in  vec3 TangentViewPos;
+in  vec3 TangentFragPos;
 
-
-out vec4 color;
 
 
 // Shader Interface
 struct Material {
-	sampler2D diffuse; //Diffuse map
-	sampler2D specular;
-	sampler2D emission;
-	float 	  shininess;
+	sampler2D diffuse;   //Diffuse map
+	sampler2D specular;  //Spec
+	sampler2D emission;  //Emission
+	sampler2D normalmap; //normalmap
+	float 	  shininess; //Roughness parameter
 };
 
 // Interface to be connected with all scene lights
@@ -36,23 +39,24 @@ struct Light{
 	int   type; // 0= Directional, 1=Point, 2=Spot
 };
 
-//To be changed
-uniform sampler2D texture_diffuse1;
 
 //Inputs
 uniform vec3 cameraPosition;
 uniform Material mat;
 uniform Light lights[NR_POINT_LIGHTS];
-
-//
+uniform bool normalActive;
 
 //Shader Global Variables
 vec3 ambient;
 vec3 norm; 
-vec3 lightDir;
+vec3 lightDir[NR_POINT_LIGHTS];//I need calculate the lightDir per light.
 vec3 diffuseContribution;
 vec3 specularContribution;
 vec3 viewDir;
+vec3 halfwayDir;
+
+
+
 
 float attenuation(Light light)
 {
@@ -61,25 +65,27 @@ float attenuation(Light light)
   	return attenuation; 
 };
 
-void ShadingCalculation(Light light)
+void ShadingCalculation(Light light,int i)
 {
-	lightDir    = normalize(light.position-FragPos);
+	lightDir[i]    = normalize(TangentLightPos[i]-FragPos);
+	halfwayDir  = normalize(lightDir[i] + cameraPosition);
 	ambient 	= light.ambient;
 	
 	//Diffuse contribution
-	float diffIntensity = max(dot(norm,lightDir),0.0f); 
+	float diffIntensity = max(dot(norm,lightDir[i]),0.0f); 
 	diffuseContribution = light.color*diffIntensity; 
 	
 	//Specular contribution
+	//Blinn
+	vec3  reflectDir = reflect(-lightDir[i],norm); 
+	float specAmount = pow(max(dot(norm,halfwayDir),0.0),mat.shininess);
 	
-	vec3 reflectDir = reflect(-lightDir,norm);
-	float specAmount= pow(max(dot(viewDir,reflectDir),0.0),mat.shininess);
-	specularContribution = light.specular*specAmount;
+	specularContribution = light.specular*specAmount*vec3(texture(mat.specular, TexCoord));
 }
 
-vec3 pointLightCalculation(Light light)
+vec3 pointLightCalculation(Light light,int i)
 {
-	ShadingCalculation(light);
+	ShadingCalculation(light,i);
 	float attenuation = attenuation(light);
 	ambient *= attenuation;
 	diffuseContribution *= attenuation;
@@ -88,10 +94,10 @@ vec3 pointLightCalculation(Light light)
 	return result;
 }
 
-vec3 spotLightCalculation(Light light)
+vec3 spotLightCalculation(Light light,int i)
 {
-	ShadingCalculation(light);
-	float theta     = dot(lightDir, normalize(-light.aim));
+	ShadingCalculation(light,i);
+	float theta     = dot(lightDir[i], normalize(-light.aim));
 	float epsi      = light.cutoff - light.outcutoff;
 	float intensity = clamp( (theta-light.outcutoff) /epsi,0.0,1.0);
 	diffuseContribution *= intensity;
@@ -100,22 +106,27 @@ vec3 spotLightCalculation(Light light)
 	return result;
 }
 void main()
-{   
-	norm		 = normalize(Normal);   
+{    
+    // without normal
+	if (normalActive){
+		norm = texture(mat.normalmap,TexCoord).rgb;
+		norm = normalize(norm * 2.0 - 1.0);
+	};
+	
 	viewDir      = normalize(cameraPosition-FragPos);
-
+	
 	vec3 lightsOutput;
 	for (int i=0; i<NR_POINT_LIGHTS;i++)
 	{
 		if (lights[i].type==0)
-			ShadingCalculation(lights[i]);
+			ShadingCalculation(lights[i],i);
 		if (lights[i].type==1)
-			lightsOutput+=pointLightCalculation(lights[i]);
+			lightsOutput+=pointLightCalculation(lights[i],i);
 		if (lights[i].type==2){
-			lightsOutput+=spotLightCalculation(lights[i]);
+			lightsOutput+=spotLightCalculation(lights[i],i);
 		}
 	}
 	
-	color = vec4(lightsOutput,1.0f);
+	color = vec4(lightsOutput*vec3(texture(mat.diffuse, TexCoord)),1.0f);
 
 }

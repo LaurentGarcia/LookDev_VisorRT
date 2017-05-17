@@ -4,8 +4,6 @@
  *  Created on: Mar 1, 2017
  *      Author: lcarro
  */
-#pragma once
-
 #ifdef _WIN32
 	#include <iostream>
 	#include <Windows.h>
@@ -29,7 +27,7 @@
 	#include <vector>
 	#include <iosfwd>
 	#include <sstream>
-	#include "Texture.h"
+	#include <map>
 	#include "../Shader.h"
 #else
 #endif
@@ -43,9 +41,11 @@ public:
 		glm::vec3 Position;
 		glm::vec3 Normal;
 		glm::vec2 TexCoords;
+		glm::vec3 Tangent;
+		glm::vec3 BiTangent;
 	};
 
-	Mesh(std::vector<Vertex> vertices,std::vector<GLuint> indices, std::vector<Texture> textures);
+	Mesh(std::vector<Vertex> vertices,std::vector<GLuint> indices);
 	Mesh(bool islightingMesh);
 	virtual ~Mesh();
 
@@ -56,13 +56,12 @@ public:
 	void   setPosition(glm::vec3 newposition);
 	void   setScale   (glm::vec3 newscale);
 
-	void   Draw(Shader shader);
+	void   Draw(Shader shader,std::map<std::string,GLuint>textures);
 
 private:
 	// Geo info
 	std::vector<Vertex>  vertices;
 	std::vector<GLuint>  indices;
-	std::vector<Texture> textures;
 	GLuint VAO;
 	GLuint VBO;
 	GLuint EBO; // For vertex index

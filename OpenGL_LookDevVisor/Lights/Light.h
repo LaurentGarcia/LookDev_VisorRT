@@ -21,6 +21,7 @@
 	#include <glm/gtc/type_ptr.hpp>
 #elif __linux__
 	#include <iostream>
+	#include <string>
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <glm/glm.hpp>
@@ -37,12 +38,13 @@ public:
 	enum lightType{directional, point, spot};
 
 	virtual ~Light();
-	virtual glm::vec3 getPosition() = 0;
-	virtual glm::vec3 getKa() = 0;
-	virtual glm::vec3 getKd() = 0;
-	virtual glm::vec3 getKs() = 0;
-	virtual lightType getType() = 0;
-	virtual bool      getOn() = 0;
+	virtual glm::vec3   getPosition() = 0;
+	virtual glm::vec3   getKa() = 0;
+	virtual glm::vec3   getKd() = 0;
+	virtual glm::vec3   getKs() = 0;
+	virtual lightType   getType() = 0;
+	virtual bool        getOn() = 0;
+	virtual std::string getName() = 0;
 
 	virtual void setOn(bool activated) = 0;
 	virtual void setPosition(glm::vec3 position) = 0;
@@ -52,10 +54,11 @@ public:
 
 protected:
 
-	bool       on;
-	lightType  type;
-	glm::vec3  position;
-	glm::vec3  ka;
-	glm::vec3  kd;
-	glm::vec3  ks;
+	std::string name;
+	bool        on;
+	lightType   type;
+	glm::vec3   position;
+	glm::vec3   ka;
+	glm::vec3   kd;
+	glm::vec3   ks;
 };

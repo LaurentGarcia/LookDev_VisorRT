@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef _WIN32
 	#include <iostream>
 	#include <Windows.h>
@@ -17,6 +15,8 @@
 	#include <glew.h>
 	#include <glfw3.h>
 	#include <iostream>
+	#include <forward_list>
+	#include <algorithm>
 	#include "../Shader.h"
 	#include "../Shaders_Manager.h"
 	#include "Mesh.h"
@@ -44,7 +44,7 @@ public:
 	glm::mat4 getModelMatrix();
 
 	//Draw
-	void Draw(Shader shader);
+	void Draw(Shader shader,std::map<std::string,GLuint>textures);
 
 
 private:
@@ -56,16 +56,19 @@ private:
 	std::vector<Mesh> 	  meshes;
 	const aiScene* 		  scene;
 	std::string			  directory;// Current Model Directory
-	std::vector<Texture>  texturesLoaded;
 
 	//Matrix transformation
-	glm::mat4             modelTransformations;
-
+	glm::mat4              modelTransformations;
+	std::vector<glm::mat4> modelLightsTransformations;
 
 	//Private functions
-	void                 processAlembicSceneTree(std::string modelPathName);
-	void 		         processAssimpSceneTree(aiNode* node, const aiScene* scene);
-	Mesh 				 processAssimpMesh     (aiMesh* mesh, const aiScene* scene);
-	std::vector<Texture> loadMaterialTextures  (aiMaterial* mat, aiTextureType type, std::string typeName);
+		//Alembic
+	void 		         processAlembicSceneTreeRecursively(Alembic::Abc::IObject objTop);
+	Mesh                 processAlembicMesh				   (Alembic::AbcGeom::IPolyMesh mesh);
+	std::vector<Mesh::Vertex> proccessAlembicNormals       (std::vector<Mesh::Vertex> vertex,
+			                                                Alembic::AbcGeom::IPolyMeshSchema meshSchema);
+		//Assimp
+	void 		         processAssimpSceneTree            (aiNode* node, const aiScene* scene);
+	Mesh 				 processAssimpMesh                 (aiMesh* mesh, const aiScene* scene);
 };
 

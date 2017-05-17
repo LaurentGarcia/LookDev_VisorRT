@@ -63,35 +63,43 @@ public:
 	virtual ~Light_Manager();
 
 
+	//Parameter n_light: indicate the selected light to be modified
+
+
 	//General Light Properties
-	void      setNewLightPosition            (glm::vec3 newpos);
-	void      setNewLightColor               (glm::vec3 newlightcolor);
-	void      setNewLightSpecContribution    (glm::vec3 newspec);
-	void      setNewLightAmbientContribution (glm::vec3 newamb);
+	void      setNewLightPosition            (int n_light,glm::vec3 newpos);
+	void      setNewLightColor               (int n_light,glm::vec3 newlightcolor);
+	void      setNewLightSpecContribution    (int n_light,glm::vec3 newspec);
+
+	void      setNewLightAmbientContribution (int n_light,glm::vec3 newamb);
 
 	//Point Light properties
-	void      setNewLightQuadraticValue      (float quadratic);
-	void	  setNewLightLinearValue		 (float value);
+	void      setNewLightConstant            (int n_light,float constant);
+	void      setNewLightQuadraticValue      (int n_light,float quadratic);
+	void	  setNewLightLinearValue		 (int n_light,float value);
 
 	//Spot Light properties
-	void      setNewLightCutoff              (float cutoff);
-    void      setNewAim						 (glm::vec3 newaim);
+	void      setNewLightCutoff              (int n_light,float cutoff);
+	void      setNewLightOutterCutoff        (int n_light,float outter_cutoff);
+    void      setNewAim						 (int n_light,glm::vec3 newaim);
 
 
-	glm::vec3 getCurrentLightColor();
-	glm::vec3 getCurrentLightSpec();
-	glm::vec3 getCurrentLightAmb();
-	glm::vec3 getCurrentLightPosition();
+	glm::vec3 getCurrentLightColor(int n_light);
+	glm::vec3 getCurrentLightSpec(int n_light);
+	glm::vec3 getCurrentLightAmb(int n_light);
+	glm::vec3 getCurrentLightPosition(int n_light);
 
 	//Point Light Properties get
-	float     getCurrentLightQuadraticValue();
-	float     getCurrentLightLinearValue();
-	float     getCurrentLightConstantValue();
+	float     getCurrentLightQuadraticValue(int n_light);
+	float     getCurrentLightLinearValue(int n_light);
+	float     getCurrentLightConstantValue(int n_light);
 
 	//Spot Light
-	float     getCurrentLightCutoff();
-	float     getCurrentLightOutCutOff();
-	glm::vec3 getCurrentAim();
+	float     getCurrentLightCutoffFloat(int n_light);
+	float     getCurrentLightOutCutOffFloat(int n_light);
+	float     getCurrentLightCutoff(int n_light);// Give us the result of Cos Phi
+	float     getCurrentLightOutCutOff(int n_light);//Give us the result of Cos Epsilon
+	glm::vec3 getCurrentAim(int n_light);
 
 
 	// Create a Light, type:
@@ -99,17 +107,22 @@ public:
 	// 1 = Point
 	// 2 = Spotlight
 	// Always when user create a new light, it will be activated by default
-	void     createNewLight(int type,glm::vec3 position);
+	// It will be stored at the end of queue
+	void     createNewLight(int type,glm::vec3 position,std::string name);
+	void     deleteLight(int n_light,std::string name);
+
 	// Return Type Light
 	// 0 = Directional
 	// 1 = Point
 	// 2 = Spotlight
-	int      getCurrentLightType();
-	int 	 getSceneNumberLightsActive();
-	bool     getIsCurrentLightOn();
-
+	int         getCurrentLightType(int n_light);
+	int 	    getSceneNumberLightsActive();
+	bool        getIsCurrentLightOn(int n_light);
+	std::string getCurrentLightName(int n_light);
 
 private:
+
+	int selectedLight;
 	std::vector<Light*> sceneLights;
 };
 
