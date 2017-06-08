@@ -100,6 +100,40 @@ bool Shaders_Manager::loadTextureFromFile (std::string t_file)
 		return false;
 	}
 }
+
+bool Shaders_Manager::loadHDRFromFile(std::string hdr_file)
+{
+	std::string t_name = hdr_file.substr(hdr_file.find_last_of("/\\") + 1);
+	GLuint hdrID;
+
+	stbi_set_flip_vertically_on_load(true);
+	int width,height,nrcomponents;
+
+	float* data = stbi_loadf(hdr_file.c_str(),&width,&height,&nrcomponents,0);
+	if(data)
+	{
+		glGenTextures(1,&hdrID);
+		glBindTexture(GL_TEXTURE_2D,hdrID);
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGB32F,width,height,0,GL_RGB,GL_FLOAT,data);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		this->textureList.push_back(t_name);
+		this->texturePool[t_name] = hdrID;
+		std::cout <<"Environment Map Loaded: "<< t_name << std::endl;
+		stbi_image_free(data);
+		return true;
+	}
+	else
+	{
+		std::cout<<"Unable to create and load HDR file";
+		return false;
+	}
+
+}
+
 int Shaders_Manager::getNumberTextures(){
 	return this->textureList.size();
 }
@@ -111,5 +145,11 @@ std::string Shaders_Manager::getTextureName(int n_texture)
 
 GLuint Shaders_Manager::getTextureId(std::string t_name)
 {
-	return this->texturePool[t_name];
+	if(this->texturePool[t_name]!=0)
+		return this->texturePool[t_name];
+	else
+	{
+		std::cout<<"Not found the TextureID: "<< t_name <<std::endl;
+		return 0;
+	}
 };

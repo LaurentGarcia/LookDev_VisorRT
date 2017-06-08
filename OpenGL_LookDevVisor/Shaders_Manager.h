@@ -55,6 +55,7 @@ public:
 	    //            OpenGL_ID.
 	    //    - False: the function will return false because it could not possible to find the texture.
 	bool        loadTextureFromFile (std::string t_file);
+	bool        loadHDRFromFile     (std::string hdr_file);
 	int         getNumberTextures   ();
 	std::string getTextureName      (int n_texture);
 	GLuint      getTextureId        (std::string t_name);

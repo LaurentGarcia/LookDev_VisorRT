@@ -59,11 +59,14 @@ public:
 	const char* vtxLightShaderFileName = "Shaders\\vtxlightshader.glsl";
 	const char* frgLightShaderFileName = "Shaders\\frglightshader.glsl";
 #elif __linux__
-	const char* vertexShaderFileName   = "Shaders/vtx_PBR.glsl";
-	const char* fragmentshaderfileName = "Shaders/frg_PBR.glsl";
+	const char* vertexShaderFileName     = "Shaders/vtx_PBR.glsl";
+	const char* fragmentshaderfileName   = "Shaders/frg_PBR.glsl";
 	const char* vtxLightShaderFileName   = "Shaders/vtx_light.glsl";
-	const char* frgLightShaderFileName = "Shaders/frg_light.glsl";
-
+	const char* frgLightShaderFileName   = "Shaders/frg_light.glsl";
+	const char* cubemapVtxShaderFileName = "Shaders/cubemapVtx.glsl";
+	const char* cubemapFrgShaderFileName = "Shaders/cubemapFrg.glsl";
+	const char* skyboxVtxShaderFileName  = "Shaders/skyboxVtx.glsl";
+	const char* skyboxFrgShaderFileName  = "Shaders/skyboxFrg.glsl";
 #else
 #endif
 	//End todo, config file;
@@ -103,6 +106,17 @@ private:
     std::map<std::string,Model*>  lightMeshes;
     std::map<std::string,GLuint>  texSelection;
 
+    //Framebuffers & Deferred (Work in Progress)
+    unsigned int framebuffer;
+    void createFrameBuffer();
+
+    //Cube Map
+    unsigned int envCubemap;
+	unsigned int cubeVAO = 0;
+	unsigned int cubeVBO = 0;
+	unsigned int captureFBO;
+	unsigned int captureRBO;
+
     //UI and User Render Interaction plus variables
     void ImGui_CreateGpuUIMainWindow  ();
     void ImGui_LightsBarFunctions     ();
@@ -119,5 +133,8 @@ private:
 	void setShaderSceneTransformations();
 	void setShaderLightingCalculation ();
 	void updateShaderInputsParameters ();
+
+	void preProccessCubeMap();
+	void renderCubeMap();
 };
 

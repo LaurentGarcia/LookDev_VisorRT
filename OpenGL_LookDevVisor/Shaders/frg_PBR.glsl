@@ -43,6 +43,8 @@ uniform Material mat;
 uniform Light lights[NR_POINT_LIGHTS];
 uniform bool normalActive;
 
+
+
 //Shader Global Variables
 vec3 ambient;
 vec3 N; 
