@@ -5,6 +5,9 @@
  *      Author: lcarro
  */
 
+
+
+
 #include "RenderEngine.h"
 
 // Static variables, control windows open status
@@ -21,8 +24,8 @@ RenderEngine::RenderEngine() {
 	glEnable(GL_DEPTH_TEST);
 
 	bool* shaderesult = new bool(false);
-	shaderManager.createShader(vtxLightShaderFileName,frgLightShaderFileName,"light_shader");
-	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName,"phong_default");
+	shaderManager.createShader(vtxLightShaderFileName,frgLightShaderFileName,"light");
+	shaderManager.createShader(vertexShaderFileName, fragmentshaderfileName,"pbr");
 
 
 	if (shaderesult) {
@@ -42,7 +45,152 @@ RenderEngine::RenderEngine() {
 	Model* lightdummy = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
 	lightdummy->setNewPosition(glm::vec3{35.0f, 40.0f, 70.0f});
 	this->lightMeshes[this->sceneLightManager.getCurrentLightName(0)] = lightdummy;
+
+	//Skybox Shader
+
+	this->shaderManager.createShader(skyboxVtxShaderFileName,skyboxFrgShaderFileName,"skybox");
+
+	//Default Cubemap and shaders
+	this->shaderManager.loadHDRFromFile("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/Textures/Cubemap/Arches_E_PineTree_3k.hdr");
+	this->shaderManager.createShader(cubemapVtxShaderFileName,cubemapFrgShaderFileName,"cubeMap");
+
+	//Setting Framebuffer
+	glGenFramebuffers(1, &captureFBO);
+	glGenRenderbuffers(1, &captureRBO);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+
+	preProccessCubeMap();
+	glDepthFunc(GL_LEQUAL);
 }
+
+void RenderEngine::preProccessCubeMap()
+{
+	// pbr: setup cubemap to render to and attach to framebuffer
+	// ---------------------------------------------------------
+	glViewport(0, 0, 512,512);
+	glGenTextures(1, &envCubemap);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+	for (unsigned int i = 0; i < 6; ++i)
+    {
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // pbr: set up projection and view matrices for capturing data onto the 6 cubemap face directions
+	// ----------------------------------------------------------------------------------------------
+	glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+	const glm::mat4 captureViews[] =
+	{
+	        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+	        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+	        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+	        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+	        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+	        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+	};
+
+	// pbr: convert HDR equirectangular environment map to cubemap equivalent
+	// ----------------------------------------------------------------------
+	this->shaderManager.getSelectedShader("cubeMap").useShader();
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader("cubeMap").getShaderId(),"equirectangularMap"), 0);
+	glUniformMatrix4fv(glGetUniformLocation(this->shaderManager.getSelectedShader("cubeMap").getShaderId(),"projection"),
+											1, GL_FALSE,glm::value_ptr(captureProjection[0]));
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->shaderManager.getTextureId("Arches_E_PineTree_3k.hdr"));
+
+	 // don't forget to configure the viewport to the capture dimensions.
+	glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+	for (unsigned int i = 0; i < 6; ++i)
+	{
+		glUniformMatrix4fv( glGetUniformLocation(this->shaderManager.getSelectedShader("cubeMap").getShaderId(),"view")
+							, 1, GL_FALSE, glm::value_ptr(captureViews[i]));
+	    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
+	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	    this->renderCubeMap();
+	 }
+	 glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void RenderEngine::renderCubeMap()
+{
+
+	if (this->cubeVAO == 0)
+	    {
+	        float vertices[] = {
+	            // back face
+	            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+	             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+	             1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
+	             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+	            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+	            -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+	            // front face
+	            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+	             1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+	             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+	             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+	            -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+	            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+	            // left face
+	            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+	            -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
+	            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+	            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+	            -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+	            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+	            // right face
+	             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+	             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+	             1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right
+	             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+	             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+	             1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
+	            // bottom face
+	            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+	             1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
+	             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+	             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+	            -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+	            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+	            // top face
+	            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+	             1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+	             1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right
+	             1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+	            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+	            -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
+	        };
+	        glGenVertexArrays(1, &cubeVAO);
+	        glGenBuffers(1, &cubeVBO);
+	        // fill buffer
+	        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	        // link vertex attributes
+	        glBindVertexArray(cubeVAO);
+	        glEnableVertexAttribArray(0);
+	        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	        glEnableVertexAttribArray(1);
+	        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	        glEnableVertexAttribArray(2);
+	        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	        glBindBuffer(GL_ARRAY_BUFFER, 0);
+	        glBindVertexArray(0);
+	    }
+	    // render Cube
+	    glBindVertexArray(cubeVAO);
+	    glDrawArrays(GL_TRIANGLES, 0, 36);
+	    glBindVertexArray(0);
+}
+
 
 RenderEngine::~RenderEngine() {
 	// TODO Auto-generated destructor stub
@@ -87,6 +235,8 @@ void RenderEngine::setShaderSceneTransformations()
 //ToDo: 
 void RenderEngine::setShaderLightingCalculation()
 {
+	std::string pbrName = "pbr";
+
 	//1. First We get the number lights that we have in the scene.
 	int numlightscene = this->sceneLightManager.getSceneNumberLightsActive();
 
@@ -109,37 +259,37 @@ void RenderEngine::setShaderLightingCalculation()
 	for (int i=0; i<numlightscene;i++){
 		//Shaders Lighting Parameters Localization
 		std::string finalambientname = lightname+std::to_string(i)+lightnameend;
-		lightAmbLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalambientname.append(".ambient").c_str());
+		lightAmbLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalambientname.append(".ambient").c_str());
 
 		std::string finalcolorname = lightname+std::to_string(i)+lightnameend;
-		lightColorLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalcolorname.append(".color").c_str());
+		lightColorLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalcolorname.append(".color").c_str());
 
 		std::string finalpositionname = lightname+std::to_string(i)+lightnameend;
-		lightPositionLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalpositionname.append(".position").c_str());
+		lightPositionLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalpositionname.append(".position").c_str());
 
 		std::string finalspecularname = lightname+std::to_string(i)+lightnameend;
-		lightSpecLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalspecularname.append(".specular").c_str());
+		lightSpecLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalspecularname.append(".specular").c_str());
 
 		std::string finalconstantname = lightname+std::to_string(i)+lightnameend;
-		lightConstantLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalconstantname.append(".constant").c_str());
+		lightConstantLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalconstantname.append(".constant").c_str());
 
 		std::string finallinearname = lightname+std::to_string(i)+lightnameend;
-		lightLinearLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finallinearname.append(".linear").c_str());
+		lightLinearLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finallinearname.append(".linear").c_str());
 
 		std::string finalquadraticname = lightname+std::to_string(i)+lightnameend;
-		lightQuadraticLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalquadraticname.append(".quadratic").c_str());
+		lightQuadraticLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalquadraticname.append(".quadratic").c_str());
 
 		std::string finalcutoffname = lightname+std::to_string(i)+lightnameend;
-		lightCutOffLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalcutoffname.append(".cutoff").c_str());
+		lightCutOffLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalcutoffname.append(".cutoff").c_str());
 
 		std::string finaloutcutoffname = lightname+std::to_string(i)+lightnameend;
-		lightOutCutOffLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finaloutcutoffname.append(".outcutoff").c_str());
+		lightOutCutOffLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finaloutcutoffname.append(".outcutoff").c_str());
 
 		std::string finalaimname = lightname+std::to_string(i)+lightnameend;
-		lightAimLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalaimname.append(".aim").c_str());
+		lightAimLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalaimname.append(".aim").c_str());
 
 		std::string finaltypename = lightname+std::to_string(i)+lightnameend;
-		lightTypeLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finaltypename.append(".type").c_str());
+		lightTypeLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finaltypename.append(".type").c_str());
 
 
 
@@ -185,35 +335,38 @@ void RenderEngine::setShaderLightingCalculation()
 
 void RenderEngine::updateShaderInputsParameters ()//Todo
 {
+	std::string pbrName = "pbr";
 	// Kd
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texSelection["kd"]);
-	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(), "mat.diffuse"), 0);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(), "mat.diffuse"), 0);
 	// Ks
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, this->texSelection["ks"]);
-	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(), "mat.metallic"), 1);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(), "mat.metallic"), 1);
 	// Kn
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D,this->texSelection["kn"]);
-	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.normalmap"),2);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(),"mat.normalmap"),2);
 	//Active normal
-	GLint activatedNormal = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(),"normalActive");
-	glUniform1i(activatedNormal,this->shaderManager.getCurrentShader().getNormalAct());
+	GLint activatedNormal = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(),"normalActive");
+	glUniform1i(activatedNormal,this->shaderManager.getSelectedShader(pbrName).getNormalAct());
 
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D,this->texSelection["kr"]);
-	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.roughness"),3);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(),"mat.roughness"),3);
 
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D,this->texSelection["ao"]);
-	glUniform1i(glGetUniformLocation(this->shaderManager.getCurrentShader().getShaderId(),"mat.ao"),4);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(),"mat.ao"),4);
 
 };
 
 
 void RenderEngine::doRender(){
 
+	std::string pbrName = "pbr";
+	std::string cubeName= "cubeMap";
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(viewportBackgroundColor.x,viewportBackgroundColor.y,viewportBackgroundColor.z, 1.0f);
@@ -225,16 +378,14 @@ void RenderEngine::doRender(){
 
 	ImGui_CreateGpuUIMainWindow();
 
-	this->shaderManager.getCurrentShader().useShader();
-
-
+	this->shaderManager.getSelectedShader(pbrName).useShader();
 
 	glm::mat4 view;
 	view = this->cameraViewport.getCameraViewMatrix();
 	projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
-	GLint viewLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "view");
+	GLint viewLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	GLint projecLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "projection");
+	GLint projecLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), "projection");
 	glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 	int numlightscene = this->sceneLightManager.getSceneNumberLightsActive();
@@ -243,32 +394,41 @@ void RenderEngine::doRender(){
 		std::string lightname = "lightPos[";
 		std::string lightnameend = "]";
 		std::string finalLightname = lightname+std::to_string(i)+lightnameend;
-		GLint lightpos = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), finalLightname.c_str());
+		GLint lightpos = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), finalLightname.c_str());
 		glUniform3f(lightpos,this->sceneLightManager.getCurrentLightPosition(i).x,
 							 this->sceneLightManager.getCurrentLightPosition(i).y,
 							 this->sceneLightManager.getCurrentLightPosition(i).z);
 	};
 
 	this->setShaderLightingCalculation();
-
-	//glm::mat4 model;
-	//model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // Translate it down a bit so it's at the center of the scene
-	//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// It's a bit too big for our scene, so scale it down
-
-	GLint viewPosLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "cameraPosition");
+	GLint viewPosLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), "cameraPosition");
 	glUniform3f(viewPosLoc, cameraViewport.getCameraPosition().x,cameraViewport.getCameraPosition().y,cameraViewport.getCameraPosition().z);
 
 	this->updateShaderInputsParameters(); //User Interface updating Shader
 
 	if (this->scene!=nullptr){
-		GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
+		GLint modelLoc = glGetUniformLocation(shaderManager.getSelectedShader(pbrName).getShaderId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->scene->getModelMatrix()));
-    	this->scene->Draw(this->shaderManager.getCurrentShader(),this->texSelection);
+    	this->scene->Draw(this->shaderManager.getSelectedShader(pbrName),this->texSelection);
 	}
 
 	this->renderLightsGeo();
 
-    ImGui::Render();
+
+	//RenderCubeMap
+	this->shaderManager.getSelectedShader("skybox").useShader();
+	GLint viewLocCube = glGetUniformLocation(shaderManager.getSelectedShader("skybox").getShaderId(), "view");
+	glUniformMatrix4fv(viewLocCube, 1, GL_FALSE, glm::value_ptr(view));
+	GLint projecLocCube = glGetUniformLocation(shaderManager.getSelectedShader("skybox").getShaderId(), "projection");
+	glUniformMatrix4fv(projecLocCube, 1, GL_FALSE, glm::value_ptr(projection));
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_CUBE_MAP,envCubemap);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader("skybox").getShaderId(), "environmentMap"), 5);
+
+	this->renderCubeMap();
+
+
+	ImGui::Render();
 
 };
 
@@ -276,11 +436,12 @@ void RenderEngine::doRender(){
 
 void RenderEngine::renderLightsGeo()
 {
+	std::string lightShaderName = "light";
 	// Light and model must be aligned with the same position
 	for (int i = 0; i<this->sceneLightManager.getSceneNumberLightsActive();i++)
-	{   GLint modelLoc = glGetUniformLocation(shaderManager.getCurrentShader().getShaderId(), "model");
+	{   GLint modelLoc = glGetUniformLocation(shaderManager.getSelectedShader(lightShaderName).getShaderId(), "model");
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->getModelMatrix()));
-		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getCurrentShader(),this->texSelection);
+		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getSelectedShader(lightShaderName),this->texSelection);
 	}
 };
 

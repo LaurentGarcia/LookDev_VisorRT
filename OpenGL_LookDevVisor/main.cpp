@@ -44,12 +44,12 @@ int main()
 
 
 	while (!glfwWindowShouldClose(windowLookDev.getWindowPointer())){
-		glfwPollEvents();
 		//Init a new Frame for our UI
 		controllerApp.ImGui_ImplGlfwGL3_NewFrame();
 		//Calculate the pass
 		myEngine.doRender();
 		glfwSwapBuffers(windowLookDev.getWindowPointer());
+		glfwPollEvents();
 	};
 
 	glfwTerminate();
