@@ -46,19 +46,8 @@ RenderEngine::RenderEngine() {
 		std::cout << "Vertex shader and Fragment Shader Load: OK" << std::endl;
 	};
 
-	this->sceneLightManager.setNewLightPosition(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{35.0f, 40.0f, 70.0f});
-	this->sceneLightManager.setNewLightColor(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.6f, 0.5f, 0.5f});
-	this->sceneLightManager.setNewLightSpecContribution(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.5f, 0.5f, 0.5f});
-	this->sceneLightManager.setNewLightAmbientContribution(this->sceneLightManager.getSceneNumberLightsActive()-1,glm::vec3{0.25f, 0.25f, 0.25f});
-	this->sceneLightManager.setNewLightLinearValue(this->sceneLightManager.getSceneNumberLightsActive()-1,0.09f);
-	this->sceneLightManager.setNewLightQuadraticValue(this->sceneLightManager.getSceneNumberLightsActive()-1,0.032f);
-
 	this->viewportBackgroundColor = {0.2,0.2,0.2};
 
-	//Default Light Created in the scene
-	Model* lightdummy = new Model("/home/lgarcia/Code/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/spotLight.obj");
-	lightdummy->setNewPosition(glm::vec3{35.0f, 40.0f, 70.0f});
-	this->lightMeshes[this->sceneLightManager.getCurrentLightName(0)] = lightdummy;
 
 	//Skybox Shader
 
@@ -602,12 +591,28 @@ void RenderEngine::doRender(){
 
 void RenderEngine::renderLightsGeo()
 {
+
 	std::string lightShaderName = "light";
+	this->shaderManager.getSelectedShader(lightShaderName).useShader();
 	// Light and model must be aligned with the same position
-	for (int i = 0; i<this->sceneLightManager.getSceneNumberLightsActive();i++)
-	{   GLint modelLoc = glGetUniformLocation(shaderManager.getSelectedShader(lightShaderName).getShaderId(), "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->getModelMatrix()));
-		this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getSelectedShader(lightShaderName),this->texSelection);
+	if(this->sceneLightManager.getSceneNumberLightsActive()>0){
+		for (int i = 0; i<this->sceneLightManager.getSceneNumberLightsActive();i++)
+		{   GLint modelLoc = glGetUniformLocation(shaderManager.getSelectedShader(lightShaderName).getShaderId(), "model");
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->getModelMatrix()));
+			glm::mat4 view;
+			view = this->cameraViewport.getCameraViewMatrix();
+			projection	= glm::perspective(cameraViewport.getCameraFov(), (GLfloat)renderWidth / (GLfloat)renderHeight, 0.1f, 100.0f);
+			GLint viewLoc = glGetUniformLocation(shaderManager.getSelectedShader(lightShaderName).getShaderId(), "view");
+			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+			GLint projecLoc = glGetUniformLocation(shaderManager.getSelectedShader(lightShaderName).getShaderId(), "projection");
+			glUniformMatrix4fv(projecLoc, 1, GL_FALSE, glm::value_ptr(projection));
+			glm::vec3 lightColor;
+			GLint lightColorLoc = glGetUniformLocation(shaderManager.getSelectedShader(lightShaderName).getShaderId(), "lightColor");
+			glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor(i).x,this->sceneLightManager.getCurrentLightColor(i).y,this->sceneLightManager.getCurrentLightColor(i).z);
+
+
+			this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getSelectedShader(lightShaderName),this->texSelection);
+		}
 	}
 };
 

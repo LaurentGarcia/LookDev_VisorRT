@@ -12,9 +12,7 @@ Light_Manager::Light_Manager() {
 //	Light* sun = new DirectionalLight;
 //	this->sceneLights.push_back(sun);
 //	Light* point = new PointLight;
-//	this->sceneLights.push_back(point);
-	Light* spot = new SpotLight ("SpotLight Dummy");
-	this->sceneLights.push_back(spot);
+//	this->sceneLights.push_back(point);s
 }
 
 Light_Manager::~Light_Manager() {
