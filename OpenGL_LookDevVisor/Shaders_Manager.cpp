@@ -120,8 +120,9 @@ bool Shaders_Manager::loadHDRFromFile(std::string hdr_file)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		this->textureList.push_back(t_name);
-		this->texturePool[t_name] = hdrID;
+		std::cout<<t_name;
+		this->hdrlist.push_back(t_name);
+		this->hdrPool[t_name] = hdrID;
 		std::cout <<"Environment Map Loaded: "<< t_name << std::endl;
 		stbi_image_free(data);
 		return true;
@@ -136,6 +137,11 @@ bool Shaders_Manager::loadHDRFromFile(std::string hdr_file)
 
 int Shaders_Manager::getNumberTextures(){
 	return this->textureList.size();
+}
+
+std::vector<std::string> Shaders_Manager::getTextureList()
+{
+	return this->textureList;
 }
 
 std::string Shaders_Manager::getTextureName(int n_texture)
@@ -153,3 +159,28 @@ GLuint Shaders_Manager::getTextureId(std::string t_name)
 		return 0;
 	}
 };
+
+GLuint Shaders_Manager::getHdrId(std::string t_name)
+{
+	if(this->hdrPool[t_name]!=0)
+		return this->hdrPool[t_name];
+	else
+	{
+		std::cout<<"Not found HDR selected: "<< t_name << std::endl;
+		return 0;
+	}
+
+};
+
+
+void  Shaders_Manager::setF0(std::string s_name, float F0)
+{
+	for (int i= 0; i<this->shaderCollection.size();i++)
+	{
+		if (this->shaderCollection[i].getShaderName() == s_name)
+		{
+			this->shaderCollection[i].setF0(F0);
+		}
+	}
+};
+

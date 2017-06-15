@@ -14,6 +14,7 @@
 static bool light_window_open   = false;
 static bool shading_window_open = false;
 
+
 // pbr: set up projection and view matrices for capturing data onto the 6 cubemap face directions
 // ----------------------------------------------------------------------------------------------
 glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
@@ -26,6 +27,7 @@ const glm::mat4 captureViews[] =
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
 };
+
 
 
 RenderEngine::RenderEngine() {
@@ -108,7 +110,7 @@ void RenderEngine::preProccessCubeMap()
 	glUniformMatrix4fv(glGetUniformLocation(this->shaderManager.getSelectedShader("cubeMap").getShaderId(),"projection"),
 											1, GL_FALSE,glm::value_ptr(captureProjection[0]));
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->shaderManager.getTextureId("Arches_E_PineTree_3k.hdr"));
+	glBindTexture(GL_TEXTURE_2D, this->shaderManager.getHdrId("Arches_E_PineTree_3k.hdr"));
 
 	 // don't forget to configure the viewport to the capture dimensions.
 	glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
@@ -491,6 +493,8 @@ void RenderEngine::updateShaderInputsParameters ()//Todo
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, this->texSelection["ks"]);
 	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(), "mat.metallic"), 1);
+	//IOR
+    glUniform1f(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(), "mat.F0"),this->shaderManager.getSelectedShader(pbrName).getF0());
 	// Kn
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D,this->texSelection["kn"]);
@@ -582,7 +586,7 @@ void RenderEngine::doRender(){
 	glUniformMatrix4fv(projecLocCube, 1, GL_FALSE, glm::value_ptr(projection));
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_CUBE_MAP,this->irradiancemap);
-	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader("skybox").getShaderId(), "environmentMap"), 0);
+	glUniform1i(glGetUniformLocation(this->shaderManager.getSelectedShader("skybox").getShaderId(), "environmentMap"), 5);
 
 	this->renderCubeMap();
 
@@ -715,11 +719,11 @@ void RenderEngine::ImGui_LightsBarFunctions()
     	std::string newlight(newuserlightname);//ToDO:: change to relative folders
     	this->sceneLightManager.createNewLight(light_type,glm::vec3(0.0f,0.0f,0.0f),newlight);
     	if(light_type == 0)
-    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/directionalLight.obj");
+    		this->lightMeshes[newlight] = new Model("/home/lgarcia/Code/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/directionalLight.obj");
     	if(light_type == 1)
-    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/pointLight.obj");
+    		this->lightMeshes[newlight] = new Model("/home/lgarcia/Code/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/pointLight.obj");
     	if(light_type == 2)
-    		this->lightMeshes[newlight] = new Model("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
+    		this->lightMeshes[newlight] = new Model("/home/lgarcia/Code/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/Lights/spotLight.obj");
     }
     ImGui::SameLine();
     if(ImGui::Button("Delete Light")) //ToDo: Eliminate light from the map
@@ -907,69 +911,66 @@ void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
 	ImGuiWindowFlags window_flags = 0;
 	ImGui::SetNextWindowSize(ImVec2(550,680), ImGuiSetCond_FirstUseEver);
 	ImGui::Begin("Shader Editor", isopen, window_flags);
-
-	ImGui::Text("Shader tool,any change will be reflected in real time");
-	ImGui::Spacing();
-	ImGui::Separator();
-
-	unsigned int size = this->shaderManager.getNumberShaders();
-	const char* shadersNames[size];
-	for (int i = 0; i<size;i++)
-	{
-		shadersNames[i] = this->shaderManager.getShaderName(i).c_str();
-	}
-	size = this->shaderManager.getNumberTextures();
-	const char * texturesNames[size];
-	for (int i = 0; i<size;i++)
-	{
-		texturesNames[i] = this->shaderManager.getTextureName(i).c_str();
-	}
-
-	//static int shaderSelected = -1;
-	//ImGui::ListBox("Shader", &shaderSelected, shadersNames, size); //ImGui::SameLine();
+	std::string shaderName = this->shaderManager.getSelectedShader("pbr").getShaderName();
+	ImGui::Text(shaderName.c_str());
 
 	ImGui::Spacing();
 	ImGui::Separator();
+
+
+	int texNumber = this->shaderManager.getNumberTextures();
+    std::string n = std::to_string(texNumber);
+	ImGui::Text("Number Textures: "); ImGui::SameLine();ImGui::Text(n.c_str());
+
+
+	std::vector<std::string> texturelist = shaderManager.getTextureList();
+
+	const char* textures[texNumber];
+
+	for (int i=0; i<texNumber;i++)
+	{
+		textures[i] = texturelist[i].c_str();
+	}
 
 	// Kd Diffuse
 	ImGui::Text("Color");
 	static int  kdTextureSelected = 0;
-	const char* items[this->shaderManager.getNumberTextures()];
-	for (int i = 0; i < this->shaderManager.getNumberTextures();i++)
-	{
-		items[i] = this->shaderManager.getTextureName(i).c_str();
-	}
-    // User selection Texture for Color
-	ImGui::Combo("Albedo Tex", &kdTextureSelected, items,this->shaderManager.getNumberTextures());
+	ImGui::Combo("Albedo",&kdTextureSelected,textures,ARRAYSIZE(textures));
 	if(this->shaderManager.getNumberTextures() != 0)
 		this->texSelection["kd"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(kdTextureSelected));
 
-	// Ks spec map & Controls
-	ImGui::Text("Metalness");
+
+//	// Ks spec map & Controls
+   	ImGui::Text("Metalness");
 	static int  ksTextureSelected = 0;
-	ImGui::Combo("Ks Tex", &ksTextureSelected, items,this->shaderManager.getNumberTextures());
+	ImGui::Combo("Ks Tex", &ksTextureSelected, textures,ARRAYSIZE(textures));
 	if(this->shaderManager.getNumberTextures() != 0)
 		this->texSelection["ks"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(ksTextureSelected));
+
+	static float IOR = 0.0;
+	ImGui::Text("IOR");
+	ImGui::SliderFloat("IOR",&IOR,0.0,1.0);
+	this->shaderManager.setF0(shaderName,IOR);
 
 	// Ks normal map & Controls
 	ImGui::Text("Normal");
 	static int  knTextureSelected = 0;
-	ImGui::Combo("Kn Tex", &knTextureSelected, items,this->shaderManager.getNumberTextures());
+	ImGui::Combo("Kn Tex", &knTextureSelected, textures,ARRAYSIZE(textures));
 	if(this->shaderManager.getNumberTextures() != 0)
 		this->texSelection["kn"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(knTextureSelected));
 	static bool active_normal;
 	ImGui::Checkbox("Active Normal",&active_normal);
 	this->shaderManager.getCurrentShaderEdit()->setNormalAct(active_normal);
-
+//
 	ImGui::Text("Roughness");
 	static int  krTextureSelected = 0;
-	ImGui::Combo("Kr Tex", &krTextureSelected, items,this->shaderManager.getNumberTextures());
+	ImGui::Combo("Kr Tex", &krTextureSelected, textures,ARRAYSIZE(textures));
 	if(this->shaderManager.getNumberTextures() != 0)
 			this->texSelection["kr"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(krTextureSelected));
-
+//
 	ImGui::Text("AO");
 	static int  aoTextureSelected = 0;
-	ImGui::Combo("AO Tex", &aoTextureSelected, items,this->shaderManager.getNumberTextures());
+	ImGui::Combo("AO Tex", &aoTextureSelected, textures,ARRAYSIZE(textures));
 	if(this->shaderManager.getNumberTextures() != 0)
 			this->texSelection["ao"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(aoTextureSelected));
 	ImGui::Spacing();

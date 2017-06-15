@@ -42,12 +42,14 @@ public:
 	void        setKeTexture(std::string ke_name);
 	void        setRoughness(GLfloat newroughness);
 	void        setNormalAct(bool act);
+	void        setF0(float F0);
 
 	std::string getKdTextureName();
 	std::string getKsTextureName();
 	std::string getKeTextureName();
 	float       getRoughness();
 	bool        getNormalAct();
+	float       getF0();
 
 	GLuint      getShaderId();
 	std::string getShaderName();
@@ -61,6 +63,7 @@ private:
 	GLuint      shaderId;
 	GLfloat     roughness;
 	bool		normalAct;
+	float       F0;
 
 	std::string s_name;// Shader name
 	std::string kd_name;// Texture diffuse Applied

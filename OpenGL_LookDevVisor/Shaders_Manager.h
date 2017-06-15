@@ -58,11 +58,21 @@ public:
 	bool        loadHDRFromFile     (std::string hdr_file);
 	int         getNumberTextures   ();
 	std::string getTextureName      (int n_texture);
+	std::vector<std::string> getTextureList();
 	GLuint      getTextureId        (std::string t_name);
+	GLuint      getHdrId            (std::string t_name);
+
+	// Set
+
+	void        setF0 				(std::string s_name, float F0);
+
+
 
 private:
 	std::vector<Shader>          shaderCollection;
 	std::vector<std::string>     textureList; // Only the Texture List loaded into the memory
 	std::map<std::string,GLuint> texturePool; // Map, assigning every Texture an OpenGL id.
+	std::vector<std::string>     hdrlist;
+	std::map<std::string,GLuint> hdrPool;
 };
 

@@ -108,7 +108,7 @@ private:
     Model*            scene = nullptr; // At the moment in the viewport will be 1 Model.
 
     std::map<std::string,Model*>  lightMeshes;
-    std::map<std::string,GLuint>  texSelection;
+    std::map<std::string,GLuint>  texSelection; //kd = GLuint , ks = GLuint...
 
     //Framebuffers & Deferred (Work in Progress)
     unsigned int framebuffer;
