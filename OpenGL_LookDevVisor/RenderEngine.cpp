@@ -13,7 +13,8 @@
 // Static variables, control windows open status
 static bool light_window_open   = false;
 static bool shading_window_open = false;
-
+static std::string hdrFile = "/home/lgarcia/Code/LookDev_VisorRT/OpenGL_LookDevVisor/Textures/Cubemap/Arches_E_PineTree_3k.hdr";
+static glm::vec2 tilingUV{1.0};
 
 // pbr: set up projection and view matrices for capturing data onto the 6 cubemap face directions
 // ----------------------------------------------------------------------------------------------
@@ -54,7 +55,7 @@ RenderEngine::RenderEngine() {
 	this->shaderManager.createShader(skyboxVtxShaderFileName,skyboxFrgShaderFileName,"skybox");
 
 	//Default Cubemap and shaders
-	this->shaderManager.loadHDRFromFile("/home/lgarcia/Code/LookDev_VisorRT/OpenGL_LookDevVisor/Textures/Cubemap/Arches_E_PineTree_3k.hdr");
+	this->shaderManager.loadHDRFromFile(hdrFile);
 	this->shaderManager.createShader(cubemapVtxShaderFileName,cubemapFrgShaderFileName,"cubeMap");
 	this->shaderManager.createShader(cubemapVtxShaderFileName,cubemapConvFrgFileName,"irradianceShader");
 	this->shaderManager.createShader(cubemapVtxShaderFileName,cubemapSpecPreFilterName,"filterSpecShader");
@@ -474,6 +475,7 @@ void RenderEngine::setShaderLightingCalculation()
 void RenderEngine::updateShaderInputsParameters ()//Todo
 {
 	std::string pbrName = "pbr";
+	glUniform2f(glGetUniformLocation(this->shaderManager.getSelectedShader(pbrName).getShaderId(), "tilingUV"),tilingUV.x,tilingUV.y);
 	// Kd
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texSelection["kd"]);
@@ -609,8 +611,6 @@ void RenderEngine::renderLightsGeo()
 			glm::vec3 lightColor;
 			GLint lightColorLoc = glGetUniformLocation(shaderManager.getSelectedShader(lightShaderName).getShaderId(), "lightColor");
 			glUniform3f(lightColorLoc,this->sceneLightManager.getCurrentLightColor(i).x,this->sceneLightManager.getCurrentLightColor(i).y,this->sceneLightManager.getCurrentLightColor(i).z);
-
-
 			this->lightMeshes[this->sceneLightManager.getCurrentLightName(i)]->Draw(this->shaderManager.getSelectedShader(lightShaderName),this->texSelection);
 		}
 	}
@@ -685,10 +685,15 @@ void RenderEngine::ImGui_LightsBarFunctions()
 	unsigned int size = this->sceneLightManager.getSceneNumberLightsActive();
 	const char* lightsNames[size];
 
-	for (int i = 0; i<size;i++)
+	std::vector<std::string> lightNamescp = this->sceneLightManager.getSceneNamesLights();
+
+	for (unsigned int i=0; i<size;i++)
 	{
-		lightsNames[i] = this->sceneLightManager.getCurrentLightName(i).c_str();
+		lightsNames[i] = lightNamescp[i].c_str();
 	}
+
+
+
 	std::string n_lightsActive = std::to_string(size);
 
 
@@ -702,6 +707,14 @@ void RenderEngine::ImGui_LightsBarFunctions()
 
     ImGui::Spacing();
     ImGui::Separator();
+
+    ImGui::Text("Current HDR: "); ImGui::SameLine(0, 20);
+    ImGui::TextColored(ImVec4(1,1,0,1),"Arches_E_PineTree_3k.hdr");
+
+
+    ImGui::Spacing();
+    ImGui::Separator();
+
 
     static int item = -1;
     ImGui::ListBox("Scene Lights", &item, lightsNames, size); ImGui::SameLine();
@@ -750,10 +763,14 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 
 	unsigned int size = this->sceneLightManager.getSceneNumberLightsActive();
 	const char* lightsNames[size];
-	for (int i = 0; i<size;i++)
+
+	std::vector<std::string> lightNamescp = this->sceneLightManager.getSceneNamesLights();
+
+	for (unsigned int i=0; i<size;i++)
 	{
-		lightsNames[i] = this->sceneLightManager.getCurrentLightName(i).c_str();
+		lightsNames[i] = lightNamescp[i].c_str();
 	}
+
 	static int item = -1;
 	ImGui::ListBox("Selected Light", &item, lightsNames, size); ImGui::SameLine();
 
@@ -774,6 +791,11 @@ void RenderEngine::ImGui_ShowLightWindowEdit(bool* isopen)
 				this->lightMeshes[this->sceneLightManager.getCurrentLightName(item)]->setNewPosition(newuserpos);
 			}
 		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		//Rotate the light
+
+
 		ImGui::Spacing();
 		ImGui::Separator();
 		ImGui::Text("Light Attributes");
@@ -936,7 +958,16 @@ void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
 	{
 		textures[i] = texturelist[i].c_str();
 	}
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Text("Tiling Factor");
+	static float tiling = 1.0;
+	ImGui::SliderFloat("UV",&tiling,1.0,100.0);
+	tilingUV.x = tiling;
+	tilingUV.y = tiling;
 
+	ImGui::Spacing();
+	ImGui::Separator();
 	// Kd Diffuse
 	ImGui::Text("Color");
 	static int  kdTextureSelected = 0;

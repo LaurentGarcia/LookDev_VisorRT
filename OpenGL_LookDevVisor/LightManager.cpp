@@ -295,3 +295,16 @@ std::string Light_Manager::getCurrentLightName(int n_light)
 {
 	return this->sceneLights[n_light]->getName();
 };
+
+std::vector<std::string> Light_Manager::getSceneNamesLights()
+{
+	std::vector<std::string> lightsNames;
+	for (int i=0; i<this->sceneLights.size();i++)
+	{
+		lightsNames.push_back(this->sceneLights[i]->getName());
+	}
+	return lightsNames;
+};
+
+
+

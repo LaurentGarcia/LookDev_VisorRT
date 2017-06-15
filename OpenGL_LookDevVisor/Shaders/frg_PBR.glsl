@@ -122,6 +122,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 
 void main()
 {		
+	
     // material properties
     vec3 albedo = pow(texture(mat.diffuse, TexCoord).rgb, vec3(2.2));
     float metallic = texture(mat.metallic, TexCoord).r;
