@@ -984,8 +984,8 @@ void RenderEngine::ImGUI_ShowShadingWindowEdit  (bool* isopen)
 		this->texSelection["ks"] = this->shaderManager.getTextureId(this->shaderManager.getTextureName(ksTextureSelected));
 
 	static float IOR = 0.0;
-	ImGui::Text("IOR");
-	ImGui::SliderFloat("IOR",&IOR,0.0,1.0);
+	ImGui::Text("Dielectric <---------------------> Metalness");
+	ImGui::SliderFloat("",&IOR,0.0,1.0);
 	this->shaderManager.setF0(shaderName,IOR);
 
 	// Ks normal map & Controls
