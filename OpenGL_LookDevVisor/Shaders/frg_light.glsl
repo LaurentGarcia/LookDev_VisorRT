@@ -2,10 +2,11 @@
 
 in vec2 TexCoords;
 
-out vec4 color;
+out vec4 fragColor;
 
+uniform vec3 lightColor;
 
 void main()
 {    
-    color = vec4(1.0f,1.0f,1.0f,1.0f);
+    fragColor = vec4(lightColor,1.0f);
 }

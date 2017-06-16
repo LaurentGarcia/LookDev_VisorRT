@@ -125,7 +125,23 @@ void Shader::setNormalAct(bool act)
 	this->normalAct = act;
 }
 
+void Shader::setF0(float F0)
+{
+	this->F0 = F0;
+}
+
 bool Shader::getNormalAct()
 {
 	return this->normalAct;
 }
+
+float Shader::getF0()
+{
+	return this->F0;;
+}
+
+
+
+
+
+

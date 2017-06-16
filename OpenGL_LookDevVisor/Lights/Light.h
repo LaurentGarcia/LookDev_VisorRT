@@ -48,9 +48,11 @@ public:
 
 	virtual void setOn(bool activated) = 0;
 	virtual void setPosition(glm::vec3 position) = 0;
+	//virtual void setRotation(glm::vec3 rotation) = 0;
 	virtual void setKa(glm::vec3 ka) = 0;
 	virtual void setKd(glm::vec3 kd) = 0;
 	virtual void setKs(glm::vec3 ks) = 0;
+
 
 protected:
 

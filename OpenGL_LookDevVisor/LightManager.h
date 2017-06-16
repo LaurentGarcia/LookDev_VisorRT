@@ -120,6 +120,8 @@ public:
 	bool        getIsCurrentLightOn(int n_light);
 	std::string getCurrentLightName(int n_light);
 
+	std::vector<std::string> getSceneNamesLights();
+
 private:
 
 	int selectedLight;

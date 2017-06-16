@@ -67,6 +67,10 @@ public:
 	const char* cubemapFrgShaderFileName = "Shaders/cubemapFrg.glsl";
 	const char* skyboxVtxShaderFileName  = "Shaders/skyboxVtx.glsl";
 	const char* skyboxFrgShaderFileName  = "Shaders/skyboxFrg.glsl";
+	const char* cubemapConvFrgFileName   = "Shaders/cubeMapConvolutionIrradiance.glsl";
+	const char* cubemapSpecPreFilterName = "Shaders/cubeMapConvolutionSpecular.glsl";
+	const char* cubemapBrdf_vtxName      = "Shaders/cubeMapBrdf_Vtx.glsl";
+	const char* cubemapBrdf_frgName      = "Shaders/cubeMapBrdf_Frg.glsl";
 #else
 #endif
 	//End todo, config file;
@@ -104,7 +108,7 @@ private:
     Model*            scene = nullptr; // At the moment in the viewport will be 1 Model.
 
     std::map<std::string,Model*>  lightMeshes;
-    std::map<std::string,GLuint>  texSelection;
+    std::map<std::string,GLuint>  texSelection; //kd = GLuint , ks = GLuint...
 
     //Framebuffers & Deferred (Work in Progress)
     unsigned int framebuffer;
@@ -112,10 +116,16 @@ private:
 
     //Cube Map
     unsigned int envCubemap;
+    unsigned int irradiancemap;
+    unsigned int prefilteredmap;
+    unsigned int brdfLutmap;
 	unsigned int cubeVAO = 0;
 	unsigned int cubeVBO = 0;
+	unsigned int quadVAO = 0;
+	unsigned int quadVBO;
 	unsigned int captureFBO;
 	unsigned int captureRBO;
+
 
     //UI and User Render Interaction plus variables
     void ImGui_CreateGpuUIMainWindow  ();
@@ -135,6 +145,10 @@ private:
 	void updateShaderInputsParameters ();
 
 	void preProccessCubeMap();
+	void preProccessIrradianceMap();
+	void preFilteringHdrMap();
+	void preProccessLutMap();
 	void renderCubeMap();
+	void renderQuad();
 };
 

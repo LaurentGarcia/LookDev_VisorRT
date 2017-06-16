@@ -12,9 +12,7 @@ Light_Manager::Light_Manager() {
 //	Light* sun = new DirectionalLight;
 //	this->sceneLights.push_back(sun);
 //	Light* point = new PointLight;
-//	this->sceneLights.push_back(point);
-	Light* spot = new SpotLight ("SpotLight Dummy");
-	this->sceneLights.push_back(spot);
+//	this->sceneLights.push_back(point);s
 }
 
 Light_Manager::~Light_Manager() {
@@ -297,3 +295,16 @@ std::string Light_Manager::getCurrentLightName(int n_light)
 {
 	return this->sceneLights[n_light]->getName();
 };
+
+std::vector<std::string> Light_Manager::getSceneNamesLights()
+{
+	std::vector<std::string> lightsNames;
+	for (int i=0; i<this->sceneLights.size();i++)
+	{
+		lightsNames.push_back(this->sceneLights[i]->getName());
+	}
+	return lightsNames;
+};
+
+
+

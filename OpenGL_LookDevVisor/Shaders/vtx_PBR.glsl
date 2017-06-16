@@ -19,10 +19,11 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform vec3 lightPos[NR_POINT_LIGHTS];
 uniform vec3 viewPos;
+uniform vec2 tilingUV;
 
 void main()
 {
-	TexCoord = texCoord;
+	TexCoord = texCoord    * tilingUV;
 	WorldPos = vec3(model  * vec4(position,1.0f));
 	Normal   = mat3(model) * normal;
 	

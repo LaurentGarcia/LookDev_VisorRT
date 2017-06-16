@@ -24,8 +24,8 @@
 	#include <assimp/Importer.hpp>
 	#include <assimp/scene.h>
 	#include <assimp/postprocess.h>
-	#include <AbcClients/WFObjConvert/AbcReader.h>
-	#include <Alembic/AbcCoreOgawa/All.h>
+	//#include <AbcClients/WFObjConvert/AbcReader.h>
+	//#include <Alembic/AbcCoreOgawa/All.h>
 
 #else
 #endif
@@ -50,7 +50,7 @@ public:
 private:
 
 	//Alembic
-	Alembic::Abc::IArchive* abcScene;
+	//Alembic::Abc::IArchive* abcScene;
 
 	//Model Class as container of Meshes Assimp
 	std::vector<Mesh> 	  meshes;
@@ -63,10 +63,10 @@ private:
 
 	//Private functions
 		//Alembic
-	void 		         processAlembicSceneTreeRecursively(Alembic::Abc::IObject objTop);
-	Mesh                 processAlembicMesh				   (Alembic::AbcGeom::IPolyMesh mesh);
-	std::vector<Mesh::Vertex> proccessAlembicNormals       (std::vector<Mesh::Vertex> vertex,
-			                                                Alembic::AbcGeom::IPolyMeshSchema meshSchema);
+	//void 		         processAlembicSceneTreeRecursively(Alembic::Abc::IObject objTop);
+	//Mesh                 processAlembicMesh				   (Alembic::AbcGeom::IPolyMesh mesh);
+	//std::vector<Mesh::Vertex> proccessAlembicNormals       (std::vector<Mesh::Vertex> vertex,
+	//		                                                Alembic::AbcGeom::IPolyMeshSchema meshSchema);
 		//Assimp
 	void 		         processAssimpSceneTree            (aiNode* node, const aiScene* scene);
 	Mesh 				 processAssimpMesh                 (aiMesh* mesh, const aiScene* scene);
