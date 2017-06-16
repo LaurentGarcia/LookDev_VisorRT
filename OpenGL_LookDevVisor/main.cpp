@@ -35,7 +35,7 @@ int main()
 {
 	
 	ApiConfiguration initApi;
-	WindowGL		 windowLookDev = WindowGL(800, 600, "Look Development Real-Time Viewport");
+	WindowGL		 windowLookDev = WindowGL(800, 600, "LookDev GL View");
 	LogicController  controllerApp = LogicController(windowLookDev);
 	controllerApp.SetupIO(windowLookDev.getWindowPointer());
 	RenderEngine     myEngine;
