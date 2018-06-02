@@ -32,12 +32,13 @@
 	#include <fstream>
 	#include <iostream>
 	#include <math.h>
+	#include <stdexcept>
 	#include <vector>
 	#include <memory>
 	#include "Lights\Light.h"
 	#include "Lights\DirectionalLight.h"
 	#include "Lights\PointLight.h"
-	#include "Lights/SpotLight.h"
+	#include "Lights\SpotLight.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>

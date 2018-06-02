@@ -12,11 +12,17 @@
 	#define  GLEW_STATIC
 	#include <glew.h>
 	#include <glfw3.h>
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
+	#include "imgui/imgui.h"
 	#include "WindowGL.h"
-	#include "Camera.h"
+	#include "Camera/Camera.h""
 	#include "Shaders_Manager.h"
 	#include "LightManager.h"
-	#include "Mesh/Mesh.h"
+	#include "Mesh/Model.h"
+	#include <string>
+	#include <map>
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>
@@ -54,10 +60,18 @@ public:
 		  int renderWidth  = 800;
 	      int renderHeight = 600;
 #ifdef _WIN32
-	const char* vertexShaderFileName = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\vertexshader.glsl";
-	const char* fragmentshaderfileName = "C:\\Users\\Lauren\\Documents\\Visual Studio 2017\\Projects\\LookDev_VisorRT\\OpenGL_LookDevVisor\\Shaders\\fragmentshader.glsl";
-	const char* vtxLightShaderFileName = "Shaders\\vtxlightshader.glsl";
-	const char* frgLightShaderFileName = "Shaders\\frglightshader.glsl";
+	const char* vertexShaderFileName = "Shaders/vtx_PBR.glsl";
+	const char* fragmentshaderfileName = "Shaders/frg_PBR.glsl";
+	const char* vtxLightShaderFileName = "Shaders/vtx_light.glsl";
+	const char* frgLightShaderFileName = "Shaders/frg_light.glsl";
+	const char* cubemapVtxShaderFileName = "Shaders/cubemapVtx.glsl";
+	const char* cubemapFrgShaderFileName = "Shaders/cubemapFrg.glsl";
+	const char* skyboxVtxShaderFileName = "Shaders/skyboxVtx.glsl";
+	const char* skyboxFrgShaderFileName = "Shaders/skyboxFrg.glsl";
+	const char* cubemapConvFrgFileName = "Shaders/cubeMapConvolutionIrradiance.glsl";
+	const char* cubemapSpecPreFilterName = "Shaders/cubeMapConvolutionSpecular.glsl";
+	const char* cubemapBrdf_vtxName = "Shaders/cubeMapBrdf_Vtx.glsl";
+	const char* cubemapBrdf_frgName = "Shaders/cubeMapBrdf_Frg.glsl";
 #elif __linux__
 	const char* vertexShaderFileName     = "Shaders/vtx_PBR.glsl";
 	const char* fragmentshaderfileName   = "Shaders/frg_PBR.glsl";

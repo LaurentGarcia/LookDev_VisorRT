@@ -14,9 +14,10 @@
 	#define  GLEW_STATIC
 	#include <glew.h>
 	#include <glfw3.h>
-	#include <assimp/Importer.hpp>
-	#include <assimp/scene.h>
-	#include <assimp/postprocess.h>
+	#include <Importer.hpp>
+	#include <scene.h>
+	#include <postprocess.h>
+	//#include "../../stb/stb_image.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>

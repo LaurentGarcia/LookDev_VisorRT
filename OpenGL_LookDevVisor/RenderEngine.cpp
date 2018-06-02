@@ -5,9 +5,6 @@
  *      Author: lcarro
  */
 
-
-
-
 #include "RenderEngine.h"
 
 // Static variables, control windows open status

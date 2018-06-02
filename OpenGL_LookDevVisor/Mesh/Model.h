@@ -8,9 +8,9 @@
 	#include "..\Shaders_Manager.h"
 	#include "Mesh.h"
 	#include "Texture.h"
-	#include <assimp\Importer.hpp>
-	#include <assimp\scene.h>
-	#include <assimp\postprocess.h>
+	#include <Importer.hpp>
+	#include <scene.h>
+	#include <postprocess.h>
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>

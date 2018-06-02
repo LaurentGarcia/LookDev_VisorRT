@@ -12,7 +12,8 @@
 	#include <stdexcept>
 	#include <math.h>
 	#include <vector>
-	#include "Texture.h"
+	#include "Shader.h"
+	#include <map>
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>

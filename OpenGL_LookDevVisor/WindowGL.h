@@ -6,6 +6,7 @@
 #define  GLEW_STATIC
 #include <glew.h>
 #include <glfw3.h>
+#include <stdexcept>
 #elif __linux__
 #define  GLEW_STATIC
 #include <glew.h>

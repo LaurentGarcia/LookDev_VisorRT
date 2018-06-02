@@ -1,25 +1,49 @@
-// Std. Includes
-#include <string>
 
-// GLEW
-#define GLEW_STATIC
-#include <GL/glew.h>
+#ifdef _WIN32
+	#include <string>
+	#include <Windows.h>
+	#define  GLEW_STATIC
+	#include <glew.h>
+	// GLFW
+	#include <glfw3.h>
+	// GL includes
+	#include "Shader.h"
+	#include "Camera/Camera.h"
+	#include "Mesh/Model.h"
+	// GLM Mathemtics
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
+	// Other Libs
+	#include <SOIL.h>
+	#include "Shader.h"
+#endif
 
-// GLFW
-#include <glfw3.h>
+#ifdef __Linux__
+	// Std. Includes
+	#include <string>
+	
+	// GLEW
+	#define GLEW_STATIC
+	#include <GL/glew.h>
+	
+	// GLFW
+	#include <glfw3.h>
+	
+	// GL includes
+	#include "Shader.h"
+	#include "Camera/Camera.h"
+	#include "Mesh/Model.h"
+	
+	// GLM Mathemtics
+	#include <glm/glm.hpp>
+	#include <glm/gtc/matrix_transform.hpp>
+	#include <glm/gtc/type_ptr.hpp>
+	
+	// Other Libs
+	#include <SOIL.h>
 
-// GL includes
-#include "Shader.h"
-#include "Camera/Camera.h"
-#include "Mesh/Model.h"
-
-// GLM Mathemtics
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-// Other Libs
-#include <SOIL.h>
+#endif
 
 // Properties
 GLuint screenWidth = 800, screenHeight = 600;

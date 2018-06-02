@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{E604E88F-4A3E-41B0-890C-C5A777FDF1E8}</ProjectGuid>
     <RootNamespace>OpenGL_LookDevVisor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -74,8 +74,8 @@
     <LibraryPath>C:\glew-2.0.0\lib\Release\x64;C:\glfw-3.2.1\build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\assimp-3.1.1-win-binaries\include\;C:\glm\glm-0.9.8.4;C:\Soil\src;C:\glfw-3.2.1\include\GLFW;C:\glew-2.0.0\include\GL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\assimp-3.1.1-win-binaries\lib64;C:\Soil\projects\VC9\x64\Release;C:\glfw-3.2.1\build\src\Release;C:\glew-2.0.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\lgarcia\Documents\libraries\Assimp\include\assimp;C:\Users\lgarcia\Documents\libraries\glm;C:\Users\lgarcia\Documents\libraries\soil\include;C:\Users\lgarcia\Documents\libraries\glfw-3.2.1\include\GLFW;C:\Users\lgarcia\Documents\libraries\glew-2.1.0\include\GL;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\lgarcia\Documents\libraries\Assimp\lib\x64;C:\Users\lgarcia\Documents\libraries\soil\lib-vc2012\Platform_x64;C:\Users\lgarcia\Documents\libraries\glfw-3.2.1\lib-vc2015;C:\Users\lgarcia\Documents\libraries\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,7 +94,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SOIL.lib;opengl32.lib;glfw3.lib;glew32s.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SOIL.lib;opengl32.lib;glfw3.lib;glew32s.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -10,12 +10,15 @@
 	#define  GLEW_STATIC
 	#include <glew.h>
 	#include <glfw3.h>
-	#include "WindowGL.h"
+	//#include "WindowGL.h"
 	#include <glm/glm.hpp>
 	#include <glm/gtc/matrix_transform.hpp>
 	#include <glm/gtc/type_ptr.hpp>
 	#include <vector>
-	#include "../Texture.h"
+	#include <iosfwd>
+	#include <sstream>
+	#include <map>	
+	#include "../Shader.h"
 #elif __linux__
 	#define  GLEW_STATIC
 	#include <glew.h>
