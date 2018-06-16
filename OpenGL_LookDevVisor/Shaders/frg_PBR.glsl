@@ -120,6 +120,28 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 // ----------------------------------------------------------------------------
 
 
+float DirectionalightAttenuation(Light light)
+{
+	return 1.0; // no attenuation for directional light
+};
+
+float pointLightAttenuation(Light light)
+{
+	float  distance    = length(light.position - WorldPos);
+  	float  attenuation = 1.0f/ (light.constant+light.linear*distance + light.quadratic*(distance*distance));
+  	return attenuation;
+
+};
+
+float SpotLightAttenuation(Light light,int i)
+{
+	float theta     = dot(lightDir[i], normalize(-light.aim));
+	float epsi      = light.cutoff - light.outcutoff;
+	float intensity = clamp( (theta-light.outcutoff) /epsi,0.0,1.0);
+	return intensity;
+
+};
+
 void main()
 {		
 	
@@ -140,13 +162,26 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 4; ++i) 
+    for(int i = 0; i < NR_POINT_LIGHTS; ++i) 
     {
         // calculate per-light radiance
         vec3 L = normalize(lights[i].position - WorldPos);
         vec3 H = normalize(V + L);
         float distance = length(lights[i].position - WorldPos);
-        float attenuation = 1.0 / (distance * distance);
+       
+        //Per light attenuation Calculation
+        //float attenuation = 1.0 / (distance * distance);
+       	
+       	float attenuation;
+       	
+       	if (lights[i].type == 0)
+       		attenuation = DirectionalightAttenuation(lights[i]);
+       	if (lights[i].type == 1)
+       		attenuation = pointLightAttenuation(lights[i]);
+       	if (lights[i].type == 2)
+       		attenuation = SpotLightAttenuation(lights[i],i);
+       
+       
         vec3 radiance = lights[i].color * attenuation;
 
         // Cook-Torrance BRDF
@@ -156,7 +191,7 @@ void main()
         
         vec3 nominator    = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
-        vec3 specular = nominator / denominator;
+        vec3 specular = (nominator / denominator) * attenuation * lights[i].specular;
         
          // kS is equal to Fresnel
         vec3 kS = F;
