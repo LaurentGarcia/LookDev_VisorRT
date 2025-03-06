@@ -76,6 +76,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\lgarciacarro\Documents\Source\libraries\assimp\include\assimp;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glm;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\soil\inc\SOIL;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glfw-3.4\include\GLFW;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glew-2.1.0\include\GL;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\lgarcia\Documents\libraries\soil\lib-vc2012\Platform_x64;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glfw-3.4\lib-vc2019;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glew-2.1.0\bin\Release\x64;$(LibraryPath)</LibraryPath>
+    <OutDir>c:\LookDevVierwport</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

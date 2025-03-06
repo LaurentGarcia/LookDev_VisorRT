@@ -41,7 +41,7 @@
 #include <map>   // Added for the texture selection map
 
 // Properties
-GLuint screenWidth = 800, screenHeight = 600;
+GLuint screenWidth = 1280, screenHeight = 720;
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -90,12 +90,12 @@ int main()
 
     // Setup and compile our shaders
     // Note: Updated to use a third argument for the shader name.
-    Shader shader("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/Shaders/vtx.glsl",
-        "/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/Shaders/frg.glsl",
+    Shader shader("Shaders/vtx_PBR.glsl",
+        "Shaders/frg_PBR.glsl",
         "default");
 
     // Load models
-    Model ourModel("/home/lcarro/workspace/LookDev_VisorRT/OpenGL_LookDevVisor/geoFiles/nanosuit/nanosuit.obj");
+    Model ourModel("geoFiles/Lion/Lion.obj");
 
     // Draw in wireframe
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
