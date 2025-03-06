@@ -9,10 +9,10 @@
 
 Texture::Texture(const char* textureName) {
 	// TODO Auto-generated constructor stub
-	unsigned char* image;
+	unsigned char* image = nullptr;
 	//image = stbi_load(textureName, &widthTex, &heightTex, 0, STBI_rgb);
 	#if DEBUG
-		if (image == 0)
+		if (image == nullptr)
 			std::cout << "Texture not found: " << textureName << std::endl;
 		else
 			std::cout << "Texture name:"<<textureName<<" and loaded size:" << widthTex << "*" << heightTex << std::endl;

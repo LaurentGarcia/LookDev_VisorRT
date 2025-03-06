@@ -16,7 +16,7 @@
 	#include <stdexcept>
 	#include <math.h>
 	#include <vector>
-	#include "Texture.h"
+	#include "Mesh/Texture.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>

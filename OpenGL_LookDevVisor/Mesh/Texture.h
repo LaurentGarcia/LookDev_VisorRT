@@ -17,7 +17,7 @@
 	#include <Importer.hpp>
 	#include <scene.h>
 	#include <postprocess.h>
-	//#include "../../stb/stb_image.h"
+	#include "../../stb/stb_image.h"
 #elif __linux__
 	#include <glew.h>
 	#include <glfw3.h>

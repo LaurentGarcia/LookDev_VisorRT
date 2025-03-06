@@ -22,32 +22,32 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{E604E88F-4A3E-41B0-890C-C5A777FDF1E8}</ProjectGuid>
     <RootNamespace>OpenGL_LookDevVisor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -74,8 +74,8 @@
     <LibraryPath>C:\glew-2.0.0\lib\Release\x64;C:\glfw-3.2.1\build\src\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\lgarcia\Documents\libraries\Assimp\include\assimp;C:\Users\lgarcia\Documents\libraries\glm;C:\Users\lgarcia\Documents\libraries\soil\include;C:\Users\lgarcia\Documents\libraries\glfw-3.2.1\include\GLFW;C:\Users\lgarcia\Documents\libraries\glew-2.1.0\include\GL;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\lgarcia\Documents\libraries\Assimp\lib\x64;C:\Users\lgarcia\Documents\libraries\soil\lib-vc2012\Platform_x64;C:\Users\lgarcia\Documents\libraries\glfw-3.2.1\lib-vc2015;C:\Users\lgarcia\Documents\libraries\glew-2.1.0\lib\Release\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\lgarciacarro\Documents\Source\libraries\assimp\include\assimp;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glm;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\soil\inc\SOIL;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glfw-3.4\include\GLFW;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glew-2.1.0\include\GL;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\lgarcia\Documents\libraries\soil\lib-vc2012\Platform_x64;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glfw-3.4\lib-vc2019;\\192.168.5.3\GarciaRobledoNas\Projects\SIE\Source\repositories\glew-2.1.0\bin\Release\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,9 +92,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>SOIL.lib;opengl32.lib;glfw3.lib;glew32s.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>soil.lib;opengl32.lib;glfw3.lib;glew32s.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>S:\Source\repositories\glew-2.1.0\lib\Release\x64;S:\Source\repositories\soil\Debug\;C:\Users\lgarciacarro\Documents\Source\libraries\assimp\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,7 +127,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ApiConfiguration.cpp" />
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="Lights\DirectionalLight.cpp" />
     <ClCompile Include="Lights\Light.cpp" />
@@ -136,13 +143,20 @@
     <ClCompile Include="Mesh\Mesh.cpp" />
     <ClCompile Include="Mesh\Model.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shaders_Manager.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Mesh\Texture.cpp" />
     <ClCompile Include="WindowGL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApiConfiguration.h" />
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="Lights\DirectionalLight.h" />
     <ClInclude Include="Lights\Light.h" />
@@ -153,7 +167,7 @@
     <ClInclude Include="Mesh\Model.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="Shaders_Manager.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Mesh\Texture.h" />
     <ClInclude Include="WindowGL.h" />
   </ItemGroup>
   <ItemGroup>

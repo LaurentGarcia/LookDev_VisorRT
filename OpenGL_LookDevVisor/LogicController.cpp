@@ -1,9 +1,7 @@
 #include "LogicController.h"
 #include "imgui/imgui.h"
 
-
 // GL3W/GLFW
-// This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
 #include <glfw3.h>
 #ifdef _WIN32
 #undef APIENTRY
@@ -14,11 +12,6 @@
 
 LogicController* LogicController::GLFWCallbackWrapper::s_LogicController = nullptr;
 
-
-
-
-
-
 // Implementing Ocornut UI , called imgui.
 // Reference: https://github.com/ocornut/imgui/blob/master/examples/opengl3_example/imgui_impl_glfw_gl3.cpp
 // This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
@@ -26,7 +19,7 @@ LogicController* LogicController::GLFWCallbackWrapper::s_LogicController = nullp
 // - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
 // Variables required to implement imgui libra
 
-static GLFWwindow*  g_Window = NULL;
+static GLFWwindow* g_Window = NULL;
 static double       g_Time = 0.0f;
 static bool         g_MousePressed[3] = { false, false, false };
 static float        g_MouseWheel = 0.0f;
@@ -36,11 +29,8 @@ static int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
 static int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
 static unsigned int g_VboHandle = 0, g_VaoHandle = 0, g_ElementsHandle = 0;
 
-
-
 void ImGui_ImplGlfwGL3_RenderDrawLists(ImDrawData* draw_data)
 {
-    // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
     ImGuiIO& io = ImGui::GetIO();
     int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
     int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
@@ -75,14 +65,14 @@ void ImGui_ImplGlfwGL3_RenderDrawLists(ImDrawData* draw_data)
     glEnable(GL_SCISSOR_TEST);
     glActiveTexture(GL_TEXTURE0);
 
-    // Setup viewport, orthographic projection matrix
+    // Setup viewport and orthographic projection matrix
     glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
     const float ortho_projection[4][4] =
     {
-        { 2.0f/io.DisplaySize.x, 0.0f,                   0.0f, 0.0f },
-        { 0.0f,                  2.0f/-io.DisplaySize.y, 0.0f, 0.0f },
-        { 0.0f,                  0.0f,                  -1.0f, 0.0f },
-        {-1.0f,                  1.0f,                   0.0f, 1.0f },
+        { 2.0f / io.DisplaySize.x, 0.0f,                   0.0f, 0.0f },
+        { 0.0f,                   2.0f / -io.DisplaySize.y, 0.0f, 0.0f },
+        { 0.0f,                   0.0f,                  -1.0f, 0.0f },
+        { -1.0f,                  1.0f,                   0.0f, 1.0f },
     };
     glUseProgram(g_ShaderHandle);
     glUniform1i(g_AttribLocationTex, 0);
@@ -95,10 +85,12 @@ void ImGui_ImplGlfwGL3_RenderDrawLists(ImDrawData* draw_data)
         const ImDrawIdx* idx_buffer_offset = 0;
 
         glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
-        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert),
+            (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ElementsHandle);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
+            (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
 
         for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
         {
@@ -110,8 +102,10 @@ void ImGui_ImplGlfwGL3_RenderDrawLists(ImDrawData* draw_data)
             else
             {
                 glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-                glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
-                glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
+                glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w),
+                    (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+                glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount,
+                    sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset);
             }
             idx_buffer_offset += pcmd->ElemCount;
         }
@@ -134,229 +128,200 @@ void ImGui_ImplGlfwGL3_RenderDrawLists(ImDrawData* draw_data)
     glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
 
+//-----------------------------------------------------------------------------
+// Constructor / Destructor
+//-----------------------------------------------------------------------------
 LogicController::LogicController(WindowGL& window)
 {
-	this->appWindow = window;
-	SetCallbackFunctions();
-	lastMouseX = 300;
-	lastMouseY = 400;
-	firstmoveMouse = true;
-	cameraFov = 45.0f;
-	this->myEngine = nullptr;
-	//Inits all the callbacks from USER Input
-
+    this->appWindow = window;
+    SetCallbackFunctions();
+    lastMouseX = 300;
+    lastMouseY = 400;
+    firstmoveMouse = true;
+    cameraFov = 45.0f;
+    this->myEngine = nullptr;
+    // Initialize engine-specific callbacks here if needed
 }
 
 LogicController::~LogicController()
 {
-
 }
 
-
-
-void LogicController::SetupEngine(RenderEngine& engine){
-	this->myEngine = &engine;
+//-----------------------------------------------------------------------------
+void LogicController::SetupEngine(RenderEngine& engine)
+{
+    this->myEngine = &engine;
 }
 
-void LogicController::SetupIO(GLFWwindow* window)
+//-----------------------------------------------------------------------------
+// Unified key callback (engine + ImGui input forwarding using new API)
+//-----------------------------------------------------------------------------
+void LogicController::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	g_Window = window;
+    // Engine-specific processing:
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (key == GLFW_KEY_W)
+        myEngine->setZoom(key);
+    if (key == GLFW_KEY_S)
+        myEngine->setZoom(key);
 
-	ImGuiIO& io = ImGui::GetIO();
-	io.DisplaySize.x = this->appWindow.getWindowSizeX();
-	io.DisplaySize.y = this->appWindow.getWindowSizeY();
-	io.IniFilename   = "imgui.ini";
-	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
-	io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-	io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-	io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-	io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-	io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-	io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-	io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-	io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-	io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-	io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-	io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-	io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-	io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-	io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-	io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-	io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-	io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-	io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+    // ImGui input forwarding using AddKeyEvent instead of direct KeysDown modification:
+    ImGuiIO& io = ImGui::GetIO();
+    bool pressed = (action != GLFW_RELEASE);
+    switch (key)
+    {
+    case GLFW_KEY_TAB:       io.AddKeyEvent(ImGuiKey_Tab, pressed);       break;
+    case GLFW_KEY_LEFT:      io.AddKeyEvent(ImGuiKey_LeftArrow, pressed);   break;
+    case GLFW_KEY_RIGHT:     io.AddKeyEvent(ImGuiKey_RightArrow, pressed);  break;
+    case GLFW_KEY_UP:        io.AddKeyEvent(ImGuiKey_UpArrow, pressed);       break;
+    case GLFW_KEY_DOWN:      io.AddKeyEvent(ImGuiKey_DownArrow, pressed);     break;
+    case GLFW_KEY_PAGE_UP:   io.AddKeyEvent(ImGuiKey_PageUp, pressed);        break;
+    case GLFW_KEY_PAGE_DOWN: io.AddKeyEvent(ImGuiKey_PageDown, pressed);      break;
+    case GLFW_KEY_HOME:      io.AddKeyEvent(ImGuiKey_Home, pressed);          break;
+    case GLFW_KEY_END:       io.AddKeyEvent(ImGuiKey_End, pressed);           break;
+    case GLFW_KEY_DELETE:    io.AddKeyEvent(ImGuiKey_Delete, pressed);        break;
+    case GLFW_KEY_BACKSPACE: io.AddKeyEvent(ImGuiKey_Backspace, pressed);     break;
+    case GLFW_KEY_ENTER:     io.AddKeyEvent(ImGuiKey_Enter, pressed);         break;
+    case GLFW_KEY_ESCAPE:    io.AddKeyEvent(ImGuiKey_Escape, pressed);        break;
+    case GLFW_KEY_A:         io.AddKeyEvent(ImGuiKey_A, pressed);             break;
+    case GLFW_KEY_C:         io.AddKeyEvent(ImGuiKey_C, pressed);             break;
+    case GLFW_KEY_V:         io.AddKeyEvent(ImGuiKey_V, pressed);             break;
+    case GLFW_KEY_X:         io.AddKeyEvent(ImGuiKey_X, pressed);             break;
+    case GLFW_KEY_Y:         io.AddKeyEvent(ImGuiKey_Y, pressed);             break;
+    case GLFW_KEY_Z:         io.AddKeyEvent(ImGuiKey_Z, pressed);             break;
+    default:
+        break;
+    }
+    // Update modifier keys using GLFW queries.
+    io.KeyCtrl = (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS);
+    io.KeyShift = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS);
+    io.KeyAlt = (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS);
+    io.KeySuper = (glfwGetKey(window, GLFW_KEY_LEFT_SUPER) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SUPER) == GLFW_PRESS);
+}
 
-
-	io.RenderDrawListsFn  = ImGui_ImplGlfwGL3_RenderDrawLists;
-	io.SetClipboardTextFn = this->ImGui_ImplGlfwGL3_SetClipboardText;
-	io.GetClipboardTextFn = this->ImGui_ImplGlfwGL3_GetClipboardText;
-	io.ClipboardUserData  = g_Window;
-
-	unsigned char* pixels;
-	int width, height;
-	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-};
-
-//Callback System
-
-void LogicController::char_callback(GLFWwindow* window,unsigned int c)
+//-----------------------------------------------------------------------------
+// Character input callback (unchanged except unified registration)
+//-----------------------------------------------------------------------------
+void LogicController::char_callback(GLFWwindow* window, unsigned int c)
 {
-	ImGuiIO& io = ImGui::GetIO();
-	if (c > 0 && c < 0x10000)
-		io.AddInputCharacter((unsigned short)c);
-};
+    ImGuiIO& io = ImGui::GetIO();
+    if (c > 0 && c < 0x10000)
+        io.AddInputCharacter((unsigned short)c);
+}
 
-void LogicController::mouse_button_callback(GLFWwindow* window,int button, int action, int mods)
+//-----------------------------------------------------------------------------
+// Mouse callbacks (unchanged)
+//-----------------------------------------------------------------------------
+void LogicController::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (action == GLFW_PRESS && button >= 0 && button < 3)
-		g_MousePressed[button] = true;
+    if (action == GLFW_PRESS && button >= 0 && button < 3)
+        g_MousePressed[button] = true;
 }
 
 void LogicController::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-	{
-		if (cameraFov >= 1.0f && cameraFov <= 45.0f)
-			cameraFov -= yoffset;
-		if (cameraFov<= 1.0f)
-			cameraFov = 1.0f;
-		if (cameraFov >= 45.0f)
-			cameraFov = 45.0f;
-		myEngine->updateCameraFov(cameraFov);
-		g_MouseWheel += (float)yoffset;
-	};
-
+{
+    if (cameraFov >= 1.0f && cameraFov <= 45.0f)
+        cameraFov -= yoffset;
+    if (cameraFov <= 1.0f)
+        cameraFov = 1.0f;
+    if (cameraFov >= 45.0f)
+        cameraFov = 45.0f;
+    myEngine->updateCameraFov(cameraFov);
+    g_MouseWheel += (float)yoffset;
+}
 
 void LogicController::mouse_callback(GLFWwindow* window, double positionX, double positionY)
 {
-	ImGuiIO& io = ImGui::GetIO();
-	if (firstmoveMouse) {
-		lastMouseX = positionX;
-		lastMouseY = positionY;
-		firstmoveMouse = false;
-	}
-	io.MousePos.x = positionX;
-	io.MousePos.y = positionY;
-	GLfloat xoffset = positionX - lastMouseX;
-	GLfloat yoffset = positionY - lastMouseY;
+    ImGuiIO& io = ImGui::GetIO();
+    if (firstmoveMouse) {
+        lastMouseX = positionX;
+        lastMouseY = positionY;
+        firstmoveMouse = false;
+    }
+    io.MousePos = ImVec2((float)positionX, (float)positionY);
+    GLfloat xoffset = (GLfloat)(positionX - lastMouseX);
+    GLfloat yoffset = (GLfloat)(positionY - lastMouseY);
 
-	lastMouseX = positionX;
-	lastMouseY = positionY;
+    lastMouseX = positionX;
+    lastMouseY = positionY;
 
-	GLfloat sensitivity = 0.05f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
+    GLfloat sensitivity = 0.05f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
 
-	int alt_state = glfwGetKey(window, GLFW_KEY_LEFT_ALT);
-	if(alt_state == GLFW_PRESS)
-		myEngine->setCameraView(xoffset,yoffset);
-	int ctr_state = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
-	if(ctr_state == GLFW_PRESS)
-		myEngine->updatePanCamera(yoffset);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+        myEngine->setCameraView(xoffset, yoffset);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+        myEngine->updatePanCamera(yoffset);
 }
-
-void LogicController::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-	if (key == GLFW_KEY_W)
-	{
-		myEngine->setZoom(key);
-	}
-	if (key == GLFW_KEY_S)
-	{
-		myEngine->setZoom(key);
-	}
-
-	//Implementing ImguiCallback
-	ImGuiIO& io = ImGui::GetIO();
-	if (action == GLFW_PRESS)
-	    io.KeysDown[key] = true;
-	if (action == GLFW_RELEASE)
-		io.KeysDown[key] = false;
-	(void)mods; // Modifiers are not reliable across systems
-	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-};
-
 
 void LogicController::window_size_callback(GLFWwindow* window, int width, int height)
 {
-	glfwSetWindowSize(window, width, height);
-	glViewport(0, 0, width, height);
+    glfwSetWindowSize(window, width, height);
+    glViewport(0, 0, width, height);
 }
 
+//-----------------------------------------------------------------------------
+// Callback registration via GLFWCallbackWrapper
+//-----------------------------------------------------------------------------
 void LogicController::SetCallbackFunctions()
 {
     GLFWCallbackWrapper::SetApplication(this);
     glfwSetCursorPosCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::MousePositionCallback);
     glfwSetKeyCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::KeyboardCallback);
-    glfwSetScrollCallback(this->appWindow.getWindowPointer(),GLFWCallbackWrapper::scrollCallback);
+    glfwSetScrollCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::scrollCallback);
     glfwSetWindowSizeCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::WindowResizeCallback);
-    glfwSetMouseButtonCallback(this->appWindow.getWindowPointer(),GLFWCallbackWrapper::MouseButtonCallback);
-    glfwSetCharCallback(this->appWindow.getWindowPointer(),GLFWCallbackWrapper::CharCallback);
+    glfwSetMouseButtonCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::MouseButtonCallback);
+    glfwSetCharCallback(this->appWindow.getWindowPointer(), GLFWCallbackWrapper::CharCallback);
 }
 
-
-//Wrapping Callback GLFW
-
+//-----------------------------------------------------------------------------
+// GLFW Callback Wrappers (unchanged aside from using the unified functions)
+//-----------------------------------------------------------------------------
 void LogicController::GLFWCallbackWrapper::CharCallback(GLFWwindow* window, unsigned int c)
 {
-	s_LogicController->char_callback(window,c);
-};
-void LogicController::GLFWCallbackWrapper::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods /*mods*/)
-{
-	s_LogicController->mouse_button_callback(window,button,action,mods);
+    s_LogicController->char_callback(window, c);
 }
-
+void LogicController::GLFWCallbackWrapper::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    s_LogicController->mouse_button_callback(window, button, action, mods);
+}
 void LogicController::GLFWCallbackWrapper::MousePositionCallback(GLFWwindow* window, double positionX, double positionY)
 {
-	s_LogicController->mouse_callback(window, positionX, positionY);
+    s_LogicController->mouse_callback(window, positionX, positionY);
 }
-
 void LogicController::GLFWCallbackWrapper::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	s_LogicController->key_callback(window, key, scancode, action, mods);
+    s_LogicController->key_callback(window, key, scancode, action, mods);
 }
-
 void LogicController::GLFWCallbackWrapper::scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	s_LogicController->scroll_callback(window,xoffset,yoffset);
+    s_LogicController->scroll_callback(window, xoffset, yoffset);
 }
-
 void LogicController::GLFWCallbackWrapper::WindowResizeCallback(GLFWwindow* window, int width, int height)
 {
-	s_LogicController->window_size_callback(window,width,height);
+    s_LogicController->window_size_callback(window, width, height);
 }
-
 void LogicController::GLFWCallbackWrapper::SetApplication(LogicController* logicController)
 {
-    GLFWCallbackWrapper::s_LogicController = logicController;
+    s_LogicController = logicController;
 }
 
-//END Wrap
-
-
-
-
+//-----------------------------------------------------------------------------
+// Device and Font texture creation functions (unchanged)
+//-----------------------------------------------------------------------------
 bool LogicController::ImGui_ImplGlfwGL3_CreateFontsTexture()
 {
-    // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
     unsigned char* pixels;
     int width, height;
-    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   // Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
+    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-    // Upload texture to graphics system
     GLint last_texture;
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
     glGenTextures(1, &g_FontTexture);
@@ -365,24 +330,20 @@ bool LogicController::ImGui_ImplGlfwGL3_CreateFontsTexture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-    // Store our identifier
-    io.Fonts->TexID = (void *)(intptr_t)g_FontTexture;
+    io.Fonts->TexID = g_FontTexture;
 
-    // Restore state
     glBindTexture(GL_TEXTURE_2D, last_texture);
-
     return true;
 }
 
 bool LogicController::ImGui_ImplGlfwGL3_CreateDeviceObjects()
 {
-    // Backup GL state
     GLint last_texture, last_array_buffer, last_vertex_array;
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
     glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
 
-    const GLchar *vertex_shader =
+    const GLchar* vertex_shader =
         "#version 330\n"
         "uniform mat4 ProjMtx;\n"
         "in vec2 Position;\n"
@@ -392,9 +353,9 @@ bool LogicController::ImGui_ImplGlfwGL3_CreateDeviceObjects()
         "out vec4 Frag_Color;\n"
         "void main()\n"
         "{\n"
-        "	Frag_UV = UV;\n"
-        "	Frag_Color = Color;\n"
-        "	gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
+        "    Frag_UV = UV;\n"
+        "    Frag_Color = Color;\n"
+        "    gl_Position = ProjMtx * vec4(Position.xy,0,1);\n"
         "}\n";
 
     const GLchar* fragment_shader =
@@ -405,7 +366,7 @@ bool LogicController::ImGui_ImplGlfwGL3_CreateDeviceObjects()
         "out vec4 Out_Color;\n"
         "void main()\n"
         "{\n"
-        "	Out_Color = Frag_Color * texture( Texture, Frag_UV.st);\n"
+        "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
         "}\n";
 
     g_ShaderHandle = glCreateProgram();
@@ -443,7 +404,6 @@ bool LogicController::ImGui_ImplGlfwGL3_CreateDeviceObjects()
 
     ImGui_ImplGlfwGL3_CreateFontsTexture();
 
-    // Restore modified GL state
     glBindTexture(GL_TEXTURE_2D, last_texture);
     glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
     glBindVertexArray(last_vertex_array);
@@ -484,7 +444,7 @@ void LogicController::ImGui_ImplGlfwGL3_NewFrame()
 
     ImGuiIO& io = ImGui::GetIO();
 
-    // Setup display size (every frame to accommodate for window resizing)
+    // Setup display size (update every frame to support window resizing)
     int w, h;
     int display_w, display_h;
     glfwGetWindowSize(g_Window, &w, &h);
@@ -493,26 +453,25 @@ void LogicController::ImGui_ImplGlfwGL3_NewFrame()
     io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 
     // Setup time step
-    double current_time =  glfwGetTime();
-    io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f/60.0f);
+    double current_time = glfwGetTime();
+    io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f / 60.0f);
     g_Time = current_time;
 
-    // Setup inputs
-    // (we already got mouse wheel, keyboard keys & characters from glfw callbacks polled in glfwPollEvents())
+    // Update mouse position if the window is focused
     if (glfwGetWindowAttrib(g_Window, GLFW_FOCUSED))
     {
         double mouse_x, mouse_y;
         glfwGetCursorPos(g_Window, &mouse_x, &mouse_y);
-        io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);   // Mouse position in screen coordinates (set to -1,-1 if no mouse / on another screen, etc.)
+        io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
     }
     else
     {
-        io.MousePos = ImVec2(-1,-1);
+        io.MousePos = ImVec2(-1, -1);
     }
 
     for (int i = 0; i < 3; i++)
     {
-        io.MouseDown[i] = g_MousePressed[i] || glfwGetMouseButton(g_Window, i) != 0;    // If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
+        io.MouseDown[i] = g_MousePressed[i] || glfwGetMouseButton(g_Window, i) != 0;
         g_MousePressed[i] = false;
     }
 
@@ -526,14 +485,12 @@ void LogicController::ImGui_ImplGlfwGL3_NewFrame()
     ImGui::NewFrame();
 }
 
-
 const char* LogicController::ImGui_ImplGlfwGL3_GetClipboardText(void* user_data)
 {
-	return glfwGetClipboardString((GLFWwindow*)user_data);
-};
-void 		LogicController::ImGui_ImplGlfwGL3_SetClipboardText(void* user_data, const char* text)
+    return glfwGetClipboardString((GLFWwindow*)user_data);
+}
+
+void LogicController::ImGui_ImplGlfwGL3_SetClipboardText(void* user_data, const char* text)
 {
-	glfwSetClipboardString((GLFWwindow*)user_data, text);
-};
-
-
+    glfwSetClipboardString((GLFWwindow*)user_data, text);
+}
